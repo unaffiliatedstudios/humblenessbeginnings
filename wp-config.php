@@ -58,6 +58,8 @@ define('FS_METHOD', 'direct');
  define('LOGGED_IN_SALT',   ':cHLDbTQ27}^M?GLOKs4Mry=@c$-3{ElNlK.hQiGO+@;%~%6x3K;TPW5x&XyVo9)');
  define('NONCE_SALT',       'Y[+yyv#a3aN,D45ae:~pVS$NCO4sXNJyXY+LC|%bO%D3~?vZ`2 dW%U^0Y}#NAbd');
 
+/* Updated 15 October to reestablish production settings
+
 /**
  * WordPress Database Table prefix.
  *

@@ -20,10 +20,10 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'wordpress_dev');
+define('DB_NAME', 'wordpress');
 
 /** MySQL database username */
-define('DB_USER', 'wordpressdev');
+define('DB_USER', 'wordpress');
 
 /** MySQL database password */
 define('DB_PASSWORD', 'W0RDPRE$$user504');
@@ -49,15 +49,14 @@ define('FS_METHOD', 'direct');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         '#rRJ9r s:F$_V*iB.MCT0Q:[]- `qp`7mEw6Im&7#+QB?99n%;]exF.wQM!8vgN!');
-define('SECURE_AUTH_KEY',  'r[A euaR<|bV,|gI1`n}jZa<1`,A^+HC7*_ua&$=A 8L;pOndUURQ#l>},|0++Mw');
-define('LOGGED_IN_KEY',    '9CIt^g(<NW8-Is>ap3rA|eGG~O1z86+|9_&8&NbUNC>O`].?6rA_*Z~TQz{u=G?|');
-define('NONCE_KEY',        '+LYC $<$8-S$)9^^5vdRmZDN~->/zy3yY}sOx=[l-x,iU/Y+||;|S} BTESKFaG,');
-define('AUTH_SALT',        'Dg-Vf. 8uL1Z6U-A=kX_&9nI1T4UCWTB2i#=yYQ%-<mq(z e[81r5}(!;fZ4Bbs4');
-define('SECURE_AUTH_SALT', 'BJ[n@bW)r&OILdGUBrbSL(Rr2APMM (J|&;?-O}`1I/+@!/%p&^#/$RJ+ZCxP~Af');
-define('LOGGED_IN_SALT',   ',p6+:9gD,.eT^V?FvAU C4CxAtMUt1eb0D_`ahFCo<mRl%Uqw)d%mAfS?#olnoh-');
-define('NONCE_SALT',       'g=0p#Es~){@iK]zF10V,A9&yv~9+u+s!R>u{kk6{POBQVN]{FA:=8%@Fuh|x7_cM');
-/**#@-*/
+ define('AUTH_KEY',         'uOAyzrEF|$#f%5.%j^^7`+7&!7_jp+9x@3d,I)+BZ:z-@8LS]i^qWQ<6zX]m1g|2');
+ define('SECURE_AUTH_KEY',  ':mLFBWE0*V`)ay^nWIS&< ;s-/QEI#mW`c_Y)`cuU7(|@@,`b<9Gelu7^hXGNb@Y');
+ define('LOGGED_IN_KEY',    'r|s$_qjc2467FT~~{.T_(~XELV$U*@8tOE]RK^A-!D m@-fy71xWy-Qq@oML|;Kn');
+ define('NONCE_KEY',        'vUBj(zdD._!J+ H|`iD|}r!|Pf+#&[}nXpk1vym2`KE/lo|qbM$jP@J;!:c(-FH;');
+ define('AUTH_SALT',        'dmA9j$p;4VWY.Rh&,WSHXJ_cC;7ox[>8F&Mg-G:u}w2m+W-4P^dHzEW$>+TIWfN?');
+ define('SECURE_AUTH_SALT', '^Z7gpk03!ERp[k%c1d^av&+).]{_-+#|_N]v3VXe XjgiXOft3rXq(pq:Bv5hSzs');
+ define('LOGGED_IN_SALT',   ':cHLDbTQ27}^M?GLOKs4Mry=@c$-3{ElNlK.hQiGO+@;%~%6x3K;TPW5x&XyVo9)');
+ define('NONCE_SALT',       'Y[+yyv#a3aN,D45ae:~pVS$NCO4sXNJyXY+LC|%bO%D3~?vZ`2 dW%U^0Y}#NAbd');
 
 /**
  * WordPress Database Table prefix.

@@ -1,0 +1,12 @@
+2018-10-04T15:53:53+00:00 CRITICAL Uncaught Error: Call to undefined function ecs_html_e() in /var/www/html/wp-content/themes/humblenessbeginnings/modules/content/content-none.php:13
+Stack trace:
+#0 /var/www/html/wp-includes/template.php(690): require()
+#1 /var/www/html/wp-includes/template.php(647): load_template('/var/www/html/w...', false)
+#2 /var/www/html/wp-includes/general-template.php(155): locate_template(Array, true, false)
+#3 /var/www/html/wp-content/themes/humblenessbeginnings/archive.php(40): get_template_part('modules/content...', 'none')
+#4 /var/www/html/wp-includes/template-loader.php(74): include('/var/www/html/w...')
+#5 /var/www/html/wp-blog-header.php(19): require_once('/var/www/html/w...')
+#6 /var/www/html/index.php(17): require('/var/www/html/w...')
+#7 {main}
+  thrown
+

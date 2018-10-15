@@ -59,6 +59,8 @@ define('FS_METHOD', 'direct');
  define('NONCE_SALT',       'HXZftj96C7Zu0xp`VhMB~9GhS+:hcaxyF6-A.C_m4G&(Q+|uQr !C}pprK;+Aw.M');
 /**#@-*/
 
+/* Updated 15 October 2018 to reestablish staging settings
+
 /**
  * WordPress Database Table prefix.
  *

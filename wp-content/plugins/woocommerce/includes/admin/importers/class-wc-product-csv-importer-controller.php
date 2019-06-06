@@ -91,7 +91,7 @@ class WC_Product_CSV_Importer_Controller {
 	 * @return bool
 	 */
 	public static function is_file_valid_csv( $file, $check_path = true ) {
-		if ( $check_path && apply_filters( 'woocommerce_product_csv_importer_check_import_file_path', true ) && 0 !== stripos( $file, ABSPATH ) ) {
+		if ( $check_path && apply_filters( 'woocommerce_product_csv_importer_check_import_file_path', true ) && false !== stripos( $file, '://' ) ) {
 			return false;
 		}
 
@@ -508,6 +508,7 @@ class WC_Product_CSV_Importer_Controller {
 					__( 'In stock?', 'woocommerce' )      => 'stock_status',
 					__( 'Stock', 'woocommerce' )          => 'stock_quantity',
 					__( 'Backorders allowed?', 'woocommerce' ) => 'backorders',
+					__( 'Low stock amount', 'woocommerce' ) => 'low_stock_amount',
 					__( 'Sold individually?', 'woocommerce' ) => 'sold_individually',
 					/* translators: %s: Weight unit */
 					sprintf( __( 'Weight (%s)', 'woocommerce' ), $weight_unit ) => 'weight',
@@ -673,6 +674,7 @@ class WC_Product_CSV_Importer_Controller {
 			'stock_status'       => __( 'In stock?', 'woocommerce' ),
 			'stock_quantity'     => _x( 'Stock', 'Quantity in stock', 'woocommerce' ),
 			'backorders'         => __( 'Backorders allowed?', 'woocommerce' ),
+			'low_stock_amount'   => __( 'Low stock amount', 'woocommerce' ),
 			'sold_individually'  => __( 'Sold individually?', 'woocommerce' ),
 			/* translators: %s: weight unit */
 			'weight'             => sprintf( __( 'Weight (%s)', 'woocommerce' ), $weight_unit ),

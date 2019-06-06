@@ -32,11 +32,44 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		const VENUE_POST_TYPE     = 'tribe_venue';
 		const ORGANIZER_POST_TYPE = 'tribe_organizer';
 
-		const VERSION             = '4.6.24.1';
-		const MIN_ADDON_VERSION   = '4.4';
-		const MIN_COMMON_VERSION  = '4.7.20';
+		const VERSION             = '4.8';
+
+		/**
+		 * Min Pro Addon
+		 *
+		 * @deprecated 4.8
+		 */
+		const MIN_ADDON_VERSION   = '4.6-dev';
+
+		/**
+		 * Min Common
+		 *
+		 * @deprecated 4.8
+		 */
+		const MIN_COMMON_VERSION  = '4.9-dev';
 
 		const WP_PLUGIN_URL       = 'https://wordpress.org/extend/plugins/the-events-calendar/';
+
+		/**
+		 * Min Version of WordPress
+		 *
+		 * @since 4.8
+		 */
+		protected $min_wordpress = '4.7';
+
+		/**
+		 * Min Version of PHP
+		 *
+		 * @since 4.8
+		 */
+		protected $min_php = '5.2.17';
+
+		/**
+		 * Min Version of Event Tickets
+		 *
+		 * @since 4.8
+		 */
+		protected $min_et_version = '4.10-dev';
 
 		/**
 		 * Maybe display data wrapper
@@ -48,7 +81,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 * Args for the event post type
 		 * @var array
 		 */
-		protected $postTypeArgs = array(
+		protected $post_type_args = array(
 			'public'          => true,
 			'rewrite'         => array( 'slug' => 'event', 'with_front' => false ),
 			'menu_position'   => 6,
@@ -90,12 +123,12 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 		public static $dotOrgSupportUrl = 'https://wordpress.org/support/plugin/the-events-calendar';
 
-		public $rewriteSlug = 'events';
+		public $rewriteSlug         = 'events';
 		public $rewriteSlugSingular = 'event';
-		public $category_slug = 'category';
-		public $tag_slug = 'tag';
-		public $monthSlug = 'month';
-		public $featured_slug = 'featured';
+		public $category_slug       = 'category';
+		public $tag_slug            = 'tag';
+		public $monthSlug           = 'month';
+		public $featured_slug       = 'featured';
 
 		/**
 		 * @deprecated 4.5.8 use `Tribe__Events__Pro__Main::instance()->all_slug` instead
@@ -121,11 +154,11 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 		// @todo remove in 4.0
 		public $upcomingSlug = 'upcoming';
-		public $pastSlug = 'past';
+		public $pastSlug     = 'past';
 
-		public $listSlug = 'list';
-		public $daySlug = 'day';
-		public $todaySlug = 'today';
+		public $listSlug               = 'list';
+		public $daySlug                = 'day';
+		public $todaySlug              = 'today';
 		protected $postExceptionThrown = false;
 
 		/**
@@ -245,6 +278,15 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		public static $tribeEventsMuDefaults;
 
 		/**
+		 * Where in the themes we will look for templates
+		 *
+		 * @since 4.7
+		 *
+		 * @var string
+		 */
+		public $template_namespace = 'events';
+
+		/**
 		 * Static Singleton Holder
 		 * @var self
 		 */
@@ -267,15 +309,13 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 */
 		protected function __construct() {
 			$this->plugin_file = TRIBE_EVENTS_FILE;
-			$this->pluginPath = $this->plugin_path = trailingslashit( dirname( $this->plugin_file ) );
-			$this->pluginDir  = $this->plugin_dir = trailingslashit( basename( $this->plugin_path ) );
-			$this->pluginUrl  = $this->plugin_url = str_replace( basename( $this->plugin_file ), '', plugins_url( basename( $this->plugin_file ), $this->plugin_file ) );
+			$this->pluginPath  = $this->plugin_path = trailingslashit( dirname( $this->plugin_file ) );
+			$this->pluginDir   = $this->plugin_dir = trailingslashit( basename( $this->plugin_path ) );
+			$this->pluginUrl   = $this->plugin_url = str_replace( basename( $this->plugin_file ), '', plugins_url( basename( $this->plugin_file ), $this->plugin_file ) );
 
-			// Set common lib information, needs to happen file load
-			$this->maybe_set_common_lib_info();
-
-			// let's initialize tec silly-early to avoid fatals with upgrades from 3.x to 4.x
+			// let's initialize tec
 			add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 0 );
+
 		}
 
 		/**
@@ -302,7 +342,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			$common_version = $matches[1];
 
 			/**
-			 * If we don't have a version of Common or an Older version of the Lib
+			 * If we don't have a version of Common or a Older version of the Lib
 			 * overwrite what should be loaded by the auto-loader
 			 */
 			if (
@@ -323,32 +363,57 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 * @return void
 		 */
 		public function plugins_loaded() {
+
+			// early check for an older version of Event Tickets to prevent fatal error
+			if (
+				class_exists( 'Tribe__Tickets__Main' ) &&
+				! version_compare( Tribe__Tickets__Main::VERSION, $this->min_et_version, '>=' )
+			) {
+				add_action( 'admin_notices', array( $this, 'compatibility_notice' ) );
+				add_action( 'network_admin_notices', array( $this, 'compatibility_notice' ) );
+				add_filter( 'tribe_ecp_to_run_or_not_to_run', array( $this, 'disable_pro' ) );
+
+				//Disable Older Versions of Community Events to Prevent Fatal Error
+				remove_action( 'plugins_loaded', 'Tribe_CE_Load', 2 );
+
+				return;
+			}
+
+			// WordPress and PHP Version Check
+			if ( ! self::supportedVersion( 'wordpress' ) || ! self::supportedVersion( 'php' ) ) {
+				add_action( 'admin_notices', array( $this, 'notSupportedError' ) );
+				return;
+			}
+
+			// Set common lib information, needs to happen file load
+			$this->maybe_set_common_lib_info();
+
 			/**
 			 * Before any methods from this plugin are called, we initialize our Autoloading
 			 * After this method we can use any `Tribe__` classes
 			 */
 			$this->init_autoloading();
 
-			// Safety check: if Tribe Common is not at a certain minimum version, bail out
-			if ( version_compare( Tribe__Main::VERSION, self::MIN_COMMON_VERSION, '<' ) ) {
-				return;
-			}
+			Tribe__Main::instance();
 
-			/**
-			 * We need Common to be able to load text domains correctly.
-			 * With that in mind we initialize Common passing the plugin Main class as the context
-			 */
+			add_action( 'tribe_common_loaded', array( $this, 'bootstrap' ), 0 );
+		}
+
+		/**
+		 * Load Text Domain on tribe_common_loaded as it requires common
+		 *
+		 * @since 4.8
+		 *
+		 */
+		public function bootstrap() {
+
 			Tribe__Main::instance( $this )->load_text_domain( 'the-events-calendar', $this->plugin_dir . 'lang/' );
 
-			if ( self::supportedVersion( 'wordpress' ) && self::supportedVersion( 'php' ) ) {
-				$this->bind_implementations();
-				$this->loadLibraries();
-				$this->addHooks();
-				$this->register_active_plugin();
-			} else {
-				// Either PHP or WordPress version is inadequate so we simply return an error.
-				add_action( 'admin_head', array( $this, 'notSupportedError' ) );
-			}
+			$this->bind_implementations();
+			$this->loadLibraries();
+			$this->addHooks();
+			$this->register_active_plugin();
+
 		}
 
 		/**
@@ -415,6 +480,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			tribe_register_provider( 'Tribe__Events__Aggregator__REST__V1__Service_Provider' );
 			tribe_register_provider( 'Tribe__Events__Aggregator__CLI__Service_Provider' );
 			tribe_register_provider( 'Tribe__Events__Aggregator__Processes__Service_Provider' );
+			tribe_register_provider( 'Tribe__Events__Editor__Provider' );
 
 			// Shortcodes
 			tribe_singleton( 'tec.shortcodes.event-details', 'Tribe__Events__Shortcode__Event_Details', array( 'hook' ) );
@@ -477,13 +543,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 * Registers this plugin as being active for other tribe plugins and extensions
 		 */
 		protected function register_active_plugin() {
-			if ( class_exists( 'Tribe__Dependency' ) ) {
-				Tribe__Dependency::instance()->add_active_plugin(
-					__CLASS__,
-					self::VERSION,
-					$this->plugin_file
-				);
-			}
+			$this->registered = new Tribe__Events__Plugin_Register();
 		}
 
 		/**
@@ -624,13 +684,6 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			add_action( 'tribe_settings_after_save', array( $this, 'flushRewriteRules' ) );
 
 			add_action( 'update_option_' . Tribe__Main::OPTIONNAME, array( $this, 'fix_all_day_events' ), 10, 2 );
-
-			// add-on compatibility
-			if ( is_multisite() ) {
-				add_action( 'network_admin_notices', array( $this, 'checkAddOnCompatibility' ) );
-			} else {
-				add_action( 'admin_notices', array( $this, 'checkAddOnCompatibility' ) );
-			}
 
 			add_action( 'wp_before_admin_bar_render', array( $this, 'add_toolbar_items' ), 10 );
 			add_action( 'all_admin_notices', array( $this, 'addViewCalendar' ) );
@@ -773,7 +826,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			$this->singular_event_label_lowercase             = tribe_get_event_label_singular_lowercase();
 			$this->plural_event_label_lowercase               = tribe_get_event_label_plural_lowercase();
 
-			$this->postTypeArgs['rewrite']['slug']            = $rewrite->prepare_slug( $this->rewriteSlugSingular, self::POSTTYPE, false );
+			$this->post_type_args['rewrite']['slug']            = $rewrite->prepare_slug( $this->rewriteSlugSingular, self::POSTTYPE, false );
 			$this->currentDay                                 = '';
 			$this->errors                                     = '';
 
@@ -844,9 +897,9 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 					'version'               => self::VERSION,
 					'plugin_path'           => $this->plugin_dir . 'the-events-calendar.php',
 					'version_history_slug'  => 'previous_ecp_versions',
-					'update_page_title'    => __( 'Welcome to The Events Calendar', 'the-events-calendar' ),
-					'update_page_template' => $this->plugin_path . 'src/admin-views/admin-update-message.php',
-					'welcome_page_title'    => __( 'Welcome to The Events Calendar', 'the-events-calendar' ),
+					'update_page_title'     => __( 'Welcome to The Events Calendar!', 'the-events-calendar' ),
+					'update_page_template'  => $this->plugin_path . 'src/admin-views/admin-update-message.php',
+					'welcome_page_title'    => __( 'Welcome to The Events Calendar!', 'the-events-calendar' ),
 					'welcome_page_template' => $this->plugin_path . 'src/admin-views/admin-welcome-message.php',
 				) );
 			}
@@ -1236,88 +1289,6 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		}
 
 		/**
-		 * Check add-ons to make sure they are supported by currently running TEC version.
-		 */
-		public function checkAddOnCompatibility() {
-
-			// Variable for storing output to admin notices.
-			$output = '';
-
-			// Array to store any plugins that are out of date.
-			$out_of_date_addons = array();
-
-			// Array to store all addons and their required CORE versions.
-			$tec_addons_required_versions = array();
-
-			// Is Core the thing that is out of date?
-			$tec_out_of_date = false;
-
-			// Get the addon information.
-			$tec_addons_required_versions = (array) apply_filters( 'tribe_tec_addons', $tec_addons_required_versions );
-
-			// Foreach addon, make sure that it is compatible with current version of core.
-			foreach ( $tec_addons_required_versions as $plugin ) {
-				// we're not going to check addons that we can't
-				if ( empty( $plugin['required_version'] ) || empty( $plugin['current_version'] ) ) {
-					continue;
-				}
-
-				// check if TEC is out of date
-				if ( version_compare( $plugin['required_version'], self::VERSION, '>' ) ) {
-					$tec_out_of_date = true;
-					break;
-				}
-
-				// check if the add-on is out of date
-				if ( version_compare( $plugin['current_version'], self::MIN_ADDON_VERSION, '<' ) ) {
-					// don't throw notices for the 4.2 legacy versions of Facebook and iCal
-					if (
-						(
-							false !== strpos( $plugin['plugin_dir_file'], 'the-events-calendar-facebook-importer.php' )
-							|| false !== strpos( $plugin['plugin_dir_file'], 'the-events-calendar-ical-importer.php' )
-						)
-						&& version_compare( $plugin['current_version'], '4.2', '>=' )
-					) {
-						continue;
-					}
-
-					$out_of_date_addons[] = $plugin['plugin_name'] . ' ' . $plugin['current_version'];
-				}
-			}
-			// If Core is out of date, generate the proper message.
-			if ( $tec_out_of_date == true ) {
-				$plugin_short_path = basename( dirname( dirname( __FILE__ ) ) ) . '/the-events-calendar.php';
-				$upgrade_path      = wp_nonce_url(
-					add_query_arg(
-						array(
-							'action' => 'upgrade-plugin',
-							'plugin' => $plugin_short_path,
-						), get_admin_url() . 'update.php'
-					), 'upgrade-plugin_' . $plugin_short_path
-				);
-				$output .= '<div class="error">';
-				$output .= '<p>' . sprintf( esc_html__( 'Your version of The Events Calendar is not up-to-date with one of your The Events Calendar add-ons. Please %supdate now.%s', 'the-events-calendar' ), '<a href="' . esc_url( $upgrade_path ) . '">', '</a>' ) . '</p>';
-				$output .= '</div>';
-			} elseif ( ! empty( $out_of_date_addons ) ) {
-				// Otherwise, if the addons are out of date, generate the proper messaging.
-				$output .= '<div class="error">';
-				$link = add_query_arg(
-					array(
-						'utm_campaign' => 'in-app',
-						'utm_medium'   => 'plugin-tec',
-						'utm_source'   => 'notice',
-						), self::$tecUrl . 'knowledgebase/version-compatibility/'
-				);
-				$output .= '<p>' . sprintf( esc_html__( 'The following plugins are out of date: %1$s. All add-ons contain dependencies on The Events Calendar and will not function properly unless paired with the right version. %2$sLearn More%3$s.', 'the-events-calendar' ), '<b>' . join( $out_of_date_addons, ', ' ) . '</b>', "<a href='" . esc_url( $link ) . "' target='_blank'>", '</a>' ) . '</p>';
-				$output .= '</div>';
-			}
-			// Make sure only to show the message if the user has the permissions necessary.
-			if ( current_user_can( 'edit_plugins' ) ) {
-				echo apply_filters( 'tribe_add_on_compatibility_errors', $output );
-			}
-		}
-
-		/**
 		 * Trigger is_404 on single event if no events are found
 		 */
 		public function template_redirect() {
@@ -1443,10 +1414,10 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			} else {
 				switch ( strtolower( $system ) ) {
 					case 'wordpress' :
-						$supported = version_compare( get_bloginfo( 'version' ), '3.0', '>=' );
+						$supported = version_compare( get_bloginfo( 'version' ), $this->min_wordpress, '>=' );
 						break;
 					case 'php' :
-						$supported = version_compare( phpversion(), '5.2', '>=' );
+						$supported = version_compare( phpversion(), $this->min_php, '>=' );
 						break;
 				}
 				$supported = apply_filters( 'tribe_events_supported_version', $supported, $system );
@@ -1461,11 +1432,57 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 */
 		public function notSupportedError() {
 			if ( ! self::supportedVersion( 'wordpress' ) ) {
-				echo '<div class="error"><p>' . sprintf( esc_html__( 'Sorry, The Events Calendar requires WordPress %s or higher. Please upgrade your WordPress install.', 'the-events-calendar' ), '3.0' ) . '</p></div>';
+				echo '<div class="error"><p>' . sprintf( esc_html__( 'Sorry, The Events Calendar requires WordPress %s or higher. Please upgrade your WordPress install.', 'the-events-calendar' ), $this->min_wordpress ) . '</p></div>';
 			}
 			if ( ! self::supportedVersion( 'php' ) ) {
-				echo '<div class="error"><p>' . sprintf( esc_html__( 'Sorry, The Events Calendar requires PHP %s or higher. Talk to your Web host about moving you to a newer version of PHP.', 'the-events-calendar' ), '5.2' ) . '</p></div>';
+				echo '<div class="error"><p>' . sprintf( esc_html__( 'Sorry, The Events Calendar requires PHP %s or higher. Talk to your Web host about moving you to a newer version of PHP.', 'the-events-calendar' ), $this->min_php ) . '</p></div>';
 			}
+		}
+
+		/**
+		 * Display Notice if Event Tickets is Running an Older Version
+		 *
+		 * @since 4.8
+		 *
+		 */
+		public function compatibility_notice() {
+
+			$mopath = $this->pluginDir . 'lang/';
+			$domain = 'the-events-calendar';
+
+			// If we don't have Common classes load the old fashioned way
+			if ( ! class_exists( 'Tribe__Main' ) ) {
+				load_plugin_textdomain( $domain, false, $mopath );
+			} else {
+				// This will load `wp-content/languages/plugins` files first
+				Tribe__Main::instance()->load_text_domain( $domain, $mopath );
+			}
+
+			$url = add_query_arg( array(
+				'tab'       => 'plugin-information',
+				'plugin'    => 'event-tickets',
+				'TB_iframe' => 'true',
+			), admin_url( 'plugin-install.php' ) );
+
+			echo '<div class="error"><p>'
+			. sprintf(
+				'%1s <a href="%2s" class="thickbox" title="%3s">%4s</a>.',
+				esc_html__( 'To continue using The Events Calendar, please install the latest version of', 'the-events-calendar' ),
+				esc_url( $url ),
+				esc_html__( 'Event Tickets', 'the-events-calendar' ),
+				esc_html__( 'Event Tickets', 'the-events-calendar' )
+				) .
+			'</p></div>';
+
+		}
+
+		/**
+		 * Disable Pro from Running if TEC shutsdown because Event Tickets is an older version
+		 *
+		 * @return bool
+		 */
+		public function disable_pro() {
+			return false;
 		}
 
 		/**
@@ -1628,7 +1645,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		public function registerPostType() {
 			$this->generatePostTypeLabels();
 
-			$post_type_args = $this->postTypeArgs;
+			$post_type_args = $this->post_type_args;
 
 			/**
 			 * Filter the event post type arguments used in register_post_type.
@@ -1756,17 +1773,22 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			 *
 			 * @var array
 			 */
-			$this->postTypeArgs['labels'] = apply_filters( 'tribe_events_register_event_post_type_labels', array(
-				'name'               => $this->plural_event_label,
-				'singular_name'      => $this->singular_event_label,
-				'add_new'            => esc_html__( 'Add New', 'the-events-calendar' ),
-				'add_new_item'       => sprintf( esc_html__( 'Add New %s', 'the-events-calendar' ), $this->singular_event_label ),
-				'edit_item'          => sprintf( esc_html__( 'Edit %s', 'the-events-calendar' ), $this->singular_event_label ),
-				'new_item'           => sprintf( esc_html__( 'New %s', 'the-events-calendar' ), $this->singular_event_label ),
-				'view_item'          => sprintf( esc_html__( 'View %s', 'the-events-calendar' ), $this->singular_event_label ),
-				'search_items'       => sprintf( esc_html__( 'Search %s', 'the-events-calendar' ), $this->plural_event_label ),
-				'not_found'          => sprintf( esc_html__( 'No %s found', 'the-events-calendar' ), $this->plural_event_label_lowercase ),
-				'not_found_in_trash' => sprintf( esc_html__( 'No %s found in Trash', 'the-events-calendar' ), $this->plural_event_label_lowercase ),
+			$this->post_type_args['labels'] = apply_filters( 'tribe_events_register_event_post_type_labels', array(
+				'name'                     => $this->plural_event_label,
+				'singular_name'            => $this->singular_event_label,
+				'add_new'                  => esc_html__( 'Add New', 'the-events-calendar' ),
+				'add_new_item'             => sprintf( esc_html__( 'Add New %s', 'the-events-calendar' ), $this->singular_event_label ),
+				'edit_item'                => sprintf( esc_html__( 'Edit %s', 'the-events-calendar' ), $this->singular_event_label ),
+				'new_item'                 => sprintf( esc_html__( 'New %s', 'the-events-calendar' ), $this->singular_event_label ),
+				'view_item'                => sprintf( esc_html__( 'View %s', 'the-events-calendar' ), $this->singular_event_label ),
+				'search_items'             => sprintf( esc_html__( 'Search %s', 'the-events-calendar' ), $this->plural_event_label ),
+				'not_found'                => sprintf( esc_html__( 'No %s found', 'the-events-calendar' ), $this->plural_event_label_lowercase ),
+				'not_found_in_trash'       => sprintf( esc_html__( 'No %s found in Trash', 'the-events-calendar' ), $this->plural_event_label_lowercase ),
+				'item_published'           => sprintf( esc_html__( '%s published.', 'the-events-calendar' ), $this->singular_event_label ),
+				'item_published_privately' => sprintf( esc_html__( '%s published privately.', 'the-events-calendar' ), $this->singular_event_label ),
+				'item_reverted_to_draft'   => sprintf( esc_html__( '%s reverted to draft.', 'the-events-calendar' ), $this->singular_event_label ),
+				'item_scheduled'           => sprintf( esc_html__( '%s scheduled.', 'the-events-calendar' ), $this->singular_event_label ),
+				'item_updated'             => sprintf( esc_html__( '%s updated.', 'the-events-calendar' ), $this->singular_event_label ),
 			) );
 
 			/**
@@ -2200,8 +2222,8 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			$tec = self::instance();
 
 			// reregister custom post type to make sure slugs are updated
-			$tec->postTypeArgs['rewrite']['slug'] = sanitize_title( $tec->getRewriteSlugSingular() );
-			register_post_type( self::POSTTYPE, apply_filters( 'tribe_events_register_event_type_args', $tec->postTypeArgs ) );
+			$tec->post_type_args['rewrite']['slug'] = sanitize_title( $tec->getRewriteSlugSingular() );
+			register_post_type( self::POSTTYPE, apply_filters( 'tribe_events_register_event_type_args', $tec->post_type_args ) );
 
 			add_action( 'shutdown', 'flush_rewrite_rules' );
 		}
@@ -2722,7 +2744,19 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 			self::instance()->plugins_loaded();
 
+			//check if class is available before continuing
+			if ( ! class_exists( 'Tribe__Settings_Manager' ) ) {
+				return;
+			}
+
 			self::flushRewriteRules();
+
+			if ( ! class_exists( 'Tribe__Events__Editor__Compatibility' ) ) {
+				require_once dirname( __FILE__ ) . '/Editor/Compatibility.php';
+			}
+
+			$editor_compatibility = new Tribe__Events__Editor__Compatibility();
+			$editor_compatibility->deactivate_gutenberg_extension_plugin();
 
 			if ( ! is_network_admin() && ! isset( $_GET['activate-multi'] ) ) {
 				set_transient( '_tribe_events_activation_redirect', 1, 30 );
@@ -2736,6 +2770,21 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 * @param bool $network_deactivating
 		 */
 		public static function deactivate( $network_deactivating ) {
+
+			// We cannot run deactivation logic because the tribe-common loaded is not compatible.
+			if ( ! class_exists( 'Tribe__Abstract_Deactivation' ) ) {
+				return;
+			}
+
+			/**
+			 * If Deactivation Class not found manually load all classes to deactivate
+			 */
+			if ( ! class_exists( 'Tribe__Events__Deactivation' ) ) {
+				require_once dirname( __FILE__ ) . '/Capabilities.php';
+				require_once dirname( __FILE__ ) . '/Aggregator/Records.php';
+				require_once dirname( __FILE__ ) . '/Deactivation.php';
+			}
+
 			$deactivation = new Tribe__Events__Deactivation( $network_deactivating );
 			add_action( 'shutdown', array( $deactivation, 'deactivate' ) );
 		}
@@ -3187,7 +3236,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			global $post;
 			$options = '';
 			$style   = '';
-			$event    = $post;
+			$event   = $post;
 
 			if ( $post->post_type == Tribe__Events__Venue::POSTTYPE ) {
 
@@ -3414,7 +3463,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 				'normal',
 				'high',
 				array(
-					'__back_compat_meta_box' => true,
+					'__back_compat_meta_box' => tribe( 'tec.gutenberg' )->should_display() || ! class_exists( 'Tribe__Events__Pro__Main' ),
 				)
 			);
 
@@ -3927,7 +3976,6 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 				return;
 			}
 
-			$current_hidden_boxes = array();
 			$current_hidden_boxes = get_user_option( 'metaboxhidden_nav-menus', $user_id );
 
 			if ( $array_key = array_search( 'add-' . self::POSTTYPE, $current_hidden_boxes ) ) {
@@ -4794,6 +4842,155 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			// In some cases, one must clear the _EventOrganizerID before it's regenerated.
 			if ( $delete_meta ) {
 				delete_post_meta( $event_id, '_EventOrganizerID' );
+			}
+		}
+
+		/**
+		 * Fetches and verify if we had a delayed activation
+		 *
+		 * @deprecated 4.8
+		 *
+		 * @since  4.7
+		 *
+		 * @return boolean [description]
+		 */
+		public function is_delayed_activation() {
+			_deprecated_function(
+				__METHOD__,
+				'',
+				'4.8'
+			);
+
+			return (bool) get_transient( $this->key_delayed_activation_outdated_common );
+		}
+
+		/**
+		 * Checks if currently loaded Common Lib version is incompatible with The Events Calendar
+		 * Sets a transient flag for us to be able to trigger plugin activation hooks on a later request
+		 *
+		 * @deprecated 4.8
+		 *
+		 * @since  4.7
+		 *
+		 * @return bool
+		 */
+		public function maybe_delay_activation_if_outdated_common() {
+			_deprecated_function(
+				__METHOD__,
+				'',
+				'4.8'
+			);
+
+			// Only if Common is loaded correctly
+			if ( ! class_exists( 'Tribe__Main' ) ) {
+				return false;
+			}
+
+			$common_version = Tribe__Main::VERSION;
+
+			// We need tribe-common-info to be loaded to test
+			if ( empty( $GLOBALS['tribe-common-info'] ) ) {
+				return false;
+			}
+
+			// Only when this common lib is newer than the loaded one on activation we bail
+			if ( ! version_compare( $GLOBALS['tribe-common-info']['version'], $common_version, '>' ) ) {
+				return false;
+			}
+
+			// Set a transient forever to flag delayed activation
+			set_transient( $this->key_delayed_activation_outdated_common, 1, 0 );
+
+			return true;
+		}
+
+		/**
+		 * Check add-ons to make sure they are supported by currently running TEC version.
+		 *
+		 * @deprecated 4.8
+		 *
+		 */
+		public function checkAddOnCompatibility() {
+			_deprecated_function(
+				__METHOD__,
+				'Use Tribe__Dependency Class instead.',
+				'4.8'
+			);
+
+			// Variable for storing output to admin notices.
+			$output = '';
+
+			// Array to store any plugins that are out of date.
+			$out_of_date_addons = array();
+
+			// Array to store all addons and their required CORE versions.
+			$tec_addons_required_versions = array();
+
+			// Is Core the thing that is out of date?
+			$tec_out_of_date = false;
+
+			// Get the addon information.
+			$tec_addons_required_versions = (array) apply_filters( 'tribe_tec_addons', $tec_addons_required_versions );
+
+			// Foreach addon, make sure that it is compatible with current version of core.
+			foreach ( $tec_addons_required_versions as $plugin ) {
+				// we're not going to check addons that we can't
+				if ( empty( $plugin['required_version'] ) || empty( $plugin['current_version'] ) ) {
+					continue;
+				}
+
+				// check if TEC is out of date
+				if ( version_compare( $plugin['required_version'], self::VERSION, '>' ) ) {
+					$tec_out_of_date = true;
+					break;
+				}
+
+				// check if the add-on is out of date
+				if ( version_compare( $plugin['current_version'], self::MIN_ADDON_VERSION, '<' ) ) {
+					// don't throw notices for the 4.2 legacy versions of Facebook and iCal
+					if (
+						(
+							false !== strpos( $plugin['plugin_dir_file'], 'the-events-calendar-facebook-importer.php' )
+							|| false !== strpos( $plugin['plugin_dir_file'], 'the-events-calendar-ical-importer.php' )
+						)
+						&& version_compare( $plugin['current_version'], '4.2', '>=' )
+					) {
+						continue;
+					}
+
+					$out_of_date_addons[] = $plugin['plugin_name'] . ' ' . $plugin['current_version'];
+				}
+			}
+			// If Core is out of date, generate the proper message.
+			if ( $tec_out_of_date == true ) {
+				$plugin_short_path = basename( dirname( dirname( __FILE__ ) ) ) . '/the-events-calendar.php';
+				$upgrade_path      = wp_nonce_url(
+					add_query_arg(
+						array(
+							'action' => 'upgrade-plugin',
+							'plugin' => $plugin_short_path,
+						), get_admin_url() . 'update.php'
+					), 'upgrade-plugin_' . $plugin_short_path
+				);
+				$output .= '<div class="error">';
+				$output .= '<p>' . sprintf( esc_html__( 'Your version of The Events Calendar is not up-to-date with one of your The Events Calendar add-ons. Please %supdate now.%s', 'the-events-calendar' ), '<a href="' . esc_url( $upgrade_path ) . '">', '</a>' ) . '</p>';
+				$output .= '</div>';
+			} elseif ( ! empty( $out_of_date_addons ) ) {
+				// Otherwise, if the addons are out of date, generate the proper messaging.
+				$output .= '<div class="error">';
+				$link = add_query_arg(
+					array(
+						'utm_campaign' => 'in-app',
+						'utm_medium'   => 'plugin-tec',
+						'utm_source'   => 'notice',
+						), self::$tecUrl . 'knowledgebase/version-compatibility/'
+				);
+				$output .= '<p>' . sprintf( esc_html__( 'The following plugins are out of date: %1$s. All add-ons contain dependencies on The Events Calendar and will not function properly unless paired with the right version. %2$sLearn More%3$s.', 'the-events-calendar' ), '<b>' . join( $out_of_date_addons, ', ' ) . '</b>', "<a href='" . esc_url( $link ) . "' target='_blank'>", '</a>' ) . '</p>';
+				$output .= '</div>';
+			}
+			// Make sure only to show the message if the user has the permissions necessary.
+			if ( current_user_can( 'edit_plugins' ) ) {
+				echo apply_filters( 'tribe_add_on_compatibility_errors', $output );
 			}
 		}
 

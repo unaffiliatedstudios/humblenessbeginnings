@@ -1,0 +1,286 @@
+[
+    {
+        "name": "analog/analog",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/codeneric/analog.git",
+            "reference": "8d815c65ea918240406c618d4c2808f03984a654"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/codeneric/analog/zipball/8d815c65ea918240406c618d4c2808f03984a654",
+            "reference": "8d815c65ea918240406c618d4c2808f03984a654",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "psr/log": "1.*"
+        },
+        "time": "2018-04-28T11:51:26+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Analog": "lib/"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Johnny Broadway",
+                "email": "johnny@johnnybroadway.com",
+                "homepage": "http://www.johnnybroadway.com/"
+            }
+        ],
+        "description": "PHP logging class that can be extended via closures. Includes several pre-built handlers including file, mail, syslog, HTTP post, and MongoDB.",
+        "homepage": "https://github.com/jbroadway/analog",
+        "keywords": [
+            "alerts",
+            "debug",
+            "debugging",
+            "error",
+            "log",
+            "logger",
+            "logging",
+            "syslog"
+        ],
+        "support": {
+            "source": "https://github.com/codeneric/analog/tree/master"
+        }
+    },
+    {
+        "name": "arvenil/ninja-mutex",
+        "version": "0.6.0",
+        "version_normalized": "0.6.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/arvenil/ninja-mutex.git",
+            "reference": "8c0f5d10f8fb1481b9d98488dbbe2bf84c2e1a25"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/arvenil/ninja-mutex/zipball/8c0f5d10f8fb1481b9d98488dbbe2bf84c2e1a25",
+            "reference": "8c0f5d10f8fb1481b9d98488dbbe2bf84c2e1a25",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "codeclimate/php-test-reporter": "0.1.*",
+            "ext-memcache": "*",
+            "ext-memcached": "*",
+            "ext-pdo_mysql": "*",
+            "ext-redis": "*",
+            "mikey179/vfsstream": "1.4.* || 1.5.*",
+            "predis/predis": "1.0.*",
+            "scrutinizer/ocular": "1.1.*"
+        },
+        "suggest": {
+            "ext-memcache": "Create mutex using memcache extension",
+            "ext-memcached": "Create mutex using memcached extension",
+            "ext-pdo_mysql": "Create mutex using MySql",
+            "predis/predis": "Create mutex using Predis (client library for Redis)"
+        },
+        "time": "2016-05-31T13:47:32+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "NinjaMutex": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Kamil Dziedzic",
+                "email": "arvenil@klecza.pl"
+            }
+        ],
+        "description": "Simple to use mutex implementation that can use flock, memcache, memcached, mysql or redis for locking",
+        "homepage": "https://github.com/arvenil/ninja-mutex",
+        "keywords": [
+            "flock",
+            "lock",
+            "locking",
+            "memcache",
+            "memcached",
+            "mutex",
+            "mysql",
+            "redis"
+        ]
+    },
+    {
+        "name": "justinrainbow/json-schema",
+        "version": "5.2.7",
+        "version_normalized": "5.2.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/justinrainbow/json-schema.git",
+            "reference": "8560d4314577199ba51bf2032f02cd1315587c23"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/8560d4314577199ba51bf2032f02cd1315587c23",
+            "reference": "8560d4314577199ba51bf2032f02cd1315587c23",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "friendsofphp/php-cs-fixer": "^2.1",
+            "json-schema/json-schema-test-suite": "1.2.0",
+            "phpunit/phpunit": "^4.8.35"
+        },
+        "time": "2018-02-14T22:26:30+00:00",
+        "bin": [
+            "bin/validate-json"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "5.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "JsonSchema\\": "src/JsonSchema/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Bruno Prieto Reis",
+                "email": "bruno.p.reis@gmail.com"
+            },
+            {
+                "name": "Justin Rainbow",
+                "email": "justin.rainbow@gmail.com"
+            },
+            {
+                "name": "Igor Wiedler",
+                "email": "igor@wiedler.ch"
+            },
+            {
+                "name": "Robert Schönthal",
+                "email": "seroscho@googlemail.com"
+            }
+        ],
+        "description": "A library to validate a json schema.",
+        "homepage": "https://github.com/justinrainbow/json-schema",
+        "keywords": [
+            "json",
+            "schema"
+        ]
+    },
+    {
+        "name": "psr/log",
+        "version": "1.0.2",
+        "version_normalized": "1.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/log.git",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-10-10T12:19:37+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Log\\": "Psr/Log/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for logging libraries",
+        "homepage": "https://github.com/php-fig/log",
+        "keywords": [
+            "log",
+            "psr",
+            "psr-3"
+        ]
+    },
+    {
+        "name": "studio24/rotate",
+        "version": "v1.0.0",
+        "version_normalized": "1.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/studio24/rotate.git",
+            "reference": "15ee04c5c0e5e806291190a7e21b9bd51671e858"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/studio24/rotate/zipball/15ee04c5c0e5e806291190a7e21b9bd51671e858",
+            "reference": "15ee04c5c0e5e806291190a7e21b9bd51671e858",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^5.2"
+        },
+        "time": "2016-04-08T12:22:59+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "studio24\\Rotate\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Simon R Jones",
+                "email": "simon@studio24.net",
+                "homepage": "http://simonrjones.net",
+                "role": "Developer"
+            }
+        ],
+        "description": "File rotation utility which rotates and removes old files",
+        "homepage": "https://github.com/studio24/rotate",
+        "keywords": [
+            "delete files",
+            "logrotate",
+            "rotate"
+        ]
+    }
+]

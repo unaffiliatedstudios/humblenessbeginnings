@@ -10,54 +10,54 @@ namespace codeneric\phmm\base\includes {
       $clientIDs = Client::get_all_ids();
       foreach ($clientIDs as $id) {
         $projectIDs = Client::get_project_ids($id);
-        if (\hacklib_cast_as_boolean(in_array($projectID, $projectIDs))) {
+        if (\hacklib_cast_as_boolean(\in_array($projectID, $projectIDs))) {
           return true;
         }
       }
       return false;
     }
     public static function save_project($id, $project) {
-      update_post_meta(
+      \update_post_meta(
         $id,
         "version",
         Configuration::get()[\hacklib_id("version")]
       );
-      update_post_meta($id, "gallery", $project[\hacklib_id("gallery")]);
-      update_post_meta(
+      \update_post_meta($id, "gallery", $project[\hacklib_id("gallery")]);
+      \update_post_meta(
         $id,
         "protection",
         $project[\hacklib_id("protection")]
       );
-      update_post_meta(
+      \update_post_meta(
         $id,
         "post_password",
         $project[\hacklib_id("protection")][\hacklib_id("password")]
       );
       if (!\hacklib_cast_as_boolean(
-            is_null($project[\hacklib_id("thumbnail")])
+            \is_null($project[\hacklib_id("thumbnail")])
           )) {
-        update_post_meta(
+        \update_post_meta(
           $id,
           "thumbnail",
           $project[\hacklib_id("thumbnail")]
         );
       }
       if (\hacklib_cast_as_boolean(
-            is_null($project[\hacklib_id("thumbnail")])
+            \is_null($project[\hacklib_id("thumbnail")])
           ) &&
           (!\hacklib_cast_as_boolean(
-             is_null(self::get_meta_thumbnail($id))
+             \is_null(self::get_meta_thumbnail($id))
            ))) {
-        delete_post_meta($id, "thumbnail");
+        \delete_post_meta($id, "thumbnail");
       }
-      update_post_meta(
+      \update_post_meta(
         $id,
         "configuration",
         $project[\hacklib_id("configuration")]
       );
     }
     public static function get_all_ids() {
-      $projectIDs = get_posts(
+      $projectIDs = \get_posts(
         array(
           "post_type" => Configuration::get()[\hacklib_id(
             "project_post_type"
@@ -75,25 +75,25 @@ namespace codeneric\phmm\base\includes {
       return $projectIDs;
     }
     public static function get_content($id) {
-      $post = get_post($id);
+      $post = \get_post($id);
       \HH\invariant(
-        !\hacklib_cast_as_boolean(is_null($post)),
+        !\hacklib_cast_as_boolean(\is_null($post)),
         "%s",
         new Error("get_post did not return a post")
       );
       $content = $post->post_content;
-      $content = apply_filters("the_content", $content);
-      return str_replace("]]>", "]]&gt;", $content);
+      $content = \apply_filters("the_content", $content);
+      return \str_replace("]]>", "]]&gt;", $content);
     }
     private static function get_gallery_for_dashboard($id) {
       $IDs = self::get_gallery_image_ids($id);
       $map = function($i) {
         return \codeneric\phmm\base\includes\Image::get_image($i, false);
       };
-      $imgs = array_map($map, $IDs);
+      $imgs = \array_map($map, $IDs);
       $res = array();
       foreach ($imgs as $i) {
-        if (!\hacklib_cast_as_boolean(is_null($i))) {
+        if (!\hacklib_cast_as_boolean(\is_null($i))) {
           $res[] = $i;
         }
       }
@@ -111,7 +111,7 @@ namespace codeneric\phmm\base\includes {
             true,
             $query_args
           );
-          if (!\hacklib_cast_as_boolean(is_null($image))) {
+          if (!\hacklib_cast_as_boolean(\is_null($image))) {
             $preloaded[] = $image;
           }
         }
@@ -120,7 +120,7 @@ namespace codeneric\phmm\base\includes {
     }
     public static function get_thumbnail($id, $withMinithumb = true) {
       \HH\invariant(
-        get_post_type($id) ===
+        \get_post_type($id) ===
         Configuration::get()[\hacklib_id("project_post_type")],
         "%s",
         new Error("Given ID must be of post project post type")
@@ -128,25 +128,25 @@ namespace codeneric\phmm\base\includes {
       $raw =
         Utils::get_post_meta_ONLY_USE_IN_HELPER_FUNCTIONS($id, "thumbnail");
       $query_args = array("project_id" => $id);
-      if (!\hacklib_cast_as_boolean(is_null($raw))) {
+      if (!\hacklib_cast_as_boolean(\is_null($raw))) {
         $thumbnailID = (int) $raw;
         $image = Image::get_image($thumbnailID, $withMinithumb, $query_args);
-        if ((!\hacklib_cast_as_boolean(is_null($image))) &&
+        if ((!\hacklib_cast_as_boolean(\is_null($image))) &&
             ($image[\hacklib_id("error")] !== true)) {
           return $image;
         }
       }
       $IDs = self::get_gallery_image_ids($id);
-      if (count($IDs) > 0) {
+      if (\count($IDs) > 0) {
         $firstImage = $IDs[0];
         $image =
           Image::get_image((int) $firstImage, $withMinithumb, $query_args);
-        if ((!\hacklib_cast_as_boolean(is_null($image))) &&
+        if ((!\hacklib_cast_as_boolean(\is_null($image))) &&
             ($image[\hacklib_id("error")] !== true)) {
           return $image;
         }
       }
-      $defaultIDString = get_option(
+      $defaultIDString = \get_option(
         Configuration::get()[\hacklib_id("default_thumbnail_id_option_key")],
         null
       );
@@ -158,7 +158,7 @@ namespace codeneric\phmm\base\includes {
     }
     public static function get_configuration($id) {
       \HH\invariant(
-        get_post_type($id) ===
+        \get_post_type($id) ===
         Configuration::get()[\hacklib_id("project_post_type")],
         "%s",
         new Error("Given ID must be of post project post type")
@@ -169,7 +169,7 @@ namespace codeneric\phmm\base\includes {
       );
       if (\hacklib_cast_as_boolean(is_array($raw))) {
         $configuration =
-          array_merge(self::getDefaultProjectConfiguration(), $raw);
+          \array_merge(self::getDefaultProjectConfiguration(), $raw);
       } else {
         $configuration = self::getDefaultProjectConfiguration();
       }
@@ -177,20 +177,20 @@ namespace codeneric\phmm\base\includes {
       return $data;
     }
     public static function get_title($id) {
-      $post = get_post($id);
-      if (\hacklib_cast_as_boolean(is_null($post))) {
+      $post = \get_post($id);
+      if (\hacklib_cast_as_boolean(\is_null($post))) {
         return null;
       }
       return (string) $post->post_title;
     }
     public static function get_title_with_id_default($id) {
       $maybe = self::get_title($id);
-      return \hacklib_cast_as_boolean(is_null($maybe)) ? ("#".$id) : $maybe;
+      return \hacklib_cast_as_boolean(\is_null($maybe)) ? ("#".$id) : $maybe;
     }
-    private static function get_meta_thumbnail($id) {
+    public static function get_meta_thumbnail($id) {
       $raw =
         Utils::get_post_meta_ONLY_USE_IN_HELPER_FUNCTIONS($id, "thumbnail");
-      if (!\hacklib_cast_as_boolean(is_null($raw))) {
+      if (!\hacklib_cast_as_boolean(\is_null($raw))) {
         return (int) $raw;
       }
       return null;
@@ -201,7 +201,7 @@ namespace codeneric\phmm\base\includes {
       if (!\hacklib_cast_as_boolean(is_array($gallery))) {
         $gallery = array();
       }
-      return array_map(
+      return \array_map(
         function($ID) {
           if (\hacklib_cast_as_boolean(is_string($ID))) {
             return (int) $ID;
@@ -213,11 +213,13 @@ namespace codeneric\phmm\base\includes {
       );
     }
     public static function get_default_protection() {
-      return array(
+      $r = array(
         "password_protection" => false,
         "private" => false,
-        "password" => null
+        "password" => null,
+        "registration" => null
       );
+      return $r;
     }
     public static function get_protection($id) {
       $raw =
@@ -238,7 +240,7 @@ namespace codeneric\phmm\base\includes {
       foreach ($IDs as $index => $ID) {
         $image =
           \codeneric\phmm\base\includes\Image::get_image($ID, $minithumbs);
-        if (!\hacklib_cast_as_boolean(is_null($image))) {
+        if (!\hacklib_cast_as_boolean(\is_null($image))) {
           $res[] = $image;
         }
       }
@@ -249,10 +251,10 @@ namespace codeneric\phmm\base\includes {
       $thumbID = self::get_meta_thumbnail($id);
       $project = array(
         "gallery" =>
-          \hacklib_cast_as_boolean(is_null($gallery)) ? array() : $gallery,
+          \hacklib_cast_as_boolean(\is_null($gallery)) ? array() : $gallery,
         "id" => $id,
         "thumbnail" =>
-          \hacklib_cast_as_boolean(is_null($thumbID))
+          \hacklib_cast_as_boolean(\is_null($thumbID))
             ? null
             : Image::get_image($thumbID, true),
         "pwd" => null,
@@ -264,13 +266,13 @@ namespace codeneric\phmm\base\includes {
     public static function get_project_for_frontend($id, $clientID = null) {
       $gallery = self::get_gallery_for_frontend($id, 10);
       $clientConfig = null;
-      if (!\hacklib_cast_as_boolean(is_null($clientID))) {
+      if (!\hacklib_cast_as_boolean(\is_null($clientID))) {
         $clientConfig = Client::get_project_configuration($clientID, $id);
       }
       $download_base_url = "";
-      $wp_upload_dir = wp_upload_dir();
+      $wp_upload_dir = \wp_upload_dir();
       if (\hacklib_cast_as_boolean(
-            array_key_exists("baseurl", $wp_upload_dir)
+            \array_key_exists("baseurl", $wp_upload_dir)
           )) {
         $download_base_url =
           $wp_upload_dir[\hacklib_id("baseurl")]."/photography_management/";
@@ -284,7 +286,7 @@ namespace codeneric\phmm\base\includes {
               "id" => (string) InternalLabelID::Favorites,
               "images" =>
                 Labels::get_set(
-                  \hacklib_cast_as_boolean(is_null($clientID))
+                  \hacklib_cast_as_boolean(\is_null($clientID))
                     ? 0
                     : $clientID,
                   $id,
@@ -299,13 +301,13 @@ namespace codeneric\phmm\base\includes {
             array()
           ),
         "gallery" =>
-          \hacklib_cast_as_boolean(is_null($gallery))
+          \hacklib_cast_as_boolean(\is_null($gallery))
             ? array("order" => array(), "preloaded" => array())
             : $gallery,
         "id" =>
           $id,
         "configuration" =>
-          \hacklib_cast_as_boolean(is_null($clientConfig))
+          \hacklib_cast_as_boolean(\is_null($clientConfig))
             ? self::get_configuration($id)
             : $clientConfig,
         "download_base_url" =>
@@ -332,7 +334,7 @@ namespace codeneric\phmm\base\includes {
     ) {
       $batches =
         self::partition_gallery_into_batches($project_id, $mode, $client_id);
-      return count($batches);
+      return \count($batches);
     }
     public static function partition_gallery_into_batches(
       $project_id,
@@ -343,14 +345,14 @@ namespace codeneric\phmm\base\includes {
       $files = array();
       if ($mode === "zip-favs") {
         \HH\invariant(
-          !\hacklib_cast_as_boolean(is_null($client_id)),
+          !\hacklib_cast_as_boolean(\is_null($client_id)),
           "%s",
           new Error("client_id has to be specified for favs mode!")
         );
         $gallery = self::get_favorites($project_id, $client_id);
       }
       foreach ($gallery as $attach_id) {
-        $files[] = get_attached_file($attach_id);
+        $files[] = \get_attached_file($attach_id);
       }
       return self::partition_files_into_batches($files);
     }
@@ -362,7 +364,7 @@ namespace codeneric\phmm\base\includes {
       $patches = array(array());
       $patch_index = 0;
       foreach ($file_paths as $i => $path) {
-        $file_size = filesize($path);
+        $file_size = \filesize($path);
         if (($curr_part_size + $file_size) < $max_part_size) {
           $curr_part_size += $file_size;
         } else {
@@ -383,11 +385,32 @@ namespace codeneric\phmm\base\includes {
       $batches =
         self::partition_gallery_into_batches($project_id, $mode, $client_id);
       \HH\invariant(
-        count($batches) > $batch,
+        \count($batches) > $batch,
         "%s",
         new Error("batch is out of bound!")
       );
       return $batches[$batch];
+    }
+    public static function get_project_titles_by_registration_code($code) {
+      $ids = self::get_all_ids();
+      $titles = array();
+      foreach ($ids as $id) {
+        $protection = self::get_protection($id);
+        $registration = $protection[\hacklib_id("registration")];
+        if (!\hacklib_cast_as_boolean(\is_null($registration))) {
+          $enabled = $registration[\hacklib_id("enabled")];
+          if (\hacklib_cast_as_boolean($enabled)) {
+            $codes =
+              $registration[\hacklib_id("registration_codes")][\hacklib_id(
+                "codes"
+              )];
+            if (\hacklib_cast_as_boolean(\in_array($code, $codes))) {
+              $titles[] = self::get_title_with_id_default($id);
+            }
+          }
+        }
+      }
+      return $titles;
     }
   }
 }

@@ -1,15 +1,7 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Uri\Retrievers;
 
-use JsonSchema\Exception\ResourceNotFoundException;
+use \JsonSchema\Exception\ResourceNotFoundException;
 
 /**
  * Tries to retrieve JSON schemas from a URI using file_get_contents()
@@ -66,7 +58,7 @@ class FileGetContents extends AbstractRetriever
      *
      * @return bool Whether the Content-Type header was found or not
      */
-    private function fetchContentType(array $headers)
+    private function fetchContentType($headers)
     {
         foreach ($headers as $header) {
             if ($this->contentType = self::getContentTypeMatchInHeader($header)) {

@@ -459,4 +459,34 @@ namespace codeneric\phmm\validate {
     );
     return $d;
   }
+  function get_project_titles_by_registration_code($data) {
+    $func = function($data) {
+      list($d, $v) = Handler::validate(
+        $data,
+        "get_project_titles_by_registration_code.json"
+      );
+      return /* UNSAFE_EXPR */ array($d, $v);
+    };
+    list($d, $v) = $func($data);
+    \HH\invariant(
+      $v->isValid(),
+      "%s",
+      new Error("Params are not valid!", $v->getErrors())
+    );
+    return $d;
+  }
+  function deactivation_survey_POST($data) {
+    $func = function($data) {
+      list($d, $v) =
+        Handler::validate($data, "deactivation_survey_POST.json");
+      return /* UNSAFE_EXPR */ array($d, $v);
+    };
+    list($d, $v) = $func($data);
+    \HH\invariant(
+      $v->isValid(),
+      "%s",
+      new Error("Params are not valid!", $v->getErrors())
+    );
+    return $d;
+  }
 }

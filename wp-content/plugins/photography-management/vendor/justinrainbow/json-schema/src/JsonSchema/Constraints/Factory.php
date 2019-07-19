@@ -1,20 +1,12 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Exception\InvalidArgumentException;
-use JsonSchema\SchemaStorage;
-use JsonSchema\SchemaStorageInterface;
-use JsonSchema\Uri\UriRetriever;
-use JsonSchema\UriRetrieverInterface;
-use JsonSchema\Validator;
+use \JsonSchema\Exception\InvalidArgumentException;
+use \JsonSchema\SchemaStorage;
+use \JsonSchema\SchemaStorageInterface;
+use \JsonSchema\Uri\UriRetriever;
+use \JsonSchema\UriRetrieverInterface;
+use \JsonSchema\Validator;
 
 /**
  * Factory for centralize constraint initialization.
@@ -74,8 +66,8 @@ class Factory
      * @param int                   $checkMode
      */
     public function __construct(
-        SchemaStorageInterface $schemaStorage = null,
-        UriRetrieverInterface $uriRetriever = null,
+$schemaStorage = null,
+$uriRetriever = null,
         $checkMode = Constraint::CHECK_MODE_NORMAL
     ) {
         // set provided config options

@@ -1,8 +1,8 @@
 <?php
 
-use studio24\Rotate\Rotate;
-use studio24\Rotate\Delete;
-use studio24\Rotate\DirectoryIterator;
+use \studio24\Rotate\Rotate;
+use \studio24\Rotate\Delete;
+use \studio24\Rotate\DirectoryIterator;
 
 class RotateTest extends PHPUnit_Framework_TestCase
 {
@@ -235,7 +235,7 @@ class RotateTest extends PHPUnit_Framework_TestCase
         chdir($this->dir . '/files');
 
         $rotate = new Delete('*');
-        $files = $rotate->deleteByCallback(function(DirectoryIterator $file) {
+        $files = $rotate->deleteByCallback(function($file) {
             if ($file->getExtension() == 'pdf' && $file->getBasename() > 2) {
                 return true;
             }

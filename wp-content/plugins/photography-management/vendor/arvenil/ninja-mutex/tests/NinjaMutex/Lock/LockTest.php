@@ -1,18 +1,10 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex\Lock;
 
-use NinjaMutex\AbstractTest;
-use NinjaMutex\Lock\Fabric\LockFabricWithExpirationInterface;
-use NinjaMutex\Mock\PermanentServiceInterface;
-use NinjaMutex\UnrecoverableMutexException;
+use \NinjaMutex\AbstractTest;
+use \NinjaMutex\Lock\Fabric\LockFabricWithExpirationInterface;
+use \NinjaMutex\Mock\PermanentServiceInterface;
+use \NinjaMutex\UnrecoverableMutexException;
 
 /**
  * Tests for Locks
@@ -25,7 +17,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testDisallowToAcquireSelfOwnedLock(LockInterface $lockImplementor)
+    public function testDisallowToAcquireSelfOwnedLock($lockImplementor)
     {
         $name = 'forfiter';
         $lockImplementor->acquireLock($name, 0);
@@ -39,7 +31,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testDisallowToAcquireLockOwnedByOtherLockImplementor(LockInterface $lockImplementor)
+    public function testDisallowToAcquireLockOwnedByOtherLockImplementor($lockImplementor)
     {
         $name = 'forfiter';
         $duplicateLockImplementor = clone $lockImplementor;
@@ -54,7 +46,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testDisallowLockImplementorToReleaseLockAcquiredByOtherImplementor(LockInterface $lockImplementor)
+    public function testDisallowLockImplementorToReleaseLockAcquiredByOtherImplementor($lockImplementor)
     {
         $name = 'forfiter';
         $lockImplementor->acquireLock($name, 0);
@@ -69,7 +61,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfLocksAreNotSharedBetweenImplementors(LockInterface $lockImplementor)
+    public function testIfLocksAreNotSharedBetweenImplementors($lockImplementor)
     {
         $name = 'forfiter';
         $lockImplementor->acquireLock($name, 0);
@@ -85,7 +77,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfLockReleasedByOneImplementorCanBeAcquiredByOther(LockInterface $lockImplementor)
+    public function testIfLockReleasedByOneImplementorCanBeAcquiredByOther($lockImplementor)
     {
         $name = 'forfiter';
         $lockImplementor->acquireLock($name, 0);
@@ -101,7 +93,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAcquireAndReleaseLock(LockInterface $lockImplementor)
+    public function testAcquireAndReleaseLock($lockImplementor)
     {
         $name = 'forfiter';
         $this->assertTrue($lockImplementor->acquireLock($name, 0));
@@ -114,7 +106,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfLockIsReleasedAfterLockImplementorIsDestroyed(LockInterface $lockImplementor)
+    public function testIfLockIsReleasedAfterLockImplementorIsDestroyed($lockImplementor)
     {
         $name = 'forfiter';
         $duplicateLockImplementor = clone $lockImplementor;
@@ -135,7 +127,7 @@ class LockTest extends AbstractTest
      * @param LockInterface             $lockImplementor
      * @param PermanentServiceInterface $backend
      */
-    public function testIfLockDestructorThrowsWhenBackendIsUnavailable(LockInterface $lockImplementor, PermanentServiceInterface $backend)
+    public function testIfLockDestructorThrowsWhenBackendIsUnavailable($lockImplementor, $backend)
     {
         $name = "forfiter";
 
@@ -170,7 +162,7 @@ class LockTest extends AbstractTest
      * @dataProvider lockFabricWithExpirationProvider
      * @param LockFabricWithExpirationInterface $lockFabricWithExpiration
      */
-    public function testExpiration(LockFabricWithExpirationInterface $lockFabricWithExpiration)
+    public function testExpiration($lockFabricWithExpiration)
     {
         $expiration = 2; // in seconds
         $name = "lockWithExpiration_" . uniqid();

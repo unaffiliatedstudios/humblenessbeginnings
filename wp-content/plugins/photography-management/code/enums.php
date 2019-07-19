@@ -112,4 +112,23 @@ namespace codeneric\phmm\enums {
     const Finished = "Finished";
     const Outstanding = "Outstanding";
   }
+  final class AdvancedBoolSettings {
+    private function __construct() {}
+    private static
+      $hacklib_values = array(
+        "PHMM_REDIRECT_CLIENT_TO_SINGLE_PROJECT" =>
+          "PHMM_REDIRECT_CLIENT_TO_SINGLE_PROJECT",
+        "PHMM_APPLY_TEMPLATE_TO_CLIENT_PAGE" =>
+          "PHMM_APPLY_TEMPLATE_TO_CLIENT_PAGE",
+        "PHMM_ALLOW_EDITORS" => "PHMM_ALLOW_EDITORS",
+        "PHMM_ENABLE_MEDIA_SEPARATION" => "PHMM_ENABLE_MEDIA_SEPARATION"
+      );
+    use \HH\HACKLIB_ENUM_LIKE;
+    const
+      PHMM_REDIRECT_CLIENT_TO_SINGLE_PROJECT = "PHMM_REDIRECT_CLIENT_TO_SINGLE_PROJECT";
+    const
+      PHMM_APPLY_TEMPLATE_TO_CLIENT_PAGE = "PHMM_APPLY_TEMPLATE_TO_CLIENT_PAGE";
+    const PHMM_ALLOW_EDITORS = "PHMM_ALLOW_EDITORS";
+    const PHMM_ENABLE_MEDIA_SEPARATION = "PHMM_ENABLE_MEDIA_SEPARATION";
+  }
 }

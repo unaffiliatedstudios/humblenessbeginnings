@@ -1,7 +1,7 @@
 <?php
 
-use studio24\Rotate\Rotate;
-use studio24\Rotate\FilenameFormat;
+use \studio24\Rotate\Rotate;
+use \studio24\Rotate\FilenameFormat;
 
 class RotateSetupTest extends PHPUnit_Framework_TestCase
 {

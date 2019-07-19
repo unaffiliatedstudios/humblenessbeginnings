@@ -1,5 +1,8 @@
 .menu-icon-client > ul > li a[href="post-new.php?post_type=client"] {
-  display: none!important;
-};
+  display: none !important;
+}
 
-
+body.post-type-project #insert-media-button,
+body.post-type-client #insert-media-button {
+  display: none !important;
+}

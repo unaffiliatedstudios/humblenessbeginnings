@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { InnerBlocks } from '@wordpress/editor';
 import { registerBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import Block from './block';
 
 /**
@@ -15,7 +17,10 @@ import Block from './block';
  */
 registerBlockType( 'woocommerce/featured-product', {
 	title: __( 'Featured Product', 'woo-gutenberg-products-block' ),
-	icon: 'star-filled',
+	icon: {
+		src: 'star-filled',
+		foreground: '#96588a',
+	},
 	category: 'woocommerce',
 	keywords: [ __( 'WooCommerce', 'woo-gutenberg-products-block' ) ],
 	description: __(
@@ -48,6 +53,21 @@ registerBlockType( 'woocommerce/featured-product', {
 		editMode: {
 			type: 'boolean',
 			default: true,
+		},
+
+		/**
+		 * Focus point for the background image
+		 */
+		focalPoint: {
+			type: 'object',
+		},
+
+		/**
+		 * A fixed height for the block.
+		 */
+		height: {
+			type: 'number',
+			default: wc_product_block_data.default_height,
 		},
 
 		/**
@@ -123,6 +143,6 @@ registerBlockType( 'woocommerce/featured-product', {
 	 * Block content is rendered in PHP, not via save function.
 	 */
 	save() {
-		return null;
+		return <InnerBlocks.Content />;
 	},
 } );

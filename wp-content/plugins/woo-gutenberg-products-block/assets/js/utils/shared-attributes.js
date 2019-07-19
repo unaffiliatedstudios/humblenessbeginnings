@@ -1,3 +1,12 @@
+
+export const sharedAttributeBlockTypes = [
+	'woocommerce/product-best-sellers',
+	'woocommerce/product-category',
+	'woocommerce/product-new',
+	'woocommerce/product-on-sale',
+	'woocommerce/product-top-rated',
+];
+
 export default {
 	/**
 	 * Number of columns.
@@ -32,10 +41,15 @@ export default {
 	},
 
 	/**
-	 * Product attributes, used to display only products with the given attributes.
+	 * Content visibility setting
 	 */
-	attributes: {
-		type: 'array',
-		default: [],
+	contentVisibility: {
+		type: 'object',
+		default: {
+			title: true,
+			price: true,
+			rating: true,
+			button: true,
+		},
 	},
 };

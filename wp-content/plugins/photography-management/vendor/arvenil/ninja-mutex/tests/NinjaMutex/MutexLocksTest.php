@@ -1,16 +1,8 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex;
 
-use NinjaMutex\Lock\LockAbstract;
-use NinjaMutex\Lock\LockInterface;
+use \NinjaMutex\Lock\LockAbstract;
+use \NinjaMutex\Lock\LockInterface;
 
 /**
  * Tests for Mutex's Locks
@@ -25,7 +17,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAcquireAndReleaseLock(LockInterface $lockImplementor)
+    public function testAcquireAndReleaseLock($lockImplementor)
     {
         $mutex = new Mutex('forfiter', $lockImplementor);
 
@@ -42,7 +34,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAllowToAcquireSelfOwnedLock(LockInterface $lockImplementor)
+    public function testAllowToAcquireSelfOwnedLock($lockImplementor)
     {
         $mutex = new Mutex('forfiter', $lockImplementor);
         $mutex->acquireLock(0);
@@ -59,7 +51,7 @@ class MutexLocksTest extends AbstractTest
      * @param LockInterface $lockImplementor
      */
     public function testMultipleSelfAcquiredLocksRequiresMultipleReleasesToCompletelyReleaseMutex(
-        LockInterface $lockImplementor
+$lockImplementor
     ) {
         $mutex = new Mutex('forfiter', $lockImplementor);
         $mutex->acquireLock(0); // #1
@@ -80,7 +72,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testUnableToAcquireLockHeldByOtherLock(LockInterface $lockImplementor)
+    public function testUnableToAcquireLockHeldByOtherLock($lockImplementor)
     {
         $mutex1 = new Mutex('forfiter', $lockImplementor);
         $mutex1->acquireLock(0);
@@ -101,7 +93,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testUnableToReleaseLockHeldByOtherLock(LockInterface $lockImplementor)
+    public function testUnableToReleaseLockHeldByOtherLock($lockImplementor)
     {
         $mutex1 = new Mutex('forfiter', $lockImplementor);
         $mutex1->acquireLock(0);
@@ -122,7 +114,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAcquireLockTimeout(LockInterface $lockImplementor)
+    public function testAcquireLockTimeout($lockImplementor)
     {
         $mutex1 = new Mutex('forfiter', $lockImplementor);
         $mutex1->acquireLock(0);
@@ -139,7 +131,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAcquireLockWithTimeoutImmiedietly(LockInterface $lockImplementor)
+    public function testAcquireLockWithTimeoutImmiedietly($lockImplementor)
     {
         $mutex = new Mutex('forfiter', $lockImplementor);
         $sleep = LockAbstract::USLEEP_TIME;
@@ -153,7 +145,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testAcquireAndReleaseSecondMutexWithoutReleaseTheFirstMutex(LockInterface $lockImplementor)
+    public function testAcquireAndReleaseSecondMutexWithoutReleaseTheFirstMutex($lockImplementor)
     {
         $firstMutex = new Mutex('forfiter', $lockImplementor);
         $firstMutex->acquireLock(0);
@@ -175,7 +167,7 @@ class MutexLocksTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfMutexIsReusableAfterSeveralAcquireReleaseCycles(LockInterface $lockImplementor)
+    public function testIfMutexIsReusableAfterSeveralAcquireReleaseCycles($lockImplementor)
     {
         $firstMutex = new Mutex('forfiter', $lockImplementor);
         $firstMutex->acquireLock();

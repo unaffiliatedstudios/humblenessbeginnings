@@ -1,12 +1,11 @@
 <?php
-
 namespace JsonSchema;
 
-use JsonSchema\Constraints\BaseConstraint;
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Exception\UnresolvableJsonPointerException;
-use JsonSchema\Uri\UriResolver;
-use JsonSchema\Uri\UriRetriever;
+use \JsonSchema\Constraints\BaseConstraint;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Exception\UnresolvableJsonPointerException;
+use \JsonSchema\Uri\UriResolver;
+use \JsonSchema\Uri\UriRetriever;
 
 class SchemaStorage implements SchemaStorageInterface
 {
@@ -17,8 +16,8 @@ class SchemaStorage implements SchemaStorageInterface
     protected $schemas = array();
 
     public function __construct(
-        UriRetrieverInterface $uriRetriever = null,
-        UriResolverInterface $uriResolver = null
+$uriRetriever = null,
+$uriResolver = null
     ) {
         $this->uriRetriever = $uriRetriever ?: new UriRetriever();
         $this->uriResolver = $uriResolver ?: new UriResolver();

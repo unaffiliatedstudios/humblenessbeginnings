@@ -224,7 +224,7 @@ class ChromePhp
      * @param string $type
      * @return void
      */
-    protected static function _log($type, array $args)
+    protected static function _log($type, $args)
     {
         // nothing passed in, don't do anything
         if (count($args) == 0 && $type != self::GROUP_END) {
@@ -321,7 +321,7 @@ class ChromePhp
      * @param ReflectionProperty
      * @return string
      */
-    protected function _getPropertyKey(ReflectionProperty $property)
+    protected function _getPropertyKey($property)
     {
         $static = $property->isStatic() ? ' static' : '';
         if ($property->isPublic()) {
@@ -343,7 +343,7 @@ class ChromePhp
      * @var mixed
      * @return void
      */
-    protected function _addRow(array $logs, $backtrace, $type)
+    protected function _addRow($logs, $backtrace, $type)
     {
         // if this is logged on the same line for example in a loop, set it to null to save space
         if (in_array($backtrace, $this->_backtraces)) {
@@ -400,7 +400,7 @@ class ChromePhp
      * @param array $settings
      * @return void
      */
-    public function addSettings(array $settings)
+    public function addSettings($settings)
     {
         foreach ($settings as $key => $value) {
             $this->addSetting($key, $value);

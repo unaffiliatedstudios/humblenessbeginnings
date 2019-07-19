@@ -1,18 +1,10 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Exception\InvalidArgumentException;
-use JsonSchema\Exception\ValidationException;
-use JsonSchema\Validator;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Exception\InvalidArgumentException;
+use \JsonSchema\Exception\ValidationException;
+use \JsonSchema\Validator;
 
 /**
  * A more basic constraint definition - used for the public
@@ -38,12 +30,12 @@ class BaseConstraint
     /**
      * @param Factory $factory
      */
-    public function __construct(Factory $factory = null)
+    public function __construct($factory = null)
     {
         $this->factory = $factory ?: new Factory();
     }
 
-    public function addError(JsonPointer $path = null, $message, $constraint = '', array $more = null)
+    public function addError($path = null, $message, $constraint = '', $more = null)
     {
         $error = array(
             'property' => $this->convertJsonPointerIntoPropertyPath($path ?: new JsonPointer('')),
@@ -65,7 +57,7 @@ class BaseConstraint
         $this->errorMask |= $error['context'];
     }
 
-    public function addErrors(array $errors)
+    public function addErrors($errors)
     {
         if ($errors) {
             $this->errors = array_merge($this->errors, $errors);

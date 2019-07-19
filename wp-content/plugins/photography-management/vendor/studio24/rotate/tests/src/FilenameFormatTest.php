@@ -1,6 +1,6 @@
 <?php
 
-use studio24\Rotate\FilenameFormat;
+use \studio24\Rotate\FilenameFormat;
 
 class FilenameFormatTest extends PHPUnit_Framework_TestCase {
 

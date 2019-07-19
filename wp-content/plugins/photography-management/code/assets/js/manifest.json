@@ -1,50 +1,167 @@
 {
-  "admin.client.js": "phmm.admin.client.js",
-  "admin.client.js.map": "phmm.admin.client.js.map",
-  "admin.commons.js": "phmm.admin.common.js",
-  "admin.commons.js.map": "phmm.admin.commons.js.map",
-  "admin.interactionspage.js": "phmm.admin.interactionspage.js",
-  "admin.interactionspage.js.map": "phmm.admin.interactionspage.js.map",
-  "admin.migration.js": "phmm.admin.migration.js",
-  "admin.migration.js.map": "phmm.admin.migration.js.map",
-  "admin.premiumpage.js": "phmm.admin.premiumpage.js",
-  "admin.premiumpage.js.map": "phmm.admin.premiumpage.js.map",
-  "admin.project.js": "phmm.admin.project.js",
-  "admin.project.js.map": "phmm.admin.project.js.map",
-  "admin.settings.js": "phmm.admin.settings.js",
-  "admin.settings.js.map": "phmm.admin.settings.js.map",
-  "admin.supportpage.js": "phmm.admin.supportpage.js",
-  "admin.supportpage.js.map": "phmm.admin.supportpage.js.map",
-  "commentEditor.js": "phmm.commentEditor.6509345b87b2d8dc91c5.async.js",
-  "commentEditor.js.map": "phmm.commentEditor.js.map",
-  "commentFeed.js": "phmm.commentFeed.d306f9c4ef2d5a5df04c.async.js",
-  "commentFeed.js.map": "phmm.commentFeed.js.map",
-  "de.js": "phmm.de.bfcdc3c14b44bf58baef.async.js",
-  "de.js.map": "phmm.de.js.map",
-  "drawer.js": "phmm.drawer.a6cf6876c8f552ed11d7.async.js",
-  "drawer.js.map": "phmm.drawer.js.map",
-  "en-US.js": "phmm.en-US.826e055e6ec6a7cad8b6.async.js",
-  "en-US.js.map": "phmm.en-US.js.map",
-  "es.js": "phmm.es.7a7534e1723bcb2c4698.async.js",
-  "es.js.map": "phmm.es.js.map",
-  "fatal.error.js": "phmm.fatal.error.js",
-  "fatal.error.js.map": "phmm.fatal.error.js.map",
-  "filter.js": "phmm.filter.f67ee441ef515fc43e29.async.js",
-  "filter.js.map": "phmm.filter.js.map",
-  "fr.js": "phmm.fr.62701a0c68be93f0215c.async.js",
-  "fr.js.map": "phmm.fr.js.map",
-  "iconMenu.js": "phmm.iconMenu.3941c861a25ad8af4bfc.async.js",
-  "iconMenu.js.map": "phmm.iconMenu.js.map",
-  "icons.js": "phmm.icons.ce3325b6b3546aa54c61.async.js",
-  "icons.js.map": "phmm.icons.js.map",
-  "pt.js": "phmm.pt.6c720ca62f3bb8ab6993.async.js",
-  "pt.js.map": "phmm.pt.js.map",
-  "public.client.js": "phmm.public.client.js",
-  "public.client.js.map": "phmm.public.client.js.map",
-  "public.commons.js": "phmm.public.common.js",
-  "public.commons.js.map": "phmm.public.commons.js.map",
-  "public.project.js": "phmm.public.project.js",
-  "public.project.js.map": "phmm.public.project.js.map",
-  "slider.js": "phmm.slider.0acb2bc5762904faef85.async.js",
-  "slider.js.map": "phmm.slider.js.map"
+  "admin.client.js": "phmm.admin.client.7a701cd423fd1863cd7e.js",
+  "admin.interactionspage.js": "phmm.admin.interactionspage.62ab0bbac1ab8c1c64be.js",
+  "admin.migration.js": "phmm.admin.migration.389b0c375917d4bad3c5.js",
+  "admin.premiumpage.js": "phmm.admin.premiumpage.83cc09f297262464840d.js",
+  "admin.producttour.js": "phmm.admin.producttour.71f9cb6cec646b765c64.js",
+  "admin.project.js": "phmm.admin.project.38b2bc14e3824c201a49.js",
+  "admin.settings.js": "phmm.admin.settings.d05aacb0e878aa2c7bdc.js",
+  "admin.supportpage.js": "phmm.admin.supportpage.1512fc6940e53a7a4839.js",
+  "camera-shadow.png": "29e5375681489b5cdb85bb1052982d7f.png",
+  "commentEditor.js": "phmm.commentEditor.6d457978aa788dcd7433.js",
+  "commentFeed.js": "phmm.commentFeed.8fa67103e9019181f5a6.js",
+  "data.c.js": "phmm.data.c.20a114a2b7acb1d660b4.js",
+  "drawer.js": "phmm.drawer.fa6000110ffb291bcb3d.js",
+  "entrypoints": {
+    "admin.client": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.client.7a701cd423fd1863cd7e.js"
+      ]
+    },
+    "admin.premiumpage": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.premiumpage.83cc09f297262464840d.js"
+      ]
+    },
+    "admin.migration": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.migration.389b0c375917d4bad3c5.js"
+      ]
+    },
+    "admin.supportpage": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+        "phmm.admin.supportpage.1512fc6940e53a7a4839.js"
+      ]
+    },
+    "admin.interactionspage": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.interactionspage.62ab0bbac1ab8c1c64be.js"
+      ]
+    },
+    "admin.project": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.project.38b2bc14e3824c201a49.js"
+      ]
+    },
+    "data.c": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.data.c.20a114a2b7acb1d660b4.js"
+      ]
+    },
+    "support.chat": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+        "phmm.vendors~admin.producttour~public.client~support.chat.185b318b3ad4460afd30.js",
+        "phmm.support.chat.6144f11350cf657ee3b8.js"
+      ]
+    },
+    "admin.settings": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.admin.settings.d05aacb0e878aa2c7bdc.js"
+      ]
+    },
+    "public.client": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+        "phmm.vendors~admin.producttour~public.client~support.chat.185b318b3ad4460afd30.js",
+        "phmm.public.client.59040fbf1c0279827dd3.js"
+      ]
+    },
+    "public.project": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+        "phmm.public.project.df41bcb812da7f84babc.js"
+      ]
+    },
+    "admin.producttour": {
+      "js": [
+        "phmm.runtime.f4258bb5428abd5aeaaa.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+        "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+        "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+        "phmm.vendors~admin.producttour~public.client~support.chat.185b318b3ad4460afd30.js",
+        "phmm.admin.producttour.71f9cb6cec646b765c64.js"
+      ]
+    }
+  },
+  "filter.js": "phmm.filter.421192d99ea3e7945fc1.js",
+  "iconMenu.js": "phmm.iconMenu.5b790f83c2bb13802e57.js",
+  "icons.js": "phmm.icons.7f1ea7b837b7c2f5770f.js",
+  "public.client.js": "phmm.public.client.59040fbf1c0279827dd3.js",
+  "public.project.js": "phmm.public.project.df41bcb812da7f84babc.js",
+  "runtime.js": "phmm.runtime.f4258bb5428abd5aeaaa.js",
+  "slider.js": "phmm.slider.b35672b0bf9e5120d888.js",
+  "support.chat.js": "phmm.support.chat.6144f11350cf657ee3b8.js",
+  "vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.js": "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~697391a8.3165c068815a96e3e537.js",
+  "vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.js": "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~760bfb7f.f54862270f7b840e51b2.js",
+  "vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.js": "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.producttour~admi~7fc76b24.f0740dfd6ea0a873e5c6.js",
+  "vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.js": "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~1a74253a.4367eba0fe7dc7ef80d8.js",
+  "vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.js": "phmm.vendors~admin.client~admin.interactionspage~admin.migration~admin.premiumpage~admin.project~admin.se~81194cea.8937c23a4bddec775a80.js",
+  "vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.js": "phmm.vendors~admin.producttour~admin.supportpage~public.client~public.project~support.chat.c44b4b63b26767fce777.js",
+  "vendors~admin.producttour~public.client~support.chat.js": "phmm.vendors~admin.producttour~public.client~support.chat.185b318b3ad4460afd30.js",
+  "vendors~commentEditor.js": "phmm.vendors~commentEditor.ea15ef8ab26e94f06af1.js",
+  "vendors~commentEditor~commentFeed.js": "phmm.vendors~commentEditor~commentFeed.914d133d4d632c72b0b1.js",
+  "vendors~commentFeed.js": "phmm.vendors~commentFeed.8111944d73d27c70923e.js",
+  "vendors~drawer~filter~iconMenu~slider.js": "phmm.vendors~drawer~filter~iconMenu~slider.52cb5d40204d1c2adcc0.js",
+  "vendors~drawer~filter~icons~slider.js": "phmm.vendors~drawer~filter~icons~slider.575f8e15b77b50d7469b.js",
+  "vendors~drawer~icons~slider.js": "phmm.vendors~drawer~icons~slider.e352d5d12dc8a969ddd4.js",
+  "vendors~filter~iconMenu.js": "phmm.vendors~filter~iconMenu.4119702624619315d288.js",
+  "vendors~icons.js": "phmm.vendors~icons.a40233261f5c75ddc80d.js"
 }

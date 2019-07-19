@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": true,
+  "definitions": {},
+  "properties": {
+    "submit_sv": {
+      "type": "integer",
+      "default": 0
+    },
+    "allow_contact": {
+      "type": "boolean",
+      "default": false
+    },
+    "email": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null
+    },
+    "reason": {
+      "type": "string",
+      "default": "UNKNOWN"
+    },
+    "explanation": {
+      "type": "string",
+      "default": "UNKNOWN"
+    }
+  },
+  "required": [
+  ],
+  "type": "object"
+}

@@ -7,25 +7,19 @@ namespace codeneric\phmm\base\admin {
     const page_name = "phmm_support";
     public static function init() {}
     public static function add_page() {
-      add_submenu_page(
+      \add_submenu_page(
         "edit.php?post_type=".
         Configuration::get()[\hacklib_id("client_post_type")],
-        "PHMM ".__("Support"),
-        __("Support"),
+        "PHMM ".\__("Support"),
+        \__("Support"),
         "manage_options",
         self::page_name,
         array(self::class, "render_page")
       );
     }
     public static function render_page() {
-      $title = "<h2>".__("Support")."</h2>";
-      $fbJoin =
-        "<strong>".
-        __(
-          "Join our <a style='color: coral' target='_blank' href='https:\\/\\/www.facebook.com/groups/1529247670736165/'>facebook group</a> to get immediate help or get in contact with other photographers using WordPress!",
-          Configuration::get()[\hacklib_id("plugin_name")]
-        ).
-        "</strong>";
+      $title = "<h2>".\__("Support")."</h2>";
+      $fbJoin = "<strong>".FrontendHandler::fb_join_message()."</strong>";
       echo
         ("<form action='options.php' method='post'>\n            ".
          $title.

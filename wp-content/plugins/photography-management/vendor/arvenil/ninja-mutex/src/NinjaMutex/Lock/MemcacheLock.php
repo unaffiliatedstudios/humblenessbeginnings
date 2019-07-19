@@ -1,15 +1,7 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex\Lock;
 
-use Memcache;
+use \Memcache;
 
 /**
  * Lock implementor using Memcache
@@ -39,7 +31,7 @@ class MemcacheLock extends LockAbstract implements LockExpirationInterface
     /**
      * @param Memcache $memcache
      */
-    public function __construct(Memcache $memcache)
+    public function __construct($memcache)
     {
         parent::__construct();
 

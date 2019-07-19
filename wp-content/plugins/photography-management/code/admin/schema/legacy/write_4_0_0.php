@@ -4,50 +4,54 @@ namespace codeneric\phmm\legacy\v4_0_0 {
   use \codeneric\phmm\legacy\type;
   use \codeneric\phmm\base\includes\Error;
   function save_project($id, $data) {
-    update_post_meta($id, "gallery", $data[\hacklib_id("gallery")]);
-    update_post_meta($id, "protection", $data[\hacklib_id("protection")]);
-    update_post_meta(
+    \update_post_meta($id, "gallery", $data[\hacklib_id("gallery")]);
+    \update_post_meta($id, "protection", $data[\hacklib_id("protection")]);
+    \update_post_meta(
       $id,
       "post_password",
       $data[\hacklib_id("protection")][\hacklib_id("password")]
     );
-    if (!\hacklib_cast_as_boolean(is_null($data[\hacklib_id("thumbnail")]))) {
-      update_post_meta($id, "thumbnail", $data[\hacklib_id("thumbnail")]);
+    if (!\hacklib_cast_as_boolean(
+          \is_null($data[\hacklib_id("thumbnail")])
+        )) {
+      \update_post_meta($id, "thumbnail", $data[\hacklib_id("thumbnail")]);
     }
-    if (\hacklib_cast_as_boolean(is_null($data[\hacklib_id("thumbnail")])) &&
-        (!\hacklib_cast_as_boolean(is_null(get_thumbnail_meta($id))))) {
-      delete_post_meta($id, "thumbnail");
+    if (\hacklib_cast_as_boolean(\is_null($data[\hacklib_id("thumbnail")])) &&
+        (!\hacklib_cast_as_boolean(\is_null(get_thumbnail_meta($id))))) {
+      \delete_post_meta($id, "thumbnail");
     }
-    update_post_meta(
+    \update_post_meta(
       $id,
       "configuration",
       $data[\hacklib_id("configuration")]
     );
   }
   function get_thumbnail_meta($id) {
-    $raw = get_post_meta($id, "thumbnail", true);
+    $raw = \get_post_meta($id, "thumbnail", true);
     if (\hacklib_cast_as_boolean(is_string($raw)) && ($raw !== "")) {
       return (int) $raw;
     }
     return null;
   }
   function save_client($post_id, $data) {
-    update_post_meta(
+    \update_post_meta(
       $post_id,
       "project_access",
       $data[\hacklib_id("project_access")]
     );
-    update_post_meta(
+    \update_post_meta(
       $post_id,
       "internal_notes",
       $data[\hacklib_id("internal_notes")]
     );
-    if (\hacklib_cast_as_boolean(is_null($data[\hacklib_id("plain_pwd")])) &&
-        (get_post_meta($post_id, "plain_pwd", true) === "")) {
-      $data[\hacklib_id("plain_pwd")] = wp_generate_password(10);
+    if (\hacklib_cast_as_boolean(\is_null($data[\hacklib_id("plain_pwd")])) &&
+        (\get_post_meta($post_id, "plain_pwd", true) === "")) {
+      $data[\hacklib_id("plain_pwd")] = \wp_generate_password(10);
     }
-    if (!\hacklib_cast_as_boolean(is_null($data[\hacklib_id("plain_pwd")]))) {
-      update_post_meta(
+    if (!\hacklib_cast_as_boolean(
+          \is_null($data[\hacklib_id("plain_pwd")])
+        )) {
+      \update_post_meta(
         $post_id,
         "plain_pwd",
         $data[\hacklib_id("plain_pwd")]
@@ -61,24 +65,25 @@ namespace codeneric\phmm\legacy\v4_0_0 {
     }
   }
   function get_client_wp_user_id($clientID) {
-    $id = get_post_meta($clientID, "wp_user", true);
+    $id = \get_post_meta($clientID, "wp_user", true);
     if ($id === "") {
       return null;
     }
     return (int) $id;
   }
   function update_wp_user($wpUserID, $data) {
+    $plain_pwd = $data[\hacklib_id("plain_pwd")];
     $userdata = array(
       "display_name" => $data[\hacklib_id("post_title")],
       "user_email" => $data[\hacklib_id("email")],
       "user_login" => $data[\hacklib_id("user_login")],
       "ID" => $wpUserID,
       "user_pass" =>
-        \hacklib_cast_as_boolean(is_null($data[\hacklib_id("plain_pwd")]))
+        \hacklib_cast_as_boolean(\is_null($plain_pwd))
           ? null
-          : wp_hash_password($data[\hacklib_id("plain_pwd")])
+          : \wp_hash_password($plain_pwd)
     );
-    wp_insert_user($userdata);
+    \wp_insert_user($userdata);
   }
   function create_and_save_wp_user($post_id, $data) {
     $userdata = array(
@@ -89,16 +94,16 @@ namespace codeneric\phmm\legacy\v4_0_0 {
       "show_admin_bar_front" => false,
       "user_pass" => $data[\hacklib_id("plain_pwd")]
     );
-    $userID = wp_insert_user($userdata);
+    $userID = \wp_insert_user($userdata);
     \HH\invariant(
       is_int($userID),
       "%s",
       new Error(
         "Failed to create a user.",
-        array(array("data", json_encode($data)))
+        array(array("data", \json_encode($data)))
       )
     );
-    $updated = update_post_meta($post_id, "wp_user", $userID);
+    $updated = \update_post_meta($post_id, "wp_user", $userID);
     \HH\invariant(
       is_int($updated),
       "%s",
@@ -108,7 +113,7 @@ namespace codeneric\phmm\legacy\v4_0_0 {
   }
   function save_comment($comment) {
     $res = 0;
-    $current_date = date("Y-m-d H:i:s");
+    $current_date = \date("Y-m-d H:i:s");
     $wpdb = \codeneric\phmm\base\globals\Superglobals::Globals("wpdb");
     \HH\invariant(
       $wpdb instanceof \wpdb,
@@ -145,7 +150,7 @@ namespace codeneric\phmm\legacy\v4_0_0 {
       new Error("Expected labels to be of type array.")
     );
     $optionName = get_option_name($clientID, $projectID, $labelID);
-    return update_option($optionName, $imageIDs);
+    return \update_option($optionName, $imageIDs);
   }
   function get_option_name($clientID, $projectID, $labelID) {
     \HH\invariant(is_int($clientID), "%s", new Error("clientID must be int"));
@@ -164,7 +169,7 @@ namespace codeneric\phmm\legacy\v4_0_0 {
       "%s",
       new Error("labelID cannot be empty string")
     );
-    $hash = md5($clientID."/".$projectID."/".$labelID);
+    $hash = \md5($clientID."/".$projectID."/".$labelID);
     return "codeneric/phmm/labels/".$hash;
   }
 }

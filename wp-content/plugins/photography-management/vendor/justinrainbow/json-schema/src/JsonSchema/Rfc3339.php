@@ -1,5 +1,4 @@
 <?php
-
 namespace JsonSchema;
 
 class Rfc3339

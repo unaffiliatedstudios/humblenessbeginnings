@@ -1,16 +1,8 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Rfc3339;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Rfc3339;
 
 /**
  * Validates against the "format" property
@@ -24,7 +16,7 @@ class FormatConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$element, $schema = null, JsonPointer $path = null, $i = null)
+    public function check(&$element, $schema = null, $path = null, $i = null)
     {
         if (!isset($schema->format) || $this->factory->getConfig(self::CHECK_MODE_DISABLE_FORMAT)) {
             return;

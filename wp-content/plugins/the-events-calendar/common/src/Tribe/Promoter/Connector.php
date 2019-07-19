@@ -8,6 +8,15 @@
 class Tribe__Promoter__Connector {
 
 	/**
+	 * Whether the user request is currently authorized by Promoter.
+	 *
+	 * @since 4.9.4
+	 *
+	 * @var bool
+	 */
+	public $authorized = false;
+
+	/**
 	 * Get the base URL for interacting with the connector.
 	 *
 	 * @return string Base URL for interacting with the connector.
@@ -69,6 +78,8 @@ class Tribe__Promoter__Connector {
 	 * @since 4.9
 	 */
 	public function authenticate_user_with_connector( $user_id ) {
+		$this->authorized = false;
+
 		$token = tribe_get_request_var( 'tribe_promoter_auth_token' );
 
 		if ( empty( $token ) ) {
@@ -87,6 +98,8 @@ class Tribe__Promoter__Connector {
 		if ( ! $response ) {
 			return $user_id;
 		}
+
+		$this->authorized = true;
 
 		return $response;
 	}
@@ -114,7 +127,7 @@ class Tribe__Promoter__Connector {
 		}
 
 		$license_key = $license_info['key'];
-		$secret_key  = get_option( 'tribe_promoter_auth_key' );
+		$secret_key  = $this->get_secret_key();
 
 		if ( empty( $secret_key ) ) {
 			return;
@@ -122,6 +135,7 @@ class Tribe__Promoter__Connector {
 
 		$payload = array(
 			'licenseKey' => $license_key,
+			'sourceId'   => $post_id,
 		);
 
 		$token = \Firebase\JWT\JWT::encode( $payload, $secret_key );
@@ -134,6 +148,24 @@ class Tribe__Promoter__Connector {
 		);
 
 		$this->make_call( $url, $args );
+	}
+
+	/**
+	 * Get the value for the option `tribe_promoter_auth_key`
+	 *
+	 * @since 4.9.12
+	 *
+	 * @return mixed
+	 */
+	protected function get_secret_key() {
+		$secret_key  = get_option( 'tribe_promoter_auth_key' );
+
+		/**
+		 * @since 4.9.12
+		 *
+		 * @param string $secret_key
+		 */
+		return apply_filters( 'tribe_promoter_secret_key', $secret_key );
 	}
 
 	/**
@@ -164,6 +196,17 @@ class Tribe__Promoter__Connector {
 		}
 
 		return $body;
+	}
+
+	/**
+	 * Check whether the user request is currently authorized by Promoter.
+	 *
+	 * @since 4.9.4
+	 *
+	 * @return bool Whether the user request is currently authorized by Promoter.
+	 */
+	public function is_user_authorized() {
+		return $this->authorized;
 	}
 
 }

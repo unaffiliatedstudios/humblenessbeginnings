@@ -1,15 +1,7 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex;
 
-use NinjaMutex\Lock\LockInterface;
+use \NinjaMutex\Lock\LockInterface;
 
 /**
  * Mutex fabric
@@ -26,7 +18,7 @@ class MutexFabric
      * @param string $lockImplementorName
      * @param $lockImplementor
      */
-    public function __construct($lockImplementorName, LockInterface $lockImplementor)
+    public function __construct($lockImplementorName, $lockImplementor)
     {
         $this->registerLockImplementor($lockImplementorName, $lockImplementor);
     }
@@ -37,7 +29,7 @@ class MutexFabric
      * @param  LockInterface  $implementor
      * @throws MutexException
      */
-    public function registerLockImplementor($name, LockInterface $implementor)
+    public function registerLockImplementor($name, $implementor)
     {
         if (isset($this->implementors[$name])) {
             throw new MutexException(sprintf('Name %s is already used', $name));

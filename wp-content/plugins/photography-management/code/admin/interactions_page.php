@@ -7,11 +7,11 @@ namespace codeneric\phmm\base\admin {
     const page_name = "interactions";
     public static function init() {}
     public static function add_page() {
-      add_submenu_page(
+      \add_submenu_page(
         "edit.php?post_type=".
         Configuration::get()[\hacklib_id("client_post_type")],
-        "PHMM ".__("Interactions"),
-        __("Interactions"),
+        "PHMM ".\__("Interactions", "photography-management"),
+        \__("Interactions", "photography-management"),
         "manage_options",
         self::page_name,
         array(self::class, "render_page")

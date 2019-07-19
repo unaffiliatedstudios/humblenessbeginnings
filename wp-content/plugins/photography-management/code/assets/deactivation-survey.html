@@ -1,0 +1,124 @@
+<div>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <style>
+        body {
+            position: relative;
+            background-size: 100% auto;
+            padding-bottom: 200px;
+        }
+
+        label {
+            display: block;
+            margin: 0 0 5px 0;
+        }
+
+        .explain {
+            display: none;
+            margin: 3px 0 10px 20px;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .explain input {
+            padding: 5px 8px;
+            font-size: 13px;
+            width: 50%;
+        }
+    </style>
+    <a href="%%ADMIN_PLUGINS_URL%%"
+        style="color: red; display: block; margin: -75px -30px 0 0; float: right; font-size: 12px; text-transform: uppercase; text-decoration: none;"><span
+            style="display: inline-block; background: red; color: #FFF; font-size: 12px; width: 16px; height: 16px; line-height: 16px; text-align: center; font-weight: bold; border-radius: 50%;">×</span>
+            %%_I18_Cancel%%</a>
+    <h2>%%_I18_title%%</h2>
+    <form method="post">
+        <label><input type="radio" name="reason" value="Could not understand" data-explain="couldnt-understand"> I
+            %%_I18_couldnt_understand%%</label>
+        <div id="couldnt-understand" class="explain">
+            <p>%%_I18_happy_to_help%% <a
+                    href="mailto:support@codeneric.com">support@codeneric.com</a></p>
+        </div>
+        <label><input type="radio" name="reason" value="Better plugin" data-explain="better-plugin"> %%_I18_found_better_plugin%%</label>
+        <div id="better-plugin" class="explain">
+            <input type="text" name="better-plugin-explanation" placeholder="Which plugin?" />
+        </div>
+        <label><input type="radio" name="reason" value="Missing feature" data-explain="missing-feature"> %%_I18_missing_feature%%</label>
+        <div id="missing-feature" class="explain">
+            <input type="text" name="missing-feature-explanation" placeholder="Specific feature?" /><br />
+        </div>
+        <label><input type="radio" name="reason" value="Not what I'm looking for" data-explain="not-looking-for"> %%_I18_not_looking_for%%</label>
+        <div id="not-looking-for" class="explain">
+            <input type="text" name="other-explanation" placeholder="What are you looking for?" />
+        </div>
+
+        <label><input type="radio" name="reason" value="Not working as expected" data-explain="not-working"> %%_I18_didnt_work_as_expected%%</label>
+        <div id="not-working" class="explain">
+            <input type="text" name="other-explanation" placeholder="Could you explain the issue?" />
+        </div>
+
+
+        <label><input type="radio" name="reason" value="Testing"> %%_I18_deactivate_temporarily%%</label>
+        <label><input type="radio" name="reason" value="Other" data-explain="other"> %%_I18_other%%</label>
+        <div id="other" class="explain">
+            <input type="text" name="other-explanation" placeholder="Any additional details?" />
+        </div>
+
+        <p>
+            <label><input type="checkbox" name="allow_contact" value="true" /> %%_I18_reach_me_at%% <input type="email"
+                    name="email" value="%%ADMIN_EMAIL%%"
+                    style="border: 0; border-bottom: 1px solid #999; padding: 0 0 3px 0; font-size: 13px; width: 200px;" />
+                    %%_I18_to_discuss%%</label>
+        </p>
+
+        <p> <input type="hidden" name="submit_sv" value="1">
+            <input type="submit" id="submit-survey" style="background: #0085ba; color: white;"
+                value="Submit Survey and Deactivate Plugin" class="button button-large" />
+            &nbsp;
+            <a href="%%JUST_DEACTIVATE_URL%%" id="just-deactivate"
+                style="display: inline-block; vertical-align: middle; margin-left: 20px; font-size: 14px;">%%_I18_just_deactivate%%</a>
+        </p>
+
+        <p style="font-size: 13px; color: #666; font-style: italic;">%%_I18_no_additional_data%%</p>
+    </form>
+
+    <script>
+        // $('input[name="reason"]').change(function () {
+        //     var reason = $('input[name="reason"]:checked').data('explain');
+        //     $('.explain').hide();
+        //     $('.explain input').attr('name', reason + '-explain');
+        //     $('#' + reason).show();
+        //     $('#' + reason + ' input').attr('name', 'explanation');
+        // });
+        var elems = document.querySelectorAll('input[name="reason"]');
+        elems.forEach(function (elem) {
+            elem.addEventListener("change", function () {
+                var checkedElem = document.querySelector('input[name="reason"]:checked');
+                var show = function (elem) {
+                    if(elem)
+                    elem.style.display = "block";
+                };
+                // Hide an element
+                var hide = function (elem) {
+                    if(elem)
+                    elem.style.display = "none";
+                };
+
+                var reason = checkedElem.dataset.explain;
+
+                document.querySelectorAll(".explain").forEach(hide);
+
+                document.querySelectorAll(".explain input").forEach(function (e) {
+                    e.setAttribute("name", reason + "-explain");
+                });
+
+                show(document.querySelector("#" + reason));
+
+                var the_input = document
+                    .querySelector("#" + reason + " input");
+                if (the_input) {
+                    the_input.setAttribute("name", "explanation");
+                }
+            });
+        });    
+    </script>
+</div>

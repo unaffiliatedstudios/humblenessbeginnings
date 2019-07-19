@@ -1,18 +1,10 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Constraints\TypeCheck\LooseTypeCheck;
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Exception\ValidationException;
-use JsonSchema\Uri\UriResolver;
+use \JsonSchema\Constraints\TypeCheck\LooseTypeCheck;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Exception\ValidationException;
+use \JsonSchema\Uri\UriResolver;
 
 /**
  * The UndefinedConstraint Constraints
@@ -30,7 +22,7 @@ class UndefinedConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$value, $schema = null, JsonPointer $path = null, $i = null, $fromDefault = false)
+    public function check(&$value, $schema = null, $path = null, $i = null, $fromDefault = false)
     {
         if (is_null($schema) || !is_object($schema)) {
             return;
@@ -59,7 +51,7 @@ class UndefinedConstraint extends Constraint
      * @param JsonPointer $path
      * @param string      $i
      */
-    public function validateTypes(&$value, $schema = null, JsonPointer $path, $i = null)
+    public function validateTypes(&$value, $schema = null, $path, $i = null)
     {
         // check array
         if ($this->getTypeCheck()->isArray($value)) {
@@ -105,7 +97,7 @@ class UndefinedConstraint extends Constraint
      * @param JsonPointer $path
      * @param string      $i
      */
-    protected function validateCommonProperties(&$value, $schema = null, JsonPointer $path, $i = '')
+    protected function validateCommonProperties(&$value, $schema = null, $path, $i = '')
     {
         // if it extends another schema, it must pass that schema as well
         if (isset($schema->extends)) {
@@ -298,7 +290,7 @@ class UndefinedConstraint extends Constraint
      * @param JsonPointer $path
      * @param string      $i
      */
-    protected function validateOfProperties(&$value, $schema, JsonPointer $path, $i = '')
+    protected function validateOfProperties(&$value, $schema, $path, $i = '')
     {
         // Verify type
         if ($value instanceof self) {
@@ -373,7 +365,7 @@ class UndefinedConstraint extends Constraint
      * @param JsonPointer $path
      * @param string      $i
      */
-    protected function validateDependencies($value, $dependencies, JsonPointer $path, $i = '')
+    protected function validateDependencies($value, $dependencies, $path, $i = '')
     {
         foreach ($dependencies as $key => $dependency) {
             if ($this->getTypeCheck()->propertyExists($value, $key)) {

@@ -1,15 +1,7 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Entity;
 
-use JsonSchema\Exception\InvalidArgumentException;
+use \JsonSchema\Exception\InvalidArgumentException;
 
 /**
  * @package JsonSchema\Entity
@@ -117,7 +109,7 @@ class JsonPointer
      *
      * @return JsonPointer
      */
-    public function withPropertyPaths(array $propertyPaths)
+    public function withPropertyPaths($propertyPaths)
     {
         $new = clone $this;
         $new->propertyPaths = $propertyPaths;

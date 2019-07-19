@@ -4,9 +4,9 @@ date_default_timezone_set ('GMT');
 
 require_once ('lib/Analog.php');
 
-use Analog\Logger;
-use Analog\Handler\Variable;
-use Psr\Log\Test\LoggerInterfaceTest;
+use \Analog\Logger;
+use \Analog\Handler\Variable;
+use \Psr\Log\Test\LoggerInterfaceTest;
 
 class PsrLogCompatTest extends LoggerInterfaceTest {
 	private $log = '';

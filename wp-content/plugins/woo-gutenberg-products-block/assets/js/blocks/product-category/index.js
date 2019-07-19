@@ -2,23 +2,26 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-import { RawHTML } from '@wordpress/element';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { without } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 import Block from './block';
-import getShortcode from '../../utils/get-shortcode';
-import sharedAttributes from '../../utils/shared-attributes';
+import { deprecatedConvertToShortcode } from '../../utils/deprecations';
+import sharedAttributes, { sharedAttributeBlockTypes } from '../../utils/shared-attributes';
 
 /**
  * Register and run the "Products by Category" block.
  */
 registerBlockType( 'woocommerce/product-category', {
 	title: __( 'Products by Category', 'woo-gutenberg-products-block' ),
-	icon: 'category',
+	icon: {
+		src: 'category',
+		foreground: '#96588a',
+	},
 	category: 'woocommerce',
 	keywords: [ __( 'WooCommerce', 'woo-gutenberg-products-block' ) ],
 	description: __(
@@ -48,6 +51,37 @@ registerBlockType( 'woocommerce/product-category', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: without( sharedAttributeBlockTypes, 'woocommerce/product-category' ),
+				transform: ( attributes ) => createBlock(
+					'woocommerce/product-category',
+					{ ...attributes, editMode: false }
+				),
+			},
+		],
+	},
+
+	deprecated: [
+		{
+			// Deprecate shortcode save method in favor of dynamic rendering.
+			attributes: {
+				...sharedAttributes,
+				editMode: {
+					type: 'boolean',
+					default: true,
+				},
+				orderby: {
+					type: 'string',
+					default: 'date',
+				},
+			},
+			save: deprecatedConvertToShortcode( 'woocommerce/product-category' ),
+		},
+	],
+
 	/**
 	 * Renders and manages the block.
 	 */
@@ -55,19 +89,7 @@ registerBlockType( 'woocommerce/product-category', {
 		return <Block { ...props } />;
 	},
 
-	/**
-	 * Save the block content in the post content. Block content is saved as a products shortcode.
-	 *
-	 * @return string
-	 */
-	save( props ) {
-		const {
-			align,
-		} = props.attributes; /* eslint-disable-line react/prop-types */
-		return (
-			<RawHTML className={ align ? `align${ align }` : '' }>
-				{ getShortcode( props, 'woocommerce/product-category' ) }
-			</RawHTML>
-		);
+	save() {
+		return null;
 	},
 } );

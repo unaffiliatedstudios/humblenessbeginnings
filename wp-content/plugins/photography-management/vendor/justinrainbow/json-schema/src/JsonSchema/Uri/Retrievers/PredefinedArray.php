@@ -1,8 +1,7 @@
 <?php
-
 namespace JsonSchema\Uri\Retrievers;
 
-use JsonSchema\Validator;
+use \JsonSchema\Validator;
 
 /**
  * URI retrieved based on a predefined array of schemas
@@ -31,7 +30,7 @@ class PredefinedArray extends AbstractRetriever
      * @param array  $schemas
      * @param string $contentType
      */
-    public function __construct(array $schemas, $contentType = Validator::SCHEMA_MEDIA_TYPE)
+    public function __construct($schemas, $contentType = Validator::SCHEMA_MEDIA_TYPE)
     {
         $this->schemas     = $schemas;
         $this->contentType = $contentType;

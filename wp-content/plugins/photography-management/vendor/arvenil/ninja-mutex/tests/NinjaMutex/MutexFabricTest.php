@@ -1,15 +1,7 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex;
 
-use NinjaMutex\Lock\LockInterface;
+use \NinjaMutex\Lock\LockInterface;
 
 /**
  * Tests for MutexFabric
@@ -22,7 +14,7 @@ class MutexFabricTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfInjectedImplementorIsSetAsDefault(LockInterface $lockImplementor)
+    public function testIfInjectedImplementorIsSetAsDefault($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $this->assertSame($mutexFabric->getDefaultLockImplementorName(), get_class($lockImplementor));
@@ -32,7 +24,7 @@ class MutexFabricTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testIfInjectedImplementorDefaultImplementorIsNotOverwritten(LockInterface $lockImplementor)
+    public function testIfInjectedImplementorDefaultImplementorIsNotOverwritten($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $mutexFabric->registerLockImplementor(get_class($lockImplementor) . '_forfiter', $lockImplementor);
@@ -43,7 +35,7 @@ class MutexFabricTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testRegisterNewImplementorAndSetIsAsDefault(LockInterface $lockImplementor)
+    public function testRegisterNewImplementorAndSetIsAsDefault($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $mutexFabric->registerLockImplementor(get_class($lockImplementor) . '_forfiter', $lockImplementor);
@@ -56,7 +48,7 @@ class MutexFabricTest extends AbstractTest
      * @expectedException \NinjaMutex\MutexException
      * @param LockInterface $lockImplementor
      */
-    public function testThrowExceptionOnDuplicateImplementorName(LockInterface $lockImplementor)
+    public function testThrowExceptionOnDuplicateImplementorName($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $mutexFabric->registerLockImplementor(get_class($lockImplementor), $lockImplementor);
@@ -66,7 +58,7 @@ class MutexFabricTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testMutexCreationWithDefaultImplementor(LockInterface $lockImplementor)
+    public function testMutexCreationWithDefaultImplementor($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $this->assertInstanceOf('NinjaMutex\Mutex', $mutexFabric->get('lock'));
@@ -76,7 +68,7 @@ class MutexFabricTest extends AbstractTest
      * @dataProvider lockImplementorProvider
      * @param LockInterface $lockImplementor
      */
-    public function testMutexCreationWithSecondaryImplementor(LockInterface $lockImplementor)
+    public function testMutexCreationWithSecondaryImplementor($lockImplementor)
     {
         $mutexFabric = new MutexFabric(get_class($lockImplementor), $lockImplementor);
         $mutexFabric->registerLockImplementor(get_class($lockImplementor) . '_forfiter', $lockImplementor);

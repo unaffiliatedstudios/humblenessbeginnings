@@ -1,15 +1,7 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex\Lock;
 
-use Predis;
+use \Predis;
 
 /**
  * Lock implementor using Predis (client library for Redis)
@@ -28,7 +20,7 @@ class PredisRedisLock extends LockAbstract
     /**
      * @param $client Predis\Client
      */
-    public function __construct(Predis\Client $client)
+    public function __construct($client)
     {
         parent::__construct();
 

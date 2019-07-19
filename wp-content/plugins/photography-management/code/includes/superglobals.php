@@ -2,33 +2,33 @@
 namespace codeneric\phmm\base\globals {
   require_once ($GLOBALS["HACKLIB_ROOT"]);
   class Superglobals {
-    static function Server() {
+    public static function Server() {
       return /* UNSAFE_EXPR */ $_SERVER;
     }
-    static function Get() {
+    public static function Get() {
       return /* UNSAFE_EXPR */ $_GET;
     }
-    static function Post() {
+    public static function Post() {
       return /* UNSAFE_EXPR */ $_POST;
     }
-    static function Files() {
+    public static function Files() {
       return /* UNSAFE_EXPR */ $_FILES;
     }
-    static function Cookie() {
+    public static function Cookie() {
       return /* UNSAFE_EXPR */ $_COOKIE;
     }
-    static function Session() {
+    public static function Session() {
       return /* UNSAFE_EXPR */ $_SESSION;
     }
-    static function Request() {
+    public static function Request() {
       return /* UNSAFE_EXPR */ $_REQUEST;
     }
-    static function Env() {
+    public static function Env() {
       return /* UNSAFE_EXPR */ $_ENV;
     }
-    static function Globals($key) {
+    public static function Globals($key) {
       $global = /* UNSAFE_EXPR */ $GLOBALS;
-      if (\hacklib_cast_as_boolean(array_key_exists($key, $global))) {
+      if (\hacklib_cast_as_boolean(\array_key_exists($key, $global))) {
         return $global[$key];
       }
       return null;

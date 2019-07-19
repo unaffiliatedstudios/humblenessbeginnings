@@ -1,15 +1,7 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Entity\JsonPointer;
 
 /**
  * The EnumConstraint Constraints, validates an element against a given set of possibilities
@@ -22,7 +14,7 @@ class EnumConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$element, $schema = null, JsonPointer $path = null, $i = null)
+    public function check(&$element, $schema = null, $path = null, $i = null)
     {
         // Only validate enum if the attribute exists
         if ($element instanceof UndefinedConstraint && (!isset($schema->required) || !$schema->required)) {

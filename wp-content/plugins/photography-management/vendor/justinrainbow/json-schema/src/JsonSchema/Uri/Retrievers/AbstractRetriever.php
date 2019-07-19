@@ -1,10 +1,4 @@
 <?php
-/**
- * JsonSchema
- *
- * @filesource
- */
-
 namespace JsonSchema\Uri\Retrievers;
 
 /**

@@ -15,7 +15,7 @@ class DirectoryIterator extends \DirectoryIterator {
      *
      * @param FilenameFormat $filenameFormat
      */
-    public function setFilenameFormat(FilenameFormat $filenameFormat)
+    public function setFilenameFormat($filenameFormat)
     {
         $this->filenameFormat = $filenameFormat;
     }

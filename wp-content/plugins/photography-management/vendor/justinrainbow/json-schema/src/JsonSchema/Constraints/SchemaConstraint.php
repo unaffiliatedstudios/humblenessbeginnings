@@ -1,19 +1,11 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Exception\InvalidArgumentException;
-use JsonSchema\Exception\InvalidSchemaException;
-use JsonSchema\Exception\RuntimeException;
-use JsonSchema\Validator;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Exception\InvalidArgumentException;
+use \JsonSchema\Exception\InvalidSchemaException;
+use \JsonSchema\Exception\RuntimeException;
+use \JsonSchema\Validator;
 
 /**
  * The SchemaConstraint Constraints, validates an element against a given schema
@@ -28,7 +20,7 @@ class SchemaConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$element, $schema = null, JsonPointer $path = null, $i = null)
+    public function check(&$element, $schema = null, $path = null, $i = null)
     {
         if ($schema !== null) {
             // passed schema

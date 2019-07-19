@@ -18,31 +18,31 @@ namespace codeneric\phmm {
   require_once (dirname(__FILE__)."/schema/legacy/legacy_validators.php");
   class FunctionContainer {
     public function update_to_1_1_0() {
-      $options = get_option("cc_photo_settings", array());
+      $options = \get_option("cc_photo_settings", array());
       \HH\invariant(is_array($options), "%s", new Error("Expected array."));
       $options[\hacklib_id("cc_photo_image_box")] = 1;
       $options[\hacklib_id("cc_photo_download_text")] = "Download all";
-      update_option("cc_photo_settings", $options);
-      $posts_array = get_posts("post_type=client");
+      \update_option("cc_photo_settings", $options);
+      $posts_array = \get_posts("post_type=client");
       foreach ($posts_array as $client) {
-        $projects = get_post_meta($client->ID, "projects", true);
+        $projects = \get_post_meta($client->ID, "projects", true);
         $projects =
           \hacklib_cast_as_boolean(is_array($projects)) ? $projects : array();
         foreach ($projects as $k => $project) {
           $projects[$k][\hacklib_id("downloadable")] = true;
         }
-        update_post_meta($client->ID, "projects", $projects);
+        \update_post_meta($client->ID, "projects", $projects);
       }
     }
     public function update_to_2_2_2() {
-      if (get_option("codeneric_phmm_error_log") === false) {
-        update_option("codeneric_phmm_error_log", array());
+      if (\get_option("codeneric_phmm_error_log") === false) {
+        \update_option("codeneric_phmm_error_log", array());
       }
     }
     public function update_to_2_3_0() {
-      add_role(
+      \add_role(
         "phmm_client",
-        __("PhMm Client"),
+        \__("PHMM Client", "photography-management"),
         array(
           "read" => true,
           "edit_posts" => false,
@@ -51,28 +51,32 @@ namespace codeneric\phmm {
       );
     }
     public function update_to_2_7_0() {
-      $upload_dir = wp_upload_dir();
+      $upload_dir = \wp_upload_dir();
       $upload_dir =
         $upload_dir[\hacklib_id("basedir")]."/photography_management";
-      if (\hacklib_cast_as_boolean(is_link($upload_dir."/protect.php"))) {
-        unlink($upload_dir."/protect.php");
+      if (\hacklib_cast_as_boolean(\is_link($upload_dir."/protect.php"))) {
+        \unlink($upload_dir."/protect.php");
       }
-      if (\hacklib_cast_as_boolean(is_link($upload_dir."/.htaccess"))) {
-        unlink($upload_dir."/.htaccess");
+      if (\hacklib_cast_as_boolean(\is_link($upload_dir."/.htaccess"))) {
+        \unlink($upload_dir."/.htaccess");
       }
-      if (\hacklib_cast_as_boolean(file_exists($upload_dir."/.htaccess"))) {
-        unlink($upload_dir."/.htaccess");
+      if (\hacklib_cast_as_boolean(\file_exists($upload_dir."/.htaccess"))) {
+        \unlink($upload_dir."/.htaccess");
       }
-      Photography_Management_Base_Generate_Htaccess($upload_dir."/.htaccess");
+      \Photography_Management_Base_Generate_Htaccess(
+        $upload_dir."/.htaccess"
+      );
     }
     public function update_to_3_2_6() {
-      $upload_dir = wp_upload_dir();
+      $upload_dir = \wp_upload_dir();
       $upload_dir =
         $upload_dir[\hacklib_id("basedir")]."/photography_management";
-      if (\hacklib_cast_as_boolean(file_exists($upload_dir."/.htaccess"))) {
-        unlink($upload_dir."/.htaccess");
+      if (\hacklib_cast_as_boolean(\file_exists($upload_dir."/.htaccess"))) {
+        \unlink($upload_dir."/.htaccess");
       }
-      Photography_Management_Base_Generate_Htaccess($upload_dir."/.htaccess");
+      \Photography_Management_Base_Generate_Htaccess(
+        $upload_dir."/.htaccess"
+      );
     }
     public function update_to_3_5_0() {
       $query_args = array(
@@ -80,14 +84,14 @@ namespace codeneric\phmm {
         "offset" => 0,
         "post_type" => "client"
       );
-      $posts_array = get_posts($query_args);
+      $posts_array = \get_posts($query_args);
       foreach ($posts_array as $client) {
-        $projects = get_post_meta($client->ID, "projects", true);
+        $projects = \get_post_meta($client->ID, "projects", true);
         $projects =
           \hacklib_cast_as_boolean(is_array($projects)) ? $projects : array();
         foreach ($projects as $k => $project) {
-          $uniqid = uniqid("", true);
-          $uniqid = str_replace(".", "", $uniqid);
+          $uniqid = \uniqid("", true);
+          $uniqid = \str_replace(".", "", $uniqid);
           if (\hacklib_cast_as_boolean(/* UNSAFE_EXPR */
                 (!isset($projects[$k][\hacklib_id("id")])) ||
                 \hacklib_equals($projects[$k][\hacklib_id("id")], false)
@@ -95,19 +99,19 @@ namespace codeneric\phmm {
             $projects[$k][\hacklib_id("id")] = $uniqid;
           }
         }
-        update_post_meta($client->ID, "projects", $projects);
+        \update_post_meta($client->ID, "projects", $projects);
       }
     }
     public function update_to_4_0_0() {
       Logger::info("Starting update to 4.0.0");
-      Logger::info("Memory allocated in beginning: ".memory_get_usage());
+      Logger::info("Memory allocated in beginning: ".\memory_get_usage());
       try {
-        $memory_limit = ini_get("memory_limit");
+        $memory_limit = \ini_get("memory_limit");
       } catch (\Exception $e) {
         $memory_limit = "not retrievable";
       }
       Logger::info("Memory limit: ".$memory_limit);
-      $startTime = microtime(true);
+      $startTime = \microtime(true);
       $wpdb = Superglobals::Globals("wpdb");
       \HH\invariant(
         $wpdb instanceof \wpdb,
@@ -122,20 +126,20 @@ namespace codeneric\phmm {
         " (\n      id   bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,\n      time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,\n      content   text DEFAULT '' NOT NULL,\n      project_id   bigint(20) UNSIGNED NOT NULL,\n      attachment_id   bigint(20) UNSIGNED NOT NULL,\n      wp_user_id   bigint(20) UNSIGNED NOT NULL,\n      client_id   bigint(20) UNSIGNED NOT NULL,\n      wp_author_id   bigint(20) UNSIGNED NOT NULL,\n      UNIQUE KEY id (id)\n    ) ".
         $charset_collate.
         ";";
-      dbDelta(/* UNSAFE_EXPR */ $sql);
+      \dbDelta(/* UNSAFE_EXPR */ $sql);
       Logger::info("Comments Table created");
       try {
         $plugin_settings =
           \codeneric\phmm\legacy\v3_6_5\read_plugin_settings();
         Logger::info("Old Plugin Settings");
-        Logger::info(json_encode($plugin_settings));
+        Logger::info(\json_encode($plugin_settings));
         $plugin_settings_4_0_0 =
           \codeneric\phmm\legacy\map_plugin_settings_from_3_6_5(
             $plugin_settings
           );
         Logger::info("New Plugin Settings");
-        Logger::info(json_encode($plugin_settings_4_0_0));
-        update_option(
+        Logger::info(\json_encode($plugin_settings_4_0_0));
+        \update_option(
           "codeneric_phmm_plugin_settings",
           $plugin_settings_4_0_0
         );
@@ -144,8 +148,8 @@ namespace codeneric\phmm {
         Logger::error(
           "Migrating plugin settings failed! ".$e->__toString(),
           array(
-            "memory" => memory_get_usage(),
-            "seconds_passed" => microtime(true) - $startTime
+            "memory" => \memory_get_usage(),
+            "seconds_passed" => \microtime(true) - $startTime
           )
         );
       }
@@ -156,7 +160,7 @@ namespace codeneric\phmm {
           "offset" => 0,
           "post_type" => "client"
         );
-        $posts_array = get_posts($query_args);
+        $posts_array = \get_posts($query_args);
         $ids = array();
         foreach ($posts_array as $p) {
           $ids[] = (int) $p->ID;
@@ -168,9 +172,9 @@ namespace codeneric\phmm {
       $caller =
         function($client_id) {
           if ("production" === "development") {
-            sleep(11);
+            \sleep(11);
           }
-          $client = get_post_meta($client_id, "client", true);
+          $client = \get_post_meta($client_id, "client", true);
           try {
             Logger::info(
               "Migrate client data representation for ID ".$client_id,
@@ -187,7 +191,7 @@ namespace codeneric\phmm {
             Logger::info("Getting projects for client ID ".$client_id);
             $projects =
               \codeneric\phmm\legacy\v3_6_5\read_projects($client_id);
-            Logger::info("Success! Got ".count($projects)." projects");
+            Logger::info("Success! Got ".\count($projects)." projects");
             $project_ids = array();
             foreach ($projects as $key => $project) {
               Logger::info(
@@ -203,11 +207,11 @@ namespace codeneric\phmm {
                 $project[\hacklib_id("id")],
                 $project_4_0_0
               );
-              $pid = wp_insert_post(
+              $pid = \wp_insert_post(
                 array(
                   "post_title" => $project[\hacklib_id("title")],
                   "post_type" => "project",
-                  "post_status" => get_post_status($client_id),
+                  "post_status" => \get_post_status($client_id),
                   "post_password" => $client[\hacklib_id("pwd")],
                   "post_content" => $project[\hacklib_id("description")]
                 )
@@ -224,7 +228,7 @@ namespace codeneric\phmm {
                 Logger::info("Saved metadata");
                 $project_ids[] = $pid;
                 if (!\hacklib_cast_as_boolean(
-                      is_null($client[\hacklib_id("wp_user_id")])
+                      \is_null($client[\hacklib_id("wp_user_id")])
                     )) {
                   Logger::info(
                     "Mapping comments for project with ID ".
@@ -236,7 +240,7 @@ namespace codeneric\phmm {
                     foreach ($comments as $c) {
                       $wp_user_id = $client[\hacklib_id("wp_user_id")];
                       $wp_user_id_of_client =
-                        (!\hacklib_cast_as_boolean(is_null($wp_user_id)))
+                        (!\hacklib_cast_as_boolean(\is_null($wp_user_id)))
                           ? $wp_user_id
                           : 0;
                       Logger::info("Got v3.6.5 comment", $c);
@@ -267,9 +271,9 @@ namespace codeneric\phmm {
               }
             }
             if (!\hacklib_cast_as_boolean(
-                  is_null($client[\hacklib_id("wp_user_id")])
+                  \is_null($client[\hacklib_id("wp_user_id")])
                 )) {
-              update_post_meta(
+              \update_post_meta(
                 $client_id,
                 "wp_user",
                 $client[\hacklib_id("wp_user_id")]
@@ -294,7 +298,7 @@ namespace codeneric\phmm {
               $client_id.
               "failed! ".
               $e->__toString(),
-              array("memory" => memory_get_usage())
+              array("memory" => \memory_get_usage())
             );
             return SemaphoreExecutorReturn::Failed;
           }
@@ -303,21 +307,21 @@ namespace codeneric\phmm {
       Logger::info("Starting migration of clients...", $semaphore_state);
       $semaphore_state =
         Semaphore::run($mutex_name, $semaphore_state, $caller);
-      if (!\hacklib_cast_as_boolean(is_null($semaphore_state))) {
+      if (!\hacklib_cast_as_boolean(\is_null($semaphore_state))) {
         Logger::info("new clients migration state:", $semaphore_state);
         Semaphore::set_state($mutex_name, $semaphore_state);
       }
       $semaphore_state = Semaphore::get_state($mutex_name, $all_client_ids);
-      if (count($semaphore_state[\hacklib_id("outstanding")]) === 0) {
+      if (\count($semaphore_state[\hacklib_id("outstanding")]) === 0) {
         Logger::info("Clients migration finished:", $semaphore_state);
         Semaphore::delete_state($mutex_name);
       }
       return $semaphore_state;
     }
     public function update_to_4_1_5() {
-      $install_time = get_option("codeneric/phmm/install_time");
+      $install_time = \get_option("codeneric/phmm/install_time");
       if ($install_time === false) {
-        update_option("codeneric/phmm/install_time", time());
+        \update_option("codeneric/phmm/install_time", \time());
       }
       $wpdb = Superglobals::Globals("wpdb");
       \HH\invariant(
@@ -333,10 +337,26 @@ namespace codeneric\phmm {
         " (\n      id   bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,\n      time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,\n      content   text DEFAULT '' NOT NULL,\n      project_id   bigint(20) UNSIGNED NOT NULL,\n      attachment_id   bigint(20) UNSIGNED NOT NULL,\n      wp_user_id   bigint(20) UNSIGNED NOT NULL,\n      client_id   bigint(20) UNSIGNED NOT NULL,\n      wp_author_id   bigint(20) UNSIGNED NOT NULL,\n      UNIQUE KEY id (id)\n    ) ".
         $charset_collate.
         ";";
-      dbDelta(/* UNSAFE_EXPR */ $sql);
+      \dbDelta(/* UNSAFE_EXPR */ $sql);
+    }
+    public function update_to_4_3_1() {
+      $old_version = \get_option("cc_photo_manage_curr_version");
+      if ($old_version === false) {
+        $settings = \codeneric\phmm\base\admin\Settings::getCurrentSettings();
+        $settings[\hacklib_id("fast_image_load")] = true;
+        \codeneric\phmm\base\admin\Settings::updateSettings($settings);
+        $upload_dir = \wp_upload_dir();
+        $upload_dir =
+          $upload_dir[\hacklib_id("basedir")]."/photography_management";
+        if (\hacklib_cast_as_boolean(
+              \file_exists($upload_dir."/.htaccess")
+            )) {
+          \unlink($upload_dir."/.htaccess");
+        }
+      }
     }
     public function legacy($cc_phmm_config) {
-      $p = get_option("cc_prem");
+      $p = (bool) \hacklib_cast_as_boolean(\get_option("cc_prem"));
       if (\hacklib_cast_as_boolean($p) &&
           (!\hacklib_cast_as_boolean(
              $cc_phmm_config[\hacklib_id("has_premium_ext")]
@@ -344,21 +364,21 @@ namespace codeneric\phmm {
         $cc_phmm_base_admin_notice_update_to_premium =
           function() {
             $class = "notice notice-error";
-            $prem_url = admin_url("edit.php");
-            $prem_url = add_query_arg(
+            $prem_url = \admin_url("edit.php");
+            $prem_url = \add_query_arg(
               array("post_type" => "client", "page" => "premium"),
               $prem_url
             );
-            $p_url = admin_url("plugins.php");
+            $p_url = \admin_url("plugins.php");
             $message =
               "Please <a id=\"cc_phmm_install_notice\" href=\"".
               $prem_url.
               "\" data-plugins-url=\"".
               $p_url.
               "\" >install</a> the Photography Management Premium extension!";
-            wp_enqueue_script(
+            \wp_enqueue_script(
               "cc_phmm_admin_notice",
-              plugin_dir_url(__FILE__)."/partials/admin_notice.js"
+              \plugin_dir_url(__FILE__)."/partials/admin_notice.js"
             );
             $spinner =
               "<div id=\"cc_phmm_notice_spinner\" style=\"background:url('images/spinner.gif') no-repeat;background-size: 20px 20px;vertical-align: middle;margin: 0 auto;height: 20px;width: 20px;display:none;\"></div>";
@@ -372,7 +392,7 @@ namespace codeneric\phmm {
                "</p></div>")
             ;
           };
-        add_action(
+        \add_action(
           "admin_notices",
           $cc_phmm_base_admin_notice_update_to_premium
         );
@@ -386,7 +406,7 @@ namespace codeneric\phmm {
           $cc_phmm_base_admin_notice_update_to_premium =
             function() {
               $class = "notice notice-error";
-              $d_url = admin_url("plugins.php");
+              $d_url = \admin_url("plugins.php");
               $message =
                 "Please <a href=\"".
                 $d_url.
@@ -401,7 +421,7 @@ namespace codeneric\phmm {
                  $script)
               ;
             };
-          add_action(
+          \add_action(
             "admin_notices",
             $cc_phmm_base_admin_notice_update_to_premium
           );

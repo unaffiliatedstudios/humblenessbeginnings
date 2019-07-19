@@ -8,7 +8,7 @@ final class SchemaTest extends Codeneric_UnitTest {
   private function checkUsername($data) {
     return \codeneric\phmm\validate\check_username($data);
   }
-  private function iterateCheck($datasets, $schema) {
+  private function iterateCheck($datasets, $schema) { // UNSAFE
     foreach ($datasets as $entry) {
       list($data, $v) =
         Schema::validate($entry[\hacklib_id("data")], $schema);

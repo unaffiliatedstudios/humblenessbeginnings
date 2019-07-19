@@ -7,7 +7,7 @@ namespace codeneric\phmm\base\admin\ajax {
     public static function getPayload() {
       $P = Superglobals::Post();
       \HH\invariant(
-        array_key_exists("payload", $P),
+        \array_key_exists("payload", $P),
         "%s",
         new Error("Payload not set")
       );
@@ -32,10 +32,10 @@ namespace codeneric\phmm\base\admin\ajax {
         \hacklib_cast_as_boolean(is_string($error))
           ? self::makeError($error)
           : $error;
-      wp_send_json_error(array("error" => $e), $statusCode);
+      \wp_send_json_error(array("error" => $e), $statusCode);
     }
     public static function resolveValidRequest($response) {
-      wp_send_json_success(array("data" => $response));
+      \wp_send_json_success(array("data" => $response));
       return $response;
     }
     public static function makeError($msg) {

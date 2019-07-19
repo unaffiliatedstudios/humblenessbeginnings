@@ -16,14 +16,14 @@ namespace codeneric\phmm\base\includes {
         return true;
       }
       $client = Client::get($client_id);
-      if (\hacklib_cast_as_boolean(is_null($client))) {
+      if (\hacklib_cast_as_boolean(\is_null($client))) {
         return false;
       }
       $wp_user = $client[\hacklib_id("wp_user")];
-      if (\hacklib_cast_as_boolean(is_null($wp_user))) {
+      if (\hacklib_cast_as_boolean(\is_null($wp_user))) {
         return false;
       }
-      $current_user = wp_get_current_user();
+      $current_user = \wp_get_current_user();
       if ($current_user === 0) {
         return false;
       }
@@ -38,7 +38,7 @@ namespace codeneric\phmm\base\includes {
         userState::Client,
         userState::Guest
       );
-      return in_array($client_state, $allowed_states);
+      return \in_array($client_state, $allowed_states);
     }
     public static function get_client_id_wrt_project($project_id) {
       $project_state = self::get_project_state($project_id);
@@ -48,7 +48,7 @@ namespace codeneric\phmm\base\includes {
         case userState::Client:
           $client = Client::get_current();
           return
-            \hacklib_cast_as_boolean(is_null($client))
+            \hacklib_cast_as_boolean(\is_null($client))
               ? null
               : $client[\hacklib_id("ID")];
           break;
@@ -65,7 +65,7 @@ namespace codeneric\phmm\base\includes {
       $projectState,
       $projectID
     ) {
-      if (!\hacklib_cast_as_boolean(is_user_logged_in())) {
+      if (!\hacklib_cast_as_boolean(\is_user_logged_in())) {
         if (($projectState !== projectState::PrivateWithGuestLogin) &&
             ($projectState !==
              projectState::PrivateWithGuestLoginNoClientsAssigned)) {
@@ -85,7 +85,7 @@ namespace codeneric\phmm\base\includes {
           return userState::Admin;
         }
         $maybeClient = Client::get_current();
-        if (\hacklib_cast_as_boolean(is_null($maybeClient))) {
+        if (\hacklib_cast_as_boolean(\is_null($maybeClient))) {
           return userState::LoggedInUserWithNoAccess;
         }
         $client = $maybeClient;
@@ -106,7 +106,7 @@ namespace codeneric\phmm\base\includes {
       }
       if (($state[\hacklib_id("password_protection")] === true) &&
           (!\hacklib_cast_as_boolean(
-             is_null($state[\hacklib_id("password")])
+             \is_null($state[\hacklib_id("password")])
            )) &&
           ($state[\hacklib_id("password")] !== "")) {
         return
@@ -162,7 +162,7 @@ namespace codeneric\phmm\base\includes {
         return portalDisplay::AdminNotice;
       }
       $c = Client::get_current();
-      if (\hacklib_cast_as_boolean(is_null($c))) {
+      if (\hacklib_cast_as_boolean(\is_null($c))) {
         return portalDisplay::LoginForm;
       }
       return portalDisplay::Redirect;
@@ -172,7 +172,7 @@ namespace codeneric\phmm\base\includes {
         return clientDisplay::AdminNoticeWithClientView;
       }
       $c = Client::get_current();
-      if (\hacklib_cast_as_boolean(is_null($c))) {
+      if (\hacklib_cast_as_boolean(\is_null($c))) {
         return clientDisplay::LoginForm;
       }
       if ($c[\hacklib_id("ID")] === $clientID) {

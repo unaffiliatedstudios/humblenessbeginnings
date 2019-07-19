@@ -1,5 +1,4 @@
 <?php
-
 namespace Analog\Handler;
 
 require_once __DIR__ . '/../../ChromePhp.php';

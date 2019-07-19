@@ -36,11 +36,11 @@ class Codeneric_UnitTest extends WP_UnitTestCase {
     $this->admin = new \codeneric\phmm\base\admin\Main();
     $this->ajaxEndpoints = new \codeneric\phmm\base\admin\ajax\Endpoints();
   }
-  public function tearDown() { /* UNSAFE_EXPR */
-    unset($this->config); /* UNSAFE_EXPR */
-    unset($this->schema); /* UNSAFE_EXPR */
-    unset($this->client); /* UNSAFE_EXPR */
-    unset($this->proect); /* UNSAFE_EXPR */
+  public function tearDown() {
+    unset($this->config);
+    unset($this->schema);
+    unset($this->client);
+    unset($this->proect);
     unset($this->labels);
     parent::tearDown();
   }
@@ -50,7 +50,7 @@ class Codeneric_UnitTest extends WP_UnitTestCase {
   public static function _setRole($role) {
     $post = /* UNSAFE_EXPR */ $_POST;
     $user_id = self::factory()->user->create(array("role" => $role));
-    wp_set_current_user($user_id);
+    \wp_set_current_user($user_id);
     $_POST = array_merge(/* UNSAFE_EXPR */ $_POST, $post);
   }
   public static function makeAdministrator() {

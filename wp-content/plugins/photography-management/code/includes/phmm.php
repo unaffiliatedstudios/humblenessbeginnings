@@ -51,6 +51,8 @@ namespace codeneric\phmm\base\includes {
         "dismiss_admin_notice"
       );
       $this->loader
+        ->add_action("wp_ajax_phmm_get_debug_info", $ajax, "get_debug_info");
+      $this->loader
         ->add_action("wp_ajax_phmm_send_feedback", $ajax, "send_feedback");
       $this->loader
         ->add_action("wp_ajax_nopriv_phmm_star_photo", $ajax, "label_images");
@@ -78,6 +80,11 @@ namespace codeneric\phmm\base\includes {
         ->add_action("wp_ajax_phmm_label_image", $ajax, "label_images");
       $this->loader
         ->add_action("wp_ajax_phmm_check_username", $ajax, "check_username");
+      $this->loader->add_action(
+        "wp_ajax_analytics_opt_in_allow",
+        $ajax,
+        "analytics_opt_in_allow"
+      );
       $this->loader
         ->add_action("wp_ajax_phmm_check_email", $ajax, "check_email");
       $this->loader->add_action(
@@ -100,8 +107,18 @@ namespace codeneric\phmm\base\includes {
         $ajax,
         "update_premium"
       );
+      $this->loader->add_action(
+        "wp_ajax_codeneric_phmm_set_product_demo_finished",
+        $ajax,
+        "set_product_demo_finished"
+      );
       $this->loader
         ->add_action("init", $plugin_admin, "register_client_post_type");
+      $this->loader->add_action(
+        "admin_head",
+        $frontendHandler,
+        "handle_analytics_enqueue"
+      );
       $this->loader->add_action(
         "admin_init",
         $frontendHandler,
@@ -151,12 +168,29 @@ namespace codeneric\phmm\base\includes {
       $this->loader->add_action(
         "admin_init",
         $plugin_admin,
+        "plugin_deactivation_survey"
+      );
+      $this->loader
+        ->add_action("admin_init", $plugin_admin, "remove_update_cache");
+      $this->loader->add_action(
+        "admin_init",
+        $plugin_admin,
         "add_admin_notice_fast_images_available_for_free"
       );
       $this->loader->add_action(
         "admin_init",
         $plugin_admin,
         "add_admin_notice_rate_the_plugin"
+      );
+      $this->loader->add_action(
+        "admin_init",
+        $plugin_admin,
+        "add_admin_notice_analytics_opt_in"
+      );
+      $this->loader->add_action(
+        "admin_init",
+        $plugin_admin,
+        "add_admin_notice_update_phmm_fast_images"
       );
       $this->loader->add_action(
         "add_meta_boxes_".$config[\hacklib_id("client_post_type")],
@@ -253,6 +287,13 @@ namespace codeneric\phmm\base\includes {
         10,
         2
       );
+      $this->loader->add_action(
+        "update_option_codeneric_phmm_plugin_settings",
+        $plugin_admin,
+        "plugin_settings_changed",
+        10,
+        2
+      );
       $this->loader->add_filter(
         "next_post_link",
         $frontendHandler,
@@ -321,15 +362,17 @@ namespace codeneric\phmm\base\includes {
         $plugin_public,
         "redirect_from_portal_page"
       );
-      add_shortcode(
+      $this->loader
+        ->add_action("wp_login_failed", $plugin_public, "login_failed");
+      \add_shortcode(
         \codeneric\phmm\base\frontend\Shortcodes::GALLERY,
         array($plugin_public, "gallery_shortcode")
       );
-      add_shortcode(
+      \add_shortcode(
         \codeneric\phmm\base\frontend\Shortcodes::CLIENT,
         array($plugin_public, "client_shortcode")
       );
-      add_shortcode(
+      \add_shortcode(
         \codeneric\phmm\base\frontend\Shortcodes::PORTAL,
         array($plugin_public, "portal_shortcode")
       );

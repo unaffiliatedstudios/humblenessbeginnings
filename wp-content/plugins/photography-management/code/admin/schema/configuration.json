@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "additionalProperties": false,
+  "additionalProperties": true,
 
   "properties": {
     "commentable": {
@@ -24,6 +24,7 @@
       "id": "/properties/downloadable_favs",
       "type": "boolean"
     },
+
     "downloadable_single": {
       "default": false,
       "id": "/properties/downloadable_single",
@@ -34,6 +35,11 @@
       "default": true,
       "id": "/properties/favoritable",
       "type": "boolean"
+    },
+    "favoritable_limit": {
+      "default": null,
+      "id": "/properties/favoritable_limit",
+      "type": ["null", "number"]
     },
     "showCaptions": {
       "default": false,
@@ -59,6 +65,7 @@
     "downloadable_single",
     "commentable",
     "favoritable",
+    "favoritable_limit",
     "showFilenames",
     "downloadable"
   ],

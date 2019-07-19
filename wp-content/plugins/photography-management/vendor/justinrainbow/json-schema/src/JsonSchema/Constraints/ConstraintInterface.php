@@ -1,15 +1,7 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Entity\JsonPointer;
 
 /**
  * The Constraints Interface
@@ -30,7 +22,7 @@ interface ConstraintInterface
      *
      * @param array $errors
      */
-    public function addErrors(array $errors);
+    public function addErrors($errors);
 
     /**
      * adds an error
@@ -40,7 +32,7 @@ interface ConstraintInterface
      * @param string           $constraint the constraint/rule that is broken, e.g.: 'minLength'
      * @param array            $more       more array elements to add to the error
      */
-    public function addError(JsonPointer $path = null, $message, $constraint='', array $more = null);
+    public function addError($path = null, $message, $constraint='', $more = null);
 
     /**
      * checks if the validator has not raised errors
@@ -61,5 +53,5 @@ interface ConstraintInterface
      *
      * @throws \JsonSchema\Exception\ExceptionInterface
      */
-    public function check(&$value, $schema = null, JsonPointer $path = null, $i = null);
+    public function check(&$value, $schema = null, $path = null, $i = null);
 }

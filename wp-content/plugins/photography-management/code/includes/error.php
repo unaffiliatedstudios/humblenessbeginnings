@@ -45,13 +45,13 @@ namespace codeneric\phmm\base\includes {
       $this->recoverFn = $recoverFn;
       $this->failedVariables = $failedVariables;
       $this->recoverFnParams =
-        \hacklib_cast_as_boolean(is_null($recoverFnParams))
+        \hacklib_cast_as_boolean(\is_null($recoverFnParams))
           ? array()
           : $recoverFnParams;
     }
     public function recover() {
       $fnRef = $this->recoverFn;
-      if (\hacklib_cast_as_boolean(is_null($fnRef)) ||
+      if (\hacklib_cast_as_boolean(\is_null($fnRef)) ||
           (!\hacklib_cast_as_boolean(RecoverEnum::isValid($fnRef)))) {
         return false;
       }
@@ -61,10 +61,10 @@ namespace codeneric\phmm\base\includes {
       );
     }
     public function __toString() {
-      return serialize($this);
+      return \serialize($this);
     }
     public static function unseralize($serialized) {
-      $us = unserialize($serialized);
+      $us = \unserialize($serialized);
       if ($us instanceof Error) {
         return $us;
       }
@@ -75,18 +75,18 @@ namespace codeneric\phmm\base\includes {
         return self::kernel_panic("Encoded error not expected shape");
       }
       $error = self::unseralize($encodedError);
-      if (\hacklib_cast_as_boolean(is_null($error))) {
+      if (\hacklib_cast_as_boolean(\is_null($error))) {
         return self::kernel_panic("Encoded error null");
       }
       $error->recover();
       $id = self::getTransientErrorID();
-      if (\hacklib_cast_as_boolean(is_null($id))) {
+      if (\hacklib_cast_as_boolean(\is_null($id))) {
         return self::kernel_panic("Transient ID null. ".$error->message);
       }
-      $transient = get_transient($id);
+      $transient = \get_transient($id);
       if ("production" === "development") {
-        $vars = json_encode($error->failedVariables);
-        if (\hacklib_cast_as_boolean(class_exists("WPDieException"))) {
+        $vars = \json_encode($error->failedVariables);
+        if (\hacklib_cast_as_boolean(\class_exists("WPDieException"))) {
           throw new \WPDieException(
             $error->message." ***** Failed variables: ".$vars
           );
@@ -95,7 +95,7 @@ namespace codeneric\phmm\base\includes {
             $error->message." ***** Failed variables: ".$vars
           );
         }
-        if (\hacklib_cast_as_boolean(class_exists("\\WPDieException"))) {
+        if (\hacklib_cast_as_boolean(\class_exists("\\WPDieException"))) {
           throw new \WPDieException(
             $error->message." ***** Failed variables: ".$vars
           );
@@ -126,32 +126,32 @@ namespace codeneric\phmm\base\includes {
       }
     }
     public static function deleteTransient($id) {
-      return delete_transient($id);
+      return \delete_transient($id);
     }
     public static function updateTransientCount($id, $count) {
-      return set_transient($id, $count, 60 * 60);
+      return \set_transient($id, $count, 60 * 60);
     }
     public static function getTransientErrorID() {
-      $bt = debug_backtrace();
+      $bt = \debug_backtrace();
       if (!\hacklib_cast_as_boolean(is_array($bt))) {
         return null;
       }
       $needle = "HH\\invariant";
       foreach ($bt as $entry) {
-        if (\hacklib_cast_as_boolean(array_key_exists("function", $entry)) &&
+        if (\hacklib_cast_as_boolean(\array_key_exists("function", $entry)) &&
             ($entry[\hacklib_id("function")] === $needle) &&
-            \hacklib_cast_as_boolean(array_key_exists("file", $entry)) &&
-            \hacklib_cast_as_boolean(array_key_exists("line", $entry))) {
+            \hacklib_cast_as_boolean(\array_key_exists("file", $entry)) &&
+            \hacklib_cast_as_boolean(\array_key_exists("line", $entry))) {
           return
             "codeneric/phmm/error/".
-            md5($entry[\hacklib_id("file")].$entry[\hacklib_id("line")]);
+            \md5($entry[\hacklib_id("file")].$entry[\hacklib_id("line")]);
         }
       }
       return null;
     }
     private static function deactivate_plugin() {
       $name = "photography-management/photography_management.php";
-      deactivate_plugins(
+      \deactivate_plugins(
         array("photography-management/photography_management.php"),
         true
       );
@@ -160,16 +160,16 @@ namespace codeneric\phmm\base\includes {
       $error = null,
       $failedVariables = null
     ) {
-      if (!\hacklib_cast_as_boolean(current_user_can("administrator"))) {
+      if (!\hacklib_cast_as_boolean(\current_user_can("administrator"))) {
         return;
       }
       $title = "<h1>Photography Management</h1>";
       try {
         if (\hacklib_cast_as_boolean(
-              class_exists("\\codeneric\\phmm\\Logger", false)
+              \class_exists("\\codeneric\\phmm\\Logger", false)
             )) {
           \codeneric\phmm\Logger::urgent(
-            \hacklib_cast_as_boolean(is_null($error))
+            \hacklib_cast_as_boolean(\is_null($error))
               ? "Fatal Error with no name"
               : $error,
             $failedVariables
@@ -178,28 +178,28 @@ namespace codeneric\phmm\base\includes {
       } catch (\Exception $e) {
       }
       try {
-        $backtrace = debug_backtrace();
+        $backtrace = \debug_backtrace();
       } catch (\Exception $e) {
         $backtrace = null;
       }
-      if (\hacklib_cast_as_boolean(is_null($backtrace))) {
+      if (\hacklib_cast_as_boolean(\is_null($backtrace))) {
         $backtrace = array();
       }
       try {
-        ob_start();
-        phpinfo(-1);
-        $phpinfo = ob_get_contents();
-        ob_get_clean();
+        \ob_start();
+        \phpinfo(-1);
+        $phpinfo = \ob_get_contents();
+        \ob_get_clean();
       } catch (\Exception $e) {
         $phpinfo = "";
       }
       $data = array("backtrace" => $backtrace, "phpinfo" => $phpinfo);
       try {
         if (\hacklib_cast_as_boolean(
-              class_exists("\\codeneric\\phmm\\Logger", false)
+              \class_exists("\\codeneric\\phmm\\Logger", false)
             )) {
           \codeneric\phmm\Logger::urgent(
-            \hacklib_cast_as_boolean(is_null($error))
+            \hacklib_cast_as_boolean(\is_null($error))
               ? "Fatal Error with no name"
               : $error,
             array(
@@ -212,8 +212,8 @@ namespace codeneric\phmm\base\includes {
       } catch (\Exception $e) {
       }
       $backtraceJSON =
-        htmlspecialchars(json_encode($backtrace), ENT_QUOTES, "UTF-8");
-      $phpinfoEscaped = htmlspecialchars($phpinfo, ENT_QUOTES, "UTF-8");
+        \htmlspecialchars(\json_encode($backtrace), \ENT_QUOTES, "UTF-8");
+      $phpinfoEscaped = \htmlspecialchars($phpinfo, \ENT_QUOTES, "UTF-8");
       $body =
         "<div id='cc_phmm_fatal_error' data-phpinfo='".
         $phpinfoEscaped.
@@ -224,34 +224,34 @@ namespace codeneric\phmm\base\includes {
         $path = "http://192.168.0.43:4242/base/phmm.fatal.error.js";
       } else {
         $filename = "phmm.fatal.error.js";
-        $path = plugins_url("../assets/js/".$filename, __FILE__);
+        $path = \plugins_url("../assets/js/".$filename, __FILE__);
       }
       $rand = function() {
         if (\hacklib_cast_as_boolean(
-              function_exists("openssl_random_pseudo_bytes")
+              \function_exists("openssl_random_pseudo_bytes")
             )) {
-          return bin2hex(openssl_random_pseudo_bytes(20));
+          return \bin2hex(\openssl_random_pseudo_bytes(20));
         } else {
-          return strval(mt_rand());
+          return \strval(\mt_rand());
         }
       };
       $nonce = $rand();
-      if (\hacklib_cast_as_boolean(function_exists("current_user_can"))) {
-        if (\hacklib_cast_as_boolean(current_user_can("administrator"))) {
-          set_transient("codeneric_phmm_deactivate", $nonce);
+      if (\hacklib_cast_as_boolean(\function_exists("current_user_can"))) {
+        if (\hacklib_cast_as_boolean(\current_user_can("administrator"))) {
+          \set_transient("codeneric_phmm_deactivate", $nonce, 60);
         } else {
           $nonce = "";
         }
       } else {
-        set_transient("codeneric_phmm_deactivate", $nonce);
+        \set_transient("codeneric_phmm_deactivate", $nonce, 60);
       }
-      $failedVariablesStringified = json_encode($failedVariables);
+      $failedVariablesStringified = \json_encode($failedVariables);
       if ($failedVariablesStringified === false) {
         $failedVariablesStringified = "";
       }
       $errorName = self::get_error_name($error, $backtrace);
-      $pluginsDir = plugins_url("assets/js/", dirname(__FILE__));
-      $baseUrl = get_site_url();
+      $pluginsDir = \plugins_url("assets/js/", \dirname(__FILE__));
+      $baseUrl = \get_site_url();
       $localize =
         "<script type='text/javascript' >\n        codeneric_phmm_plugins_dir = '".
         $pluginsDir.
@@ -265,34 +265,34 @@ namespace codeneric\phmm\base\includes {
         $baseUrl.
         "';\n    </script>";
       $script = "<script type='text/javascript' src='".$path."'></script>";
-      wp_die($body.$localize.$script);
+      \wp_die($body.$localize.$script);
     }
     private static function kernel_panic($error = null) {
       self::deactivate_plugin();
       $title = "<h1>Photography Management Kernel Panic</h1>";
-      wp_die(
-        $title.((!\hacklib_cast_as_boolean(is_null($error))) ? $error : "")
+      \wp_die(
+        $title.((!\hacklib_cast_as_boolean(\is_null($error))) ? $error : "")
       );
     }
     public static function get_error_name($error, $backtrace) {
       $unknownErrorName = "Unknown error";
       if (!\hacklib_cast_as_boolean(is_array($backtrace))) {
         return
-          \hacklib_cast_as_boolean(is_null($error))
+          \hacklib_cast_as_boolean(\is_null($error))
             ? $unknownErrorName
             : $error;
       }
-      $e = \hacklib_cast_as_boolean(is_null($error)) ? "" : ($error." ");
+      $e = \hacklib_cast_as_boolean(\is_null($error)) ? "" : ($error." ");
       foreach ($backtrace as $trace) {
         if (\hacklib_cast_as_boolean(is_array($trace)) &&
-            \hacklib_cast_as_boolean(array_key_exists("function", $trace)) &&
-            \hacklib_cast_as_boolean(array_key_exists("file", $trace)) &&
-            \hacklib_cast_as_boolean(array_key_exists("line", $trace)) &&
+            \hacklib_cast_as_boolean(\array_key_exists("function", $trace)) &&
+            \hacklib_cast_as_boolean(\array_key_exists("file", $trace)) &&
+            \hacklib_cast_as_boolean(\array_key_exists("line", $trace)) &&
             ($trace[\hacklib_id("function")] === "HH\\invariant")) {
           $path = $trace[\hacklib_id("file")].":".$trace[\hacklib_id("line")];
           $result = array();
-          preg_match("/.*(photography\\-management.*)/", $path, $result);
-          if (count($result) >= 2) {
+          \preg_match("/.*(photography\\-management.*)/", $path, $result);
+          if (\count($result) >= 2) {
             return $e.$result[1];
           } else {
             return $e.$path;
@@ -300,7 +300,7 @@ namespace codeneric\phmm\base\includes {
         }
       }
       return
-        \hacklib_cast_as_boolean(is_null($error))
+        \hacklib_cast_as_boolean(\is_null($error))
           ? $unknownErrorName
           : $error;
     }

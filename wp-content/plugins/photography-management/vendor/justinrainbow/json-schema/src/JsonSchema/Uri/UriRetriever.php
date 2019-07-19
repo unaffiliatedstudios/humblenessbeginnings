@@ -1,21 +1,13 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Uri;
 
-use JsonSchema\Exception\InvalidSchemaMediaTypeException;
-use JsonSchema\Exception\JsonDecodingException;
-use JsonSchema\Exception\ResourceNotFoundException;
-use JsonSchema\Uri\Retrievers\FileGetContents;
-use JsonSchema\Uri\Retrievers\UriRetrieverInterface;
-use JsonSchema\UriRetrieverInterface as BaseUriRetrieverInterface;
-use JsonSchema\Validator;
+use \JsonSchema\Exception\InvalidSchemaMediaTypeException;
+use \JsonSchema\Exception\JsonDecodingException;
+use \JsonSchema\Exception\ResourceNotFoundException;
+use \JsonSchema\Uri\Retrievers\FileGetContents;
+use \JsonSchema\Uri\Retrievers\UriRetrieverInterface;
+use \JsonSchema\UriRetrieverInterface as BaseUriRetrieverInterface;
+use \JsonSchema\Validator;
 
 /**
  * Retrieves JSON Schema URIs
@@ -206,7 +198,7 @@ class UriRetriever implements BaseUriRetrieverInterface
      *
      * @return $this for chaining
      */
-    public function setUriRetriever(UriRetrieverInterface $uriRetriever)
+    public function setUriRetriever($uriRetriever)
     {
         $this->uriRetriever = $uriRetriever;
 
@@ -251,7 +243,7 @@ class UriRetriever implements BaseUriRetrieverInterface
      *
      * @return string
      */
-    public function generate(array $components)
+    public function generate($components)
     {
         $uri = $components['scheme'] . '://'
              . $components['authority']

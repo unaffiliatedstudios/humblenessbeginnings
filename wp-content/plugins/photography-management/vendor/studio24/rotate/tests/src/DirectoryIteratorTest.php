@@ -1,7 +1,7 @@
 <?php
 
-use studio24\Rotate\FilenameFormat;
-use studio24\Rotate\DirectoryIterator;
+use \studio24\Rotate\FilenameFormat;
+use \studio24\Rotate\DirectoryIterator;
 
 class DirectoryIteratorTest extends PHPUnit_Framework_TestCase {
 

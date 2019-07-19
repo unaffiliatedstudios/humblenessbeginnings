@@ -1,5 +1,4 @@
 <?php
-
 namespace JsonSchema\Constraints\TypeCheck;
 
 interface TypeCheckInterface

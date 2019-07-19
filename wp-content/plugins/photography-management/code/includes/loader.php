@@ -59,7 +59,7 @@ namespace codeneric\phmm\base\includes {
     }
     public function run() {
       foreach ($this->filters as $hook) {
-        add_filter(
+        \add_filter(
           $hook[\hacklib_id("hook")],
           array(
             $hook[\hacklib_id("component")],
@@ -72,7 +72,7 @@ namespace codeneric\phmm\base\includes {
       foreach ($this->actions as $hook) {
         if ($hook[\hacklib_id("component")] instanceof Labels) {
         }
-        add_action(
+        \add_action(
           $hook[\hacklib_id("hook")],
           array(
             $hook[\hacklib_id("component")],

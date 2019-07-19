@@ -1,30 +1,22 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) Kamil Dziedzic <arvenil@klecza.pl>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex;
 
-use NinjaMutex\Lock\DirectoryLock;
-use NinjaMutex\Lock\FlockLock;
-use NinjaMutex\Lock\MemcacheLock;
-use NinjaMutex\Lock\MemcachedLock;
-use NinjaMutex\Lock\MySqlLock;
-use NinjaMutex\Lock\Fabric\MemcacheLockFabric;
-use NinjaMutex\Lock\Fabric\MemcachedLockFabric;
-use NinjaMutex\Mock\MockMemcache;
-use NinjaMutex\Mock\MockMemcached;
-use NinjaMutex\Mock\MockPredisClient;
-use NinjaMutex\Mock\MockPhpRedisClient;
-use NinjaMutex\Lock\PredisRedisLock;
-use NinjaMutex\Lock\PhpRedisLock;
-use Predis;
+use \NinjaMutex\Lock\DirectoryLock;
+use \NinjaMutex\Lock\FlockLock;
+use \NinjaMutex\Lock\MemcacheLock;
+use \NinjaMutex\Lock\MemcachedLock;
+use \NinjaMutex\Lock\MySqlLock;
+use \NinjaMutex\Lock\Fabric\MemcacheLockFabric;
+use \NinjaMutex\Lock\Fabric\MemcachedLockFabric;
+use \NinjaMutex\Mock\MockMemcache;
+use \NinjaMutex\Mock\MockMemcached;
+use \NinjaMutex\Mock\MockPredisClient;
+use \NinjaMutex\Mock\MockPhpRedisClient;
+use \NinjaMutex\Lock\PredisRedisLock;
+use \NinjaMutex\Lock\PhpRedisLock;
+use \Predis;
 use \Redis;
-use org\bovigo\vfs;
+use \org\bovigo\vfs;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {

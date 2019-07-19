@@ -1,7 +1,12 @@
 <?php
 namespace codeneric\phmm\legacy\validate {
   require_once ($GLOBALS["HACKLIB_ROOT"]);
-  use \codeneric\phmm\legacy\type;
+  use \codeneric\phmm\legacy\type\client_data_representation_4_0_0;
+  use \codeneric\phmm\legacy\type\project_data_representation_4_0_0;
+  use \codeneric\phmm\legacy\type\client_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\comment_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\project_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\plugin_settings_data_representation_3_6_5;
   use \codeneric\phmm\base\includes\Error;
   class Handler {
     private static function init($schema, $baseUrl = null) {

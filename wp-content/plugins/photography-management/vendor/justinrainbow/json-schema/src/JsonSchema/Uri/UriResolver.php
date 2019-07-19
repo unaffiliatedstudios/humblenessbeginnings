@@ -1,16 +1,8 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Uri;
 
-use JsonSchema\Exception\UriResolverException;
-use JsonSchema\UriResolverInterface;
+use \JsonSchema\Exception\UriResolverException;
+use \JsonSchema\UriResolverInterface;
 
 /**
  * Resolves JSON Schema URIs
@@ -55,7 +47,7 @@ class UriResolver implements UriResolverInterface
      *
      * @return string
      */
-    public function generate(array $components)
+    public function generate($components)
     {
         $uri = $components['scheme'] . '://'
              . $components['authority']

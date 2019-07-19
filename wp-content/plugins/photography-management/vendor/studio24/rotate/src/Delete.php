@@ -1,7 +1,7 @@
 <?php
 namespace studio24\Rotate;
 
-use DateTime, DateInterval;
+use \DateTime, DateInterval;
 
 /**
  * Class to manage file deletion
@@ -22,7 +22,7 @@ class Delete extends RotateAbstract
      *
      * @param DateTime $dateTime
      */
-    public function setNow(DateTime $dateTime)
+    public function setNow($dateTime)
     {
         $this->now = $dateTime;
     }
@@ -157,7 +157,7 @@ class Delete extends RotateAbstract
      * @throws FilenameFormatException
      * @throws RotateException
      */
-    public function deleteByCallback(callable $callback)
+    public function deleteByCallback($callback)
     {
         if (!$this->hasFilenameFormat()) {
             throw new FilenameFormatException('You must set a filename format to match files against');

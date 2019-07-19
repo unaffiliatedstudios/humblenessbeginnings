@@ -1,12 +1,4 @@
 <?php
-/**
- * This file is part of ninja-mutex.
- *
- * (C) leo108 <root@leo108.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 namespace NinjaMutex\Lock;
 
 use \Redis;
@@ -28,7 +20,7 @@ class PhpRedisLock extends LockAbstract
     /**
      * @param $client Redis
      */
-    public function __construct(Redis $client)
+    public function __construct($client)
     {
         parent::__construct();
 

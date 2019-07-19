@@ -1,16 +1,8 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Uri\Retrievers;
 
-use JsonSchema\Exception\RuntimeException;
-use JsonSchema\Validator;
+use \JsonSchema\Exception\RuntimeException;
+use \JsonSchema\Validator;
 
 /**
  * Tries to retrieve JSON schemas from a URI using cURL library

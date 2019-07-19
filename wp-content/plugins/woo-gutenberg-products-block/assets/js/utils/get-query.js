@@ -1,15 +1,31 @@
-export default function getQuery( attributes, name ) {
-	const { categories, catOperator, columns, orderby, products, rows } = attributes;
+/**
+ * External dependencies
+ */
+import { min } from 'lodash';
+
+export default function getQuery( blockAttributes, name ) {
+	const {
+		attributes,
+		attrOperator,
+		categories,
+		catOperator,
+		orderby,
+		products,
+	} = blockAttributes;
+	const columns = blockAttributes.columns || wc_product_block_data.default_columns;
+	const rows = blockAttributes.rows || wc_product_block_data.default_rows;
+	const apiMax = Math.floor( 100 / columns ) * columns; // Prevent uneven final row.
 
 	const query = {
 		status: 'publish',
-		per_page: rows * columns,
+		per_page: min( [ rows * columns, apiMax ] ),
+		catalog_visibility: 'visible',
 	};
 
 	if ( categories && categories.length ) {
 		query.category = categories.join( ',' );
 		if ( catOperator && 'all' === catOperator ) {
-			query.cat_operator = 'AND';
+			query.category_operator = 'and';
 		}
 	}
 
@@ -28,6 +44,15 @@ export default function getQuery( attributes, name ) {
 			query.order = 'asc';
 		} else {
 			query.orderby = orderby;
+		}
+	}
+
+	if ( attributes && attributes.length > 0 ) {
+		query.attribute_term = attributes.map( ( { id } ) => id ).join( ',' );
+		query.attribute = attributes[ 0 ].attr_slug;
+
+		if ( attrOperator ) {
+			query.attribute_operator = 'all' === attrOperator ? 'and' : 'in';
 		}
 	}
 

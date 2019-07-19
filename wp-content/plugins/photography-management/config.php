@@ -10,7 +10,7 @@ class Photography_Management_Base_Config
      * @since    1.0.0
      * @access   public
      */
-
+ 
 
 
     public static function set($env){

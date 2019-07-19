@@ -5,7 +5,7 @@ namespace codeneric\phmm\base\includes {
     public static function data_remover() {}
     public static function get_privacy_content() {
       if (!\hacklib_cast_as_boolean(
-            function_exists("wp_add_privacy_policy_content")
+            \function_exists("wp_add_privacy_policy_content")
           )) {
         return;
       }
@@ -13,23 +13,23 @@ namespace codeneric\phmm\base\includes {
       $content .= "<h3>What Photography Management collects</h3>";
       $content .=
         "The plugin Photography Management does not collect personal data from visitors, it only collects personal data from logged in users. The personal data is limited to data gathered by the user's interaction with the plugin, which are the following: 'proofing' (liking) images and commenting images.";
-      wp_add_privacy_policy_content(
+      \wp_add_privacy_policy_content(
         "Photography Management",
-        wp_kses_post(wpautop($content, false))
+        \wp_kses_post(\wpautop($content, false))
       );
     }
     public static function export_item($email_address, $page = 1) {
       $emptyReturn = array("done" => true, "data" => array());
-      $user = get_user_by("email", $email_address);
+      $user = \get_user_by("email", $email_address);
       if ($user instanceof \WP_User) {
         $clientID = Client::get_client_id_from_wp_user_id($user->ID);
-        if (\hacklib_cast_as_boolean(is_null($clientID))) {
+        if (\hacklib_cast_as_boolean(\is_null($clientID))) {
           return $emptyReturn;
         }
         $config = \codeneric\phmm\Configuration::get();
         $data = array();
         $projects = Client::get_project_ids($clientID);
-        $projectTitles = array_map(
+        $projectTitles = \array_map(
           function($projectID) {
             return Project::get_title_with_id_default($projectID);
           },
@@ -38,8 +38,8 @@ namespace codeneric\phmm\base\includes {
         $data[] = array(
           "name" => "Assigned Projects",
           "value" =>
-            (count($projectTitles) > 0)
-              ? implode(",", $projectTitles)
+            (\count($projectTitles) > 0)
+              ? \implode(",", $projectTitles)
               : "none"
         );
         $item = array(
@@ -58,7 +58,7 @@ namespace codeneric\phmm\base\includes {
       $exporters[\codeneric\phmm\Configuration::get()[\hacklib_id(
         "plugin_name"
       )]] = array(
-        "exporter_friendly_name" => __("Photography Management Plugin"),
+        "exporter_friendly_name" => "Photography Management Plugin",
         "callback" => array(Privacy::class, "export_item")
       );
       return $exporters;

@@ -3,10 +3,10 @@ namespace codeneric\phmm\base\includes {
   require_once ($GLOBALS["HACKLIB_ROOT"]);
   class i18n {
     public function load_plugin_textdomain() {
-      load_plugin_textdomain(
-        "phmm",
+      \load_plugin_textdomain(
+        "photography-management",
         false,
-        dirname(dirname(plugin_basename(__FILE__)))."/languages/"
+        \dirname(\dirname(\plugin_basename(__FILE__)))."/languages/"
       );
     }
   }

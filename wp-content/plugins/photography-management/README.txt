@@ -2,21 +2,19 @@
 Contributors: denis_golovin, alex_schwabauer
 Tags: images, photo proofing, proof, photography, photographer, client, customer, password, password-protected, wedding, gallery, zip, best gallery plugin
 Requires at least: 3.6
-Tested up to: 5.0.2
+Tested up to: 5.2.2
 Requires PHP: 5.6
-Stable tag: 4.1.5 
+Stable tag: 4.3.3 
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Provide your clients with links to (optionally password-protected) photo galleries and photo proofing
+A toolkit that helps photographers communicate with clients and securely deliver galleries. Beautifully.
 
 == Description ==
 https://www.youtube.com/watch?v=2zQPJRCPNaY
 
 
-> ## <strong>Checkout our demos:</strong><br>
- [Admin Demo](https://codeneric.com/products/photography-management/#demo) what you see<br>
- [Client Demo](http://demo.codeneric.com/project/fancy-photos/) what your clients see<br>
+> ## <strong>Checkout our [demo](http://demo.codeneric.com/project/fancy-photos/).</strong><br>
 
 > ## Visit the [official photography management website](https://codeneric.com/products/photography-management) for more information!
 > 
@@ -90,6 +88,61 @@ then just disable the image box in the global settings.
 
 == Changelog ==
 
+
+= 4.3.3 =
+* Tweak - contact Codeneric support easier from admin frontend
+
+= 4.3.2 =
+* Fix - slideshow arrows in Safari
+
+= 4.3.1 =
+* Feature - fast image load setting
+
+= 4.3.0 =
+* Feature - set a proofing limit
+
+= 4.2.2 =
+* Localization - add Chinese
+* Localization - add Arabic
+* Localization - add Polish
+* Localization - add Russian
+* Localization - improve German
+* Localization - add Hindi
+* Localization - add Portuguese (Brazil)
+* Localization - add Portuguese (Portugal)
+* Localization - add Japanese
+* Localization - add Spanish
+
+= 4.2.1 =
+* Fix - load correct text domain
+
+= 4.2.0 =
+* Tweak - all the text is translatable now.
+* Fix - enqueue custom css only on client and project pages.
+
+= 4.1.10 =
+* Tweak - redirect client to project page after portal login, if she only has only one project and no client description
+* Fix - typo (Unlke -> Unlike)
+* Fix - accent color
+* Fix - empty gallery warning
+* Tweak - admins can view private projects without logging out
+* Tweak - apply template setting to client page. Set constant 'PHMM_APPLY_TEMPLATE_TO_CLIENT_PAGE' in wp-config.php to false to disable
+
+= 4.1.9 =
+* Bugfixes
+
+= 4.1.8 =
+* Handle legacy settings.
+* Add filter hook 'codeneric/phmm/user_can_administer'
+
+= 4.1.7 =
+* Make editor access configurable via PHMM_ALLOW_EDITORS constant.
+* Make editor access to default media library configurable via PHMM_ENABLE_MEDIA_SEPARATION constant.
+* Small fixes.
+
+= 4.1.6 =
+* Fix dismiss function of admin notices.
+* Handle Fast Images extension, if it is too old.
 
 = 4.1.5 =
 * Non critical admin notices are dismissable now.

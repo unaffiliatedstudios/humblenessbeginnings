@@ -6,14 +6,14 @@ namespace codeneric\phmm {
   class Logger {
     static $jsonOptions = 0;
     public static function init() {
-      if (("false" !== "true") ||
+      if (("%%TEST_ENV%%" !== "true") ||
           ("production" === "production")) {
         $customHandler = function() {
-          $upload_dir = wp_upload_dir();
+          $upload_dir = \wp_upload_dir();
           $upload_dir =
             $upload_dir[\hacklib_id("basedir")]."/photography_management";
-          if (!\hacklib_cast_as_boolean(file_exists($upload_dir))) {
-            mkdir($upload_dir, 0777, true);
+          if (!\hacklib_cast_as_boolean(\file_exists($upload_dir))) {
+            \mkdir($upload_dir, 0777, true);
           }
           $log_file = $upload_dir."/phmm.log";
           $maxLogSize = "2MB";
@@ -28,15 +28,15 @@ namespace codeneric\phmm {
           AnalogLogger\Handler\LevelName::init($customHandler())
         );
       } else {
-        self::$jsonOptions = JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
+        self::$jsonOptions = \JSON_UNESCAPED_SLASHES | \JSON_PRETTY_PRINT;
         AnalogLogger::handler(AnalogLogger\Handler\ChromeLogger::init());
       }
     }
     private static function parseAdditionalInfo($additional = null) {
-      if (\hacklib_cast_as_boolean(is_null($additional))) {
+      if (\hacklib_cast_as_boolean(\is_null($additional))) {
         return "";
       }
-      $additionalInfoString = json_encode($additional, self::$jsonOptions);
+      $additionalInfoString = \json_encode($additional, self::$jsonOptions);
       if ($additionalInfoString === false) {
         return "";
       }

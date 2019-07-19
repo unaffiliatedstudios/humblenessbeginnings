@@ -1,17 +1,9 @@
 <?php
-
-/*
- * This file is part of the JsonSchema package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace JsonSchema\Constraints;
 
-use JsonSchema\Entity\JsonPointer;
-use JsonSchema\Exception\InvalidArgumentException;
-use UnexpectedValueException as StandardUnexpectedValueException;
+use \JsonSchema\Entity\JsonPointer;
+use \JsonSchema\Exception\InvalidArgumentException;
+use \UnexpectedValueException as StandardUnexpectedValueException;
 
 /**
  * The TypeConstraint Constraints, validates an element against a given type
@@ -39,7 +31,7 @@ class TypeConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$value = null, $schema = null, JsonPointer $path = null, $i = null)
+    public function check(&$value = null, $schema = null, $path = null, $i = null)
     {
         $type = isset($schema->type) ? $schema->type : null;
         $isValid = false;
@@ -76,7 +68,7 @@ class TypeConstraint extends Constraint
      * @param bool  $isValid           The current validation value
      * @param $path
      */
-    protected function validateTypesArray(&$value, array $type, &$validTypesWording, &$isValid, $path)
+    protected function validateTypesArray(&$value, $type, &$validTypesWording, &$isValid, $path)
     {
         foreach ($type as $tp) {
             // $tp can be an object, if it's a schema instead of a simple type, validate it
@@ -112,7 +104,7 @@ class TypeConstraint extends Constraint
      *
      * @return string
      */
-    protected function implodeWith(array $elements, $delimiter = ', ', $listEnd = false)
+    protected function implodeWith($elements, $delimiter = ', ', $listEnd = false)
     {
         if ($listEnd === false || !isset($elements[1])) {
             return implode($delimiter, $elements);

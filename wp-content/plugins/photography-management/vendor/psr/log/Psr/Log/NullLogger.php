@@ -1,5 +1,4 @@
 <?php
-
 namespace Psr\Log;
 
 /**
@@ -21,7 +20,7 @@ class NullLogger extends AbstractLogger
      *
      * @return void
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, $context = array())
     {
         // noop
     }

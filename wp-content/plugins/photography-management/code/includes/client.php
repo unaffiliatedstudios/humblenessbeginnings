@@ -7,7 +7,7 @@ namespace codeneric\phmm\base\includes {
   class Client {
     const phmm_user_role = "phmm_client";
     public static function get($clientID) {
-      if (get_post_status($clientID) === false) {
+      if (\get_post_status($clientID) === false) {
         return null;
       }
       $projectAccess = self::get_meta_project_access($clientID);
@@ -32,28 +32,32 @@ namespace codeneric\phmm\base\includes {
       return $client;
     }
     public static function get_current() {
-      $current_user = wp_get_current_user();
-      if ($current_user === false) {
-        return null;
-      }
-      $c = self::get_client_id_from_wp_user_id($current_user->ID);
-      if (\hacklib_cast_as_boolean(is_null($c))) {
+      $c = self::get_current_id();
+      if (\hacklib_cast_as_boolean(\is_null($c))) {
         return null;
       }
       return self::get($c);
     }
+    public static function get_current_id() {
+      $current_user = \wp_get_current_user();
+      if ($current_user === false) {
+        return null;
+      }
+      return self::get_client_id_from_wp_user_id($current_user->ID);
+    }
     private static function update_wp_user($wpUserID, $data) {
+      $plain_pwd = $data[\hacklib_id("plain_pwd")];
       $userdata = array(
         "display_name" => $data[\hacklib_id("post_title")],
         "user_email" => $data[\hacklib_id("email")],
         "user_login" => $data[\hacklib_id("user_login")],
         "ID" => $wpUserID,
         "user_pass" =>
-          \hacklib_cast_as_boolean(is_null($data[\hacklib_id("plain_pwd")]))
+          \hacklib_cast_as_boolean(\is_null($plain_pwd))
             ? null
-            : wp_hash_password($data[\hacklib_id("plain_pwd")])
+            : \wp_hash_password($plain_pwd)
       );
-      wp_insert_user($userdata);
+      \wp_insert_user($userdata);
     }
     private static function create_and_get_wp_user($post_id, $data) {
       $userdata = array(
@@ -64,31 +68,31 @@ namespace codeneric\phmm\base\includes {
         "show_admin_bar_front" => false,
         "user_pass" => $data[\hacklib_id("plain_pwd")]
       );
-      $userID = wp_insert_user($userdata);
+      $userID = \wp_insert_user($userdata);
       \HH\invariant(
         is_int($userID),
         "%s",
         new Error(
           "Failed to create a user.",
-          array(array("data", json_encode($data)))
+          array(array("data", \json_encode($data)))
         )
       );
       return $userID;
     }
     public static function typesafe_save($ID, $data) {
       $data = \codeneric\phmm\validate\client_to_db($data);
-      update_post_meta(
+      \update_post_meta(
         $ID,
         "project_access",
         $data[\hacklib_id("project_access")]
       );
-      update_post_meta(
+      \update_post_meta(
         $ID,
         "internal_notes",
         $data[\hacklib_id("internal_notes")]
       );
-      update_post_meta($ID, "plain_pwd", $data[\hacklib_id("plain_pwd")]);
-      update_post_meta($ID, "wp_user", $data[\hacklib_id("wp_user")]);
+      \update_post_meta($ID, "plain_pwd", $data[\hacklib_id("plain_pwd")]);
+      \update_post_meta($ID, "wp_user", $data[\hacklib_id("wp_user")]);
     }
     public static function get_meta_plain_pwd($post_id) {
       $mix = Utils::get_post_meta_ONLY_USE_IN_HELPER_FUNCTIONS(
@@ -106,7 +110,7 @@ namespace codeneric\phmm\base\includes {
         $post_id,
         "wp_user"
       );
-      if (!\hacklib_cast_as_boolean(is_null($mix))) {
+      if (!\hacklib_cast_as_boolean(\is_null($mix))) {
         return (int) $mix;
       } else {
         return null;
@@ -118,7 +122,7 @@ namespace codeneric\phmm\base\includes {
         "project_access"
       );
       if (\hacklib_cast_as_boolean(is_array($mix))) {
-        return array_map(
+        return \array_map(
           function($e) {
             return \codeneric\phmm\validate\client_project_access($e);
           },
@@ -143,9 +147,9 @@ namespace codeneric\phmm\base\includes {
       $pwd = null;
       $plain_pwd = $data[\hacklib_id("plain_pwd")];
       $oldPwd = self::get_meta_plain_pwd($post_id);
-      if (\hacklib_cast_as_boolean(is_null($plain_pwd))) {
-        if (\hacklib_cast_as_boolean(is_null($oldPwd))) {
-          $pwd = wp_generate_password(10);
+      if (\hacklib_cast_as_boolean(\is_null($plain_pwd))) {
+        if (\hacklib_cast_as_boolean(\is_null($oldPwd))) {
+          $pwd = \wp_generate_password(10);
         } else {
           $pwd = $oldPwd;
         }
@@ -171,7 +175,7 @@ namespace codeneric\phmm\base\includes {
     }
     public static function has_client_wp_user($clientID) {
       $id = self::get_meta_wp_user($clientID);
-      return !\hacklib_cast_as_boolean(is_null($id));
+      return !\hacklib_cast_as_boolean(\is_null($id));
     }
     public static function get_client_wp_user_id($clientID) {
       return self::get_meta_wp_user($clientID);
@@ -192,7 +196,7 @@ namespace codeneric\phmm\base\includes {
       if (!\hacklib_cast_as_boolean(is_int($id))) {
         return null;
       }
-      $user = get_user_by("ID", $id);
+      $user = \get_user_by("ID", $id);
       if ($user instanceof \WP_User) {
         return $user;
       }
@@ -205,7 +209,7 @@ namespace codeneric\phmm\base\includes {
         foreach ($project_ids as $id) {
           $protec = Project::get_protection($id);
           if ((!\hacklib_cast_as_boolean(
-                 is_null($protec[\hacklib_id("password")])
+                 \is_null($protec[\hacklib_id("password")])
                )) ||
               (!\hacklib_cast_as_boolean($protec[\hacklib_id("private")]))) {
             $project_ids_with_guest_access[] = $id;
@@ -217,13 +221,13 @@ namespace codeneric\phmm\base\includes {
       if (\hacklib_cast_as_boolean(is_array($projects))) {
         $map = function($project) {
           \HH\invariant(
-            array_key_exists("id", $project),
+            \array_key_exists("id", $project),
             "%s",
             new Error("Project access shape different than expected")
           );
           return $project[\hacklib_id("id")];
         };
-        return array_values(array_map($map, $projects));
+        return \array_values(\array_map($map, $projects));
       }
       return array();
     }
@@ -238,8 +242,8 @@ namespace codeneric\phmm\base\includes {
         new Error("get project_access meta expected to be array")
       );
       if (\hacklib_cast_as_boolean($filterActive)) {
-        $projects = array_values(
-          array_filter(
+        $projects = \array_values(
+          \array_filter(
             $projects,
             function($project) {
               return $project[\hacklib_id("active")] === true;
@@ -248,7 +252,7 @@ namespace codeneric\phmm\base\includes {
         );
       }
       $map = function($project) {
-        $post = get_post($project[\hacklib_id("id")]);
+        $post = \get_post($project[\hacklib_id("id")]);
         \HH\invariant(
           $post instanceof \WP_Post,
           "%s",
@@ -256,7 +260,7 @@ namespace codeneric\phmm\base\includes {
         );
         return $post;
       };
-      $posts = array_map($map, $projects);
+      $posts = \array_map($map, $projects);
       return $posts;
     }
     public static function get_project_configuration($clientID, $projectID) {
@@ -264,7 +268,7 @@ namespace codeneric\phmm\base\includes {
       foreach ($accesses as $i => $a) {
         if ($a[\hacklib_id("id")] === $projectID) {
           if (!\hacklib_cast_as_boolean(
-                is_null($a[\hacklib_id("configuration")])
+                \is_null($a[\hacklib_id("configuration")])
               )) {
             return $a[\hacklib_id("configuration")];
           } else {
@@ -275,7 +279,7 @@ namespace codeneric\phmm\base\includes {
       return null;
     }
     public static function get_all_ids() {
-      $clientIDs = get_posts(
+      $clientIDs = \get_posts(
         array(
           "post_type" => Configuration::get()[\hacklib_id(
             "client_post_type"
@@ -293,7 +297,7 @@ namespace codeneric\phmm\base\includes {
       return $clientIDs;
     }
     public static function get_all_clients() {
-      $clients = get_posts(
+      $clients = \get_posts(
         array(
           "post_type" => Configuration::get()[\hacklib_id(
             "client_post_type"
@@ -341,7 +345,7 @@ namespace codeneric\phmm\base\includes {
       return false;
     }
     public static function dereference_project($projectID, $clientIDs) {
-      if (\hacklib_equals($clientIDs, null)) {
+      if ($clientIDs === null) {
         $clientIDs = self::get_all_ids();
       }
       foreach ($clientIDs as $clientID) {
@@ -362,19 +366,19 @@ namespace codeneric\phmm\base\includes {
           }
           return true;
         };
-        $cleanAccess = array_filter($access, $filter);
-        update_post_meta($clientID, "project_access", $cleanAccess);
+        $cleanAccess = \array_filter($access, $filter);
+        \update_post_meta($clientID, "project_access", $cleanAccess);
       }
     }
     public static function get_name($clientID) {
-      return ($clientID !== 0) ? get_the_title($clientID) : "Guest";
+      return ($clientID !== 0) ? \get_the_title($clientID) : "Guest";
     }
     public static function delete_client($userID) {
       $postID = self::get_client_id_from_wp_user_id($userID);
-      if (\hacklib_cast_as_boolean(is_null($postID))) {
+      if (\hacklib_cast_as_boolean(\is_null($postID))) {
         return;
       }
-      wp_delete_post($postID, true);
+      \wp_delete_post($postID, true);
     }
   }
 }

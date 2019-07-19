@@ -15,7 +15,7 @@ namespace codeneric\phmm\base\admin {
     const ERROR_SCRIPT_HANDLE = "codeneric-phmm-err";
     public static function enqueue_styles() {
       $config = Configuration::get();
-      wp_enqueue_style(
+      \wp_enqueue_style(
         "codeneric-phmm-admin-css-fixes",
         $config[\hacklib_id("assets")][\hacklib_id("css")][\hacklib_id(
           "admin"
@@ -31,7 +31,7 @@ namespace codeneric\phmm\base\admin {
         return;
       }
       $handle = "codeneric-phmm-admin-commons-css";
-      wp_enqueue_style(
+      \wp_enqueue_style(
         $handle,
         $config[\hacklib_id("assets")][\hacklib_id("css")][\hacklib_id(
           "admin"
@@ -41,19 +41,26 @@ namespace codeneric\phmm\base\admin {
         "all"
       );
     }
+    public static function fb_join_message() {
+      return
+        \__(
+          "Join our <a style='color: coral' target='_blank' href='https://www.facebook.com/groups/1529247670736165/'>facebook group</a> to get immediate help or get in contact with other photographers using WordPress!",
+          "photography-management"
+        );
+    }
     private static function is_custom_post_edit_or_new() {
       $pagename = Superglobals::Globals("pagenow");
       return ($pagename === "post-new.php") || ($pagename === "post.php");
     }
     private static function safely_get_current_screen() {
-      if (\hacklib_cast_as_boolean(function_exists("get_current_screen"))) {
-        return get_current_screen();
+      if (\hacklib_cast_as_boolean(\function_exists("get_current_screen"))) {
+        return \get_current_screen();
       }
       return null;
     }
     private static function get_current_post_type() {
       $current_screen = self::safely_get_current_screen();
-      if (!\hacklib_cast_as_boolean(is_null($current_screen))) {
+      if (!\hacklib_cast_as_boolean(\is_null($current_screen))) {
         return $current_screen->post_type;
       }
       return null;
@@ -72,7 +79,7 @@ namespace codeneric\phmm\base\admin {
     }
     private static function is_settings_page() {
       $current_screen = self::safely_get_current_screen();
-      if (\hacklib_cast_as_boolean(is_null($current_screen))) {
+      if (\hacklib_cast_as_boolean(\is_null($current_screen))) {
         return false;
       }
       return
@@ -83,7 +90,7 @@ namespace codeneric\phmm\base\admin {
     }
     private static function is_premium_page() {
       $current_screen = self::safely_get_current_screen();
-      if (\hacklib_cast_as_boolean(is_null($current_screen))) {
+      if (\hacklib_cast_as_boolean(\is_null($current_screen))) {
         return false;
       }
       return
@@ -94,7 +101,7 @@ namespace codeneric\phmm\base\admin {
     }
     private static function is_support_page() {
       $current_screen = self::safely_get_current_screen();
-      if (\hacklib_cast_as_boolean(is_null($current_screen))) {
+      if (\hacklib_cast_as_boolean(\is_null($current_screen))) {
         return false;
       }
       return
@@ -105,7 +112,7 @@ namespace codeneric\phmm\base\admin {
     }
     private static function is_interaction_page() {
       $current_screen = self::safely_get_current_screen();
-      if (\hacklib_cast_as_boolean(is_null($current_screen))) {
+      if (\hacklib_cast_as_boolean(\is_null($current_screen))) {
         return false;
       }
       return
@@ -121,61 +128,124 @@ namespace codeneric\phmm\base\admin {
         ($current_post_type === $config[\hacklib_id("client_post_type")]) ||
         ($current_post_type === $config[\hacklib_id("project_post_type")]);
     }
-    private static function enqueue_admin_commons($handle) {
-      wp_enqueue_script("dashicons");
+    private static function enqueue_filelist(
+      $list,
+      $globals,
+      $dependencies = array()
+    ) {
       $configuration = Configuration::get();
-      wp_register_script(
-        $handle,
-        $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
-          "admin"
-        )][\hacklib_id("common")],
-        array(),
-        $configuration[\hacklib_id("version")],
-        true
-      );
-      $url = plugins_url("/", $configuration[\hacklib_id("manifest_path")]);
-      wp_localize_script($handle, "codeneric_phmm_plugins_dir", $url);
-      wp_enqueue_script($handle);
+      foreach ($list as $index => $file) {
+        $handle = $file;
+        $isLast = \count($list) === ($index + 1);
+        \wp_register_script($handle, $file, $dependencies, null, true);
+        if (\hacklib_cast_as_boolean($isLast)) {
+          $url =
+            \plugins_url("/", $configuration[\hacklib_id("manifest_path")]);
+          \wp_localize_script($handle, "codeneric_phmm_plugins_dir", $url);
+          \wp_localize_script(
+            $handle,
+            "codeneric_phmm_admin_globals",
+            \json_encode(self::get_general_admin_frontend_globals())
+          );
+          foreach ($globals as $name => $data) {
+            \wp_localize_script($handle, $name, $data);
+          }
+        }
+        \wp_enqueue_script($handle);
+        \array_push($dependencies, $handle);
+      }
     }
     public static function get_the_id() {
-      $id = get_the_ID();
+      $id = \get_the_ID();
       if (!\hacklib_cast_as_boolean(is_int($id))) {
         return null;
       }
       return $id;
     }
+    public static function should_show_support_chat() {
+      $day = \gmdate("l");
+      $isWorkingDay = ($day !== "Saturday") && ($day !== "Sunday");
+      $install_time = \intval(\get_option("codeneric/phmm/install_time", 0));
+      $now = \time();
+      $maxSupportTimeAfterInstall = 60 * 60 * 24 * 7 * 1;
+      $delta = $now - ($install_time + $maxSupportTimeAfterInstall);
+      $isWithinSupportRange = $delta > 0;
+      return
+        \hacklib_cast_as_boolean(self::is_our_business()) &&
+        \hacklib_cast_as_boolean($isWithinSupportRange) &&
+        \hacklib_cast_as_boolean($isWorkingDay);
+    }
+    public static function support_chat_is_team_available() {
+      $currentGMTHour = \gmdate("H");
+      $GMTbusinessHours = array("07", "09");
+      $lower = \intval($currentGMTHour) >= \intval($GMTbusinessHours[0]);
+      $upper = \intval($currentGMTHour) <= \intval($GMTbusinessHours[1]);
+      return
+        \hacklib_cast_as_boolean($lower) && \hacklib_cast_as_boolean($upper);
+    }
     public static function enqueue_scripts($hook) {
-      if (!\hacklib_cast_as_boolean(self::is_our_business())) {
-        return;
-      }
       $configuration = Configuration::get();
-      $commons_script_handle = "codeneric-phmm-admin-commons";
-      $scripthandle = "";
-      self::enqueue_admin_commons($commons_script_handle);
-      if (\hacklib_cast_as_boolean(self::is_client_single_page())) {
-        $scriptsrc =
+      $settings = Settings::getCurrentSettings();
+      if (\hacklib_cast_as_boolean(self::should_show_support_chat())) {
+        self::enqueue_filelist(
           $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
             "admin"
-          )][\hacklib_id("client")];
-        $scripthandle =
-          $configuration[\hacklib_id("plugin_name")]."-admin-client";
-        wp_register_script(
-          $scripthandle,
-          $scriptsrc,
-          array($commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
+          )][\hacklib_id("support_chat")],
+          array(
+            "codeneric_plugin_id" => Utils::get_plugin_id(),
+            "codeneric_should_show_support_chat" => \json_encode(
+              self::support_chat_is_team_available()
+            )
+          )
         );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_admin_client_globals",
-          json_encode(self::get_admin_client_frontend_globals())
+      }
+      $should_enqueue_data_js = (bool) \hacklib_cast_as_boolean(
+        \get_transient("codeneric/phmm/data_changed")
+      );
+      if (($settings[\hacklib_id("analytics_opt_in")] === true) &&
+          \hacklib_cast_as_boolean($should_enqueue_data_js)) {
+        \delete_transient("codeneric/phmm/data_changed");
+        self::enqueue_filelist(
+          $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
+            "admin"
+          )][\hacklib_id("data")],
+          array(
+            "codeneric_phmm_debug_ajaxurl" => \json_encode(
+              \admin_url("admin-ajax.php")
+            ),
+            "codeneric_phmm_debug_wpps_url" => \json_encode(
+              $configuration[\hacklib_id("wpps_url")]
+            )
+          )
         );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_admin_client_project_access_globals",
-          json_encode(
-            self::get_admin_client_project_access_frontend_globals()
+      }
+      if ("%%DEMO_BUILD%%" === "true") {
+        if (\hacklib_cast_as_boolean(self::should_start_product_tour())) {
+          self::enqueue_filelist(
+            $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
+              "admin"
+            )][\hacklib_id("product_tour")],
+            array(
+              "codeneric_phmm_product_tour_should_start" => \json_encode(
+                self::should_start_product_tour()
+              )
+            )
+          );
+        }
+      }
+      if (\hacklib_cast_as_boolean(self::is_client_single_page())) {
+        self::enqueue_filelist(
+          $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
+            "admin"
+          )][\hacklib_id("client")],
+          array(
+            "codeneric_phmm_admin_client_globals" => \json_encode(
+              self::get_admin_client_frontend_globals()
+            ),
+            "codeneric_phmm_admin_client_project_access_globals" =>
+              \json_encode(
+                self::get_admin_client_project_access_frontend_globals()
+              )
           )
         );
       }
@@ -187,205 +257,205 @@ namespace codeneric\phmm\base\admin {
         $scripthandle =
           $configuration[\hacklib_id("plugin_name")]."-admin-project"; /* UNSAFE_EXPR */
         wp_enqueue_media();
-        wp_register_script(
-          $scripthandle,
-          $scriptsrc,
-          array("media-upload", $commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
-        );
         $admin_project_frontend_globals =
           self::get_admin_project_frontend_globals();
         if (\hacklib_cast_as_boolean(
-              is_null($admin_project_frontend_globals)
+              \is_null($admin_project_frontend_globals)
             )) {
           $admin_project_frontend_globals = array();
         }
-        wp_localize_script(
+        \wp_localize_script(
           $scripthandle,
           "CODENERIC_PHMM_ADMIN_PROJECT_GLOBALS",
-          json_encode($admin_project_frontend_globals)
+          \json_encode($admin_project_frontend_globals)
+        );
+        self::enqueue_filelist(
+          $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
+            "admin"
+          )][\hacklib_id("project")],
+          array(
+            "CODENERIC_PHMM_ADMIN_PROJECT_GLOBALS" => \json_encode(
+              $admin_project_frontend_globals
+            )
+          ),
+          array("media-upload")
         );
       }
       if (\hacklib_cast_as_boolean(self::is_settings_page())) { /* UNSAFE_EXPR */
         wp_enqueue_media();
-        $scripthandle =
-          $configuration[\hacklib_id("plugin_name")]."-settings-page";
-        wp_register_script(
-          $scripthandle,
+        $watermarkImageID =
+          $settings[\hacklib_id("watermark")][\hacklib_id("image_id")];
+        $imageData = "";
+        if (\hacklib_cast_as_boolean(is_int($watermarkImageID))) {
+          $image = Image::get_image($watermarkImageID, false);
+          if (!\hacklib_cast_as_boolean(\is_null($image))) {
+            $imageData = \json_encode($image);
+          }
+        }
+        self::enqueue_filelist(
           $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
             "admin"
           )][\hacklib_id("settings")],
-          array("media-upload", $commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
+          array(
+            "codeneric_phmm_settings_globals" => \json_encode(
+              self::get_settings_frontend_globals()
+            ),
+            "codeneric_phmm_current_settings" => \json_encode($settings),
+            "codeneric_phmm_settings_preloaded_watermark_image" =>
+              $imageData
+          ),
+          array("media-upload")
         );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_settings_globals",
-          json_encode(self::get_settings_frontend_globals())
-        );
-        $settings = Settings::getCurrentSettings();
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_current_settings",
-          json_encode($settings)
-        );
-        $watermarkImageID =
-          $settings[\hacklib_id("watermark")][\hacklib_id("image_id")];
-        if (\hacklib_cast_as_boolean(is_int($watermarkImageID))) {
-          $image = Image::get_image($watermarkImageID, false);
-          if (!\hacklib_cast_as_boolean(is_null($image))) {
-            wp_localize_script(
-              $scripthandle,
-              "codeneric_phmm_settings_preloaded_watermark_image",
-              json_encode($image)
-            );
-          }
-        }
       }
       if (\hacklib_cast_as_boolean(self::is_interaction_page())) {
-        $scripthandle =
-          $configuration[\hacklib_id("plugin_name")]."-interactions-page";
-        wp_register_script(
-          $scripthandle,
+        self::enqueue_filelist(
           $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
             "admin"
           )][\hacklib_id("interactions_page")],
-          array($commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
-        );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_interactions_globals",
-          json_encode(self::get_interactions_frontend_globals())
+          array(
+            "codeneric_phmm_interactions_globals" => \json_encode(
+              self::get_interactions_frontend_globals()
+            )
+          )
         );
       }
       if (\hacklib_cast_as_boolean(self::is_premium_page())) {
-        $scripthandle =
-          $configuration[\hacklib_id("plugin_name")]."-premium-page";
-        wp_register_script(
-          $scripthandle,
+        self::enqueue_filelist(
           $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
             "admin"
           )][\hacklib_id("premium_page")],
-          array("media-upload", $commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
-        );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_premiumpage_globals",
-          json_encode(self::get_premium_page_globals())
+          array(
+            "codeneric_phmm_premiumpage_globals" => \json_encode(
+              self::get_premium_page_globals()
+            )
+          ),
+          array("media-upload")
         );
       }
       if (\hacklib_cast_as_boolean(self::is_support_page())) {
-        $scripthandle =
-          $configuration[\hacklib_id("plugin_name")]."-support-page";
-        wp_register_script(
-          $scripthandle,
+        self::enqueue_filelist(
           $configuration[\hacklib_id("assets")][\hacklib_id("js")][\hacklib_id(
             "admin"
           )][\hacklib_id("support_page")],
-          array($commons_script_handle),
-          $configuration[\hacklib_id("version")],
-          true
-        );
-        wp_localize_script(
-          $scripthandle,
-          "codeneric_phmm_supportpage_globals",
-          json_encode(self::get_support_page_globals())
+          array(
+            "codeneric_phmm_supportpage_globals" => \json_encode(
+              self::get_support_page_globals()
+            )
+          ),
+          array()
         );
       }
-      wp_localize_script(
-        $scripthandle,
-        "codeneric_phmm_admin_globals",
-        json_encode(self::get_general_admin_frontend_globals())
-      );
-      wp_enqueue_script($scripthandle);
+    }
+    public static function handle_analytics_enqueue() {
+      if (!\hacklib_cast_as_boolean(self::is_our_business())) {
+        return;
+      }
+      $settings = Settings::getCurrentSettings();
+      $trackingID = Configuration::get()[\hacklib_id("ga_tracking_id")];
+      $gTagSnippet =
+        \hacklib_cast_as_boolean($settings[\hacklib_id("analytics_opt_in")])
+          ? "<script async src='https://www.googletagmanager.com/gtag/js?id=".
+          $trackingID.
+          "'></script>"
+          : "";
+      $optOut =
+        ($settings[\hacklib_id("analytics_opt_in")] === true)
+          ? "window['ga-disable-".$trackingID."'] = false;"
+          : "window['ga-disable-".$trackingID."'] = true;";
+      $id = Utils::get_plugin_id();
+      $hashedID = \md5($id);
+      echo
+        ($gTagSnippet.
+         "\n      <script>\n        window.dataLayer = window.dataLayer || [];\n        function gtag() {\n          dataLayer.push(arguments);\n        }\n        gtag('js', new Date());\n        gtag('config', '".
+         $trackingID.
+         "', {\n          user_id: '".
+         $hashedID.
+         "',\n          custom_map: { dimension1: 'platform', dimension2: 'productType', 'anonymize_ip': true  }\n        });\n        ".
+         $optOut.
+         "\n      </script>\n      ")
+      ;
     }
     public static function handle_placeholder_image_upload() {
       $optionName =
         Configuration::get()[\hacklib_id("default_thumbnail_id_option_key")];
-      $id = get_option($optionName, null);
-      if (!\hacklib_cast_as_boolean(is_null($id))) {
-        $exists = wp_attachment_is_image((int) $id);
+      $id = \get_option($optionName, null);
+      if (!\hacklib_cast_as_boolean(\is_null($id))) {
+        $exists = \wp_attachment_is_image((int) $id);
         if (\hacklib_cast_as_boolean($exists)) {
           return;
         }
       }
-      $imageUrl = plugin_dir_path(__FILE__)."/../assets/img/placeholder.png";
-      $upload = wp_upload_bits(
+      $imageUrl = \plugin_dir_path(__FILE__)."/../assets/img/placeholder.png";
+      $upload = \wp_upload_bits(
         "phmm_project_placeholder.png",
         null,
-        file_get_contents($imageUrl)
+        \file_get_contents($imageUrl)
       );
       $wp_filetype =
-        wp_check_filetype(basename($upload[\hacklib_id("file")]), null);
-      $wp_upload_dir = wp_upload_dir();
+        \wp_check_filetype(\basename($upload[\hacklib_id("file")]), null);
+      $wp_upload_dir = \wp_upload_dir();
       $attachment = array(
         "guid" =>
           $wp_upload_dir[\hacklib_id("baseurl")].
-          _wp_relative_upload_path($upload[\hacklib_id("file")]),
+          \_wp_relative_upload_path($upload[\hacklib_id("file")]),
         "post_mime_type" => $wp_filetype[\hacklib_id("type")],
-        "post_title" => preg_replace(
+        "post_title" => \preg_replace(
           "/\\.[^.]+$/",
           "",
-          basename($upload[\hacklib_id("file")])
+          \basename($upload[\hacklib_id("file")])
         ),
         "post_content" => "",
         "post_status" => "inherit"
       );
       $attach_id =
-        wp_insert_attachment($attachment, $upload[\hacklib_id("file")]);
-      $attach_data = wp_generate_attachment_metadata(
+        \wp_insert_attachment($attachment, $upload[\hacklib_id("file")]);
+      $attach_data = \wp_generate_attachment_metadata(
         $attach_id,
         $upload[\hacklib_id("file")]
       );
-      wp_update_attachment_metadata($attach_id, $attach_data);
+      \wp_update_attachment_metadata($attach_id, $attach_data);
       if (\hacklib_cast_as_boolean(is_int($attach_id))) {
-        update_option($optionName, $attach_id);
+        \update_option($optionName, $attach_id);
       }
     }
     public static function get_general_admin_frontend_globals() {
       $config = Configuration::get();
       $res = array(
-        "base_url" => get_site_url(),
-        "ajax_url" => admin_url("admin-ajax.php"),
+        "base_url" => \get_site_url(),
+        "ajax_url" => \admin_url("admin-ajax.php"),
         "author_id" => Utils::get_current_user_id(),
-        "locale" => (string) get_locale(),
+        "locale" => (string) \get_locale(),
         "wpps_url" => $config[\hacklib_id("wpps_url")],
-        "canned_emails_supported_placeholders" => array_values(
+        "canned_emails_supported_placeholders" => \array_values(
           CannedEmailPlaceholders::getValues()
         ),
         "canned_emails" => Settings::getCurrentSettings()[\hacklib_id(
           "canned_emails"
         )],
         "links" => array(
-          "new_project" => add_query_arg(
+          "new_project" => \add_query_arg(
             array(
               "post_type" => $config[\hacklib_id("project_post_type")]
             ),
-            admin_url("post-new.php")
+            \admin_url("post-new.php")
           ),
-          "new_client" => add_query_arg(
+          "new_client" => \add_query_arg(
             array("post_type" => $config[\hacklib_id("client_post_type")]),
-            admin_url("post-new.php")
+            \admin_url("post-new.php")
           ),
-          "settings" => add_query_arg(
+          "settings" => \add_query_arg(
             array(
               "post_type" => $config[\hacklib_id("client_post_type")],
               "page" => "options"
             ),
-            admin_url("edit.php")
+            \admin_url("edit.php")
           ),
-          "support" => add_query_arg(
+          "support" => \add_query_arg(
             array(
               "post_type" => $config[\hacklib_id("client_post_type")],
               "page" => "support"
             ),
-            admin_url("edit.php")
+            \admin_url("edit.php")
           )
         )
       );
@@ -393,7 +463,7 @@ namespace codeneric\phmm\base\admin {
     }
     public static function strip_wp_posts($posts) {
       $whitelist = array("id", "post_title");
-      return array_map(
+      return \array_map(
         function($post) {
           return array("id" => $post->ID, "title" => $post->post_title);
         },
@@ -402,46 +472,46 @@ namespace codeneric\phmm\base\admin {
     }
     public static function get_settings_frontend_globals() {
       $options = Settings::getCurrentSettings();
-      $theme = get_template_directory();
+      $theme = \get_template_directory();
       $template_file = $theme."/".$options[\hacklib_id("page_template")];
-      $current_template_exists = file_exists($template_file);
-      $pages = get_page_templates();
+      $current_template_exists = \file_exists($template_file);
+      $pages = \get_page_templates();
       $templates = array();
       foreach ($pages as $key => $value) {
         $arr = array("templatename" => $key, "filename" => $value);
         $templates[] = $arr;
       }
-      $current_theme = wp_get_theme();
+      $current_theme = \wp_get_theme();
       $current_theme_name = $current_theme->offsetGet("Name");
       return array(
         "templates" => $templates,
         "current_template_exists" => $current_template_exists,
         "current_theme_name" => $current_theme_name,
-        "pages" => self::strip_wp_posts(get_pages())
+        "pages" => self::strip_wp_posts(\get_pages())
       );
     }
     public static function get_interactions_frontend_globals() {
       $options = Settings::getCurrentSettings();
-      $theme = get_template_directory();
+      $theme = \get_template_directory();
       $template_file = $theme."/".$options[\hacklib_id("page_template")];
-      $current_template_exists = file_exists($template_file);
-      $pages = get_page_templates();
+      $current_template_exists = \file_exists($template_file);
+      $pages = \get_page_templates();
       $templates = array();
       foreach ($pages as $key => $value) {
         $arr = array("templatename" => $key, "filename" => $value);
         $templates[] = $arr;
       }
-      $current_theme = wp_get_theme();
+      $current_theme = \wp_get_theme();
       $current_theme_name = $current_theme->offsetGet("Name");
       $clientIDs = Client::get_all_ids();
-      $clients = array_map(
+      $clients = \array_map(
         function($ID) {
           $client = Client::get_wp_user_from_client_id($ID);
           return array(
             "id" => $ID,
-            "name" => get_the_title($ID),
+            "name" => \get_the_title($ID),
             "wp_user_name" =>
-              \hacklib_cast_as_boolean(is_null($client))
+              \hacklib_cast_as_boolean(\is_null($client))
                 ? null
                 : $client->get("user_login"),
             "project_access" => Client::get_project_ids($ID)
@@ -450,11 +520,11 @@ namespace codeneric\phmm\base\admin {
         $clientIDs
       );
       $project_ids = Project::get_all_ids();
-      $projects = array_map(
+      $projects = \array_map(
         function($ID) {
-          $post = get_post($ID);
+          $post = \get_post($ID);
           $title = "";
-          if (!\hacklib_cast_as_boolean(is_null($post))) {
+          if (!\hacklib_cast_as_boolean(\is_null($post))) {
             $title = $post->post_title;
           }
           return array(
@@ -471,7 +541,7 @@ namespace codeneric\phmm\base\admin {
       foreach ($project_ids as $id) {
         $protec = Project::get_protection($id);
         if ((!\hacklib_cast_as_boolean(
-               is_null($protec[\hacklib_id("password")])
+               \is_null($protec[\hacklib_id("password")])
              )) ||
             (!\hacklib_cast_as_boolean($protec[\hacklib_id("private")]))) {
           $project_ids_with_guest_access[] = $id;
@@ -494,16 +564,16 @@ namespace codeneric\phmm\base\admin {
       );
     }
     public static function get_support_page_globals() {
-      $email = get_option("admin_email");
+      $email = \get_option("admin_email");
       if (!\hacklib_cast_as_boolean(is_string($email))) {
         $email = "";
       }
-      $current_user = wp_get_current_user();
+      $current_user = \wp_get_current_user();
       $name = $current_user->user_firstname." ".$current_user->user_lastname;
       return array("admin_email" => $email, "admin_name" => $name);
     }
     public static function get_admin_client_frontend_globals() {
-      $id = get_the_ID();
+      $id = \get_the_ID();
       \HH\invariant(
         is_int($id),
         "%s",
@@ -511,7 +581,7 @@ namespace codeneric\phmm\base\admin {
       );
       $client = Client::get($id);
       \HH\invariant(
-        !\hacklib_cast_as_boolean(is_null($client)),
+        !\hacklib_cast_as_boolean(\is_null($client)),
         "%s",
         new Error("No client found with given id")
       );
@@ -519,14 +589,14 @@ namespace codeneric\phmm\base\admin {
     }
     public static function get_admin_project_frontend_globals() {
       $id = self::get_the_id();
-      if (\hacklib_cast_as_boolean(is_null($id))) {
+      if (\hacklib_cast_as_boolean(\is_null($id))) {
         return null;
       }
       return Project::get_project_for_admin($id);
     }
     public static function get_admin_client_project_access_frontend_globals() {
-      $id = get_the_ID();
-      $posts = get_posts(
+      $id = \get_the_ID();
+      $posts = \get_posts(
         array(
           "post_type" => Configuration::get()[\hacklib_id(
             "project_post_type"
@@ -540,7 +610,7 @@ namespace codeneric\phmm\base\admin {
         $configurations[$project->ID] =
           Project::get_configuration($project->ID);
       }
-      if (count($configurations) === 0) {
+      if (\count($configurations) === 0) {
         $configurations = null;
       }
       return array(
@@ -549,11 +619,11 @@ namespace codeneric\phmm\base\admin {
       );
     }
     private static function populateMissingPostTitle($posts) {
-      return array_map(
+      return \array_map(
         function($post) {
           $post->post_title =
             ($post->post_title === "")
-              ? (__(self::POST_EMPTY_TITLE_FILL)." #".$post->ID)
+              ? (\__("No title", "photography-management")." #".$post->ID)
               : $post->post_title;
           return $post;
         },
@@ -563,22 +633,22 @@ namespace codeneric\phmm\base\admin {
     public static function hide_admin_bar() {
       $settings = Settings::getCurrentSettings();
       if (($settings[\hacklib_id("hide_admin_bar")] === true) &&
-          (!\hacklib_cast_as_boolean(current_user_can("edit_posts")))) {
-        add_filter("show_admin_bar", "__return_false");
+          (!\hacklib_cast_as_boolean(\current_user_can("edit_posts")))) {
+        \add_filter("show_admin_bar", "__return_false");
       }
     }
     public static function change_title_placeholder($title) {
       if (\hacklib_cast_as_boolean(self::is_client_single_page())) {
-        return __("Enter client name here", "phmm");
+        return \__("Enter client name here", "photography-management");
       }
       if (\hacklib_cast_as_boolean(self::is_project_single_page())) {
-        return __("Enter project name here", "phmm");
+        return \__("Enter project name here", "photography-management");
       }
       return $title;
     }
     private static function string_or_else($str, $alternative) {
       if ((!\hacklib_cast_as_boolean(is_string($str))) ||
-          (strlen($str) === 0)) {
+          (\strlen($str) === 0)) {
         return $alternative;
       }
       return $str;
@@ -586,24 +656,21 @@ namespace codeneric\phmm\base\admin {
     public static function define_client_table_columns($column_name) {
       $cols = array(
         "cb" => "<input type=\"checkbox\" />",
-        "title" => __("Name"),
-        "projects" => __(
-          "Projects",
-          Configuration::get()[\hacklib_id("plugin_name")]
-        ),
-        "email" => __("Email"),
-        "shortcode" => __("Shortcode"),
-        "date" => __("Date")
+        "title" => \__("Name", "photography-management"),
+        "projects" => \__("Projects", "photography-management"),
+        "email" => \__("Email", "photography-management"),
+        "shortcode" => \__("Shortcode", "photography-management"),
+        "date" => \__("Date", "photography-management")
       );
       return $cols;
     }
     public static function define_project_table_columns() {
       $cols = array(
         "cb" => "<input type=\"checkbox\" />",
-        "title" => __("Project Name"),
-        "categories" => __("Categories"),
-        "shortcode" => __("Shortcode"),
-        "date" => __("Date")
+        "title" => \__("Project Name", "photography-management"),
+        "categories" => \__("Categories", "photography-management"),
+        "shortcode" => \__("Shortcode", "photography-management"),
+        "date" => \__("Date", "photography-management")
       );
       return $cols;
     }
@@ -619,9 +686,9 @@ namespace codeneric\phmm\base\admin {
       }
     }
     public static function fill_client_columns($column, $post_id) {
-      $post = get_post($post_id);
+      $post = \get_post($post_id);
       $emptyDash = "\342\200\224";
-      $editLink = get_edit_post_link($post_id);
+      $editLink = \get_edit_post_link($post_id);
       \HH\invariant(
         $post instanceof \WP_Post,
         "%s",
@@ -645,7 +712,7 @@ namespace codeneric\phmm\base\admin {
         case "email":
           $user = Client::get_wp_user_from_client_id($post_id);
           $email = \hacklib_nullsafe($user)->get("user_email");
-          if (\hacklib_cast_as_boolean(is_null($email)) || ($email === "")) {
+          if (\hacklib_cast_as_boolean(\is_null($email)) || ($email === "")) {
             echo ($emptyDash);
           } else {
             echo ($email);
@@ -654,11 +721,11 @@ namespace codeneric\phmm\base\admin {
         case "projects":
           {
             $projects = Client::get_project_wp_posts($post_id);
-            if (count($projects) === 0) {
+            if (\count($projects) === 0) {
               echo ($emptyDash);
             } else {
               foreach ($projects as $i => $project) {
-                $editLink = get_edit_post_link($project->ID);
+                $editLink = \get_edit_post_link($project->ID);
                 \HH\invariant(
                   is_string($editLink),
                   "%s",
@@ -672,11 +739,11 @@ namespace codeneric\phmm\base\admin {
                    "\">".
                    self::string_or_else(
                      $project->post_title,
-                     __("Unnamed project", "phmm")
+                     \__("Unnamed project", "photography-management")
                    ).
                    "</a></strong>")
                 ;
-                if (($i + 1) < count($projects)) {
+                if (($i + 1) < \count($projects)) {
                   echo (", ");
                 }
               }
@@ -690,24 +757,26 @@ namespace codeneric\phmm\base\admin {
       $settings = Settings::getCurrentSettings();
       $chosenTemplate = false;
       $chosenTemplate = $settings[\hacklib_id("page_template")];
-      $theme = get_template_directory();
+      $theme = \get_template_directory();
       $template_file = $theme."/".$chosenTemplate;
       if (($chosenTemplate !== "phmm-legacy") &&
           ($chosenTemplate !== "phmm-theme-default") &&
-          (!\hacklib_cast_as_boolean(file_exists($template_file)))) {
-        $editurl = admin_url("edit.php");
-        $link = add_query_arg(
+          (!\hacklib_cast_as_boolean(\file_exists($template_file)))) {
+        $editurl = \admin_url("edit.php");
+        $link = \add_query_arg(
           array("post_type" => "client", "page" => "options"),
           $editurl
         );
         $class = "notice notice-error";
         $message =
-          __(
-            "The chosen page template in Photography Management -> Settings does not exist. Have you changed your theme recently? <br />Please <a href=\"".
-            $link.
-            "\">update</a> the option."
+          \sprintf(
+            \__(
+              "The chosen page template in Photography Management -> Settings does not exist. Have you changed your theme recently? <br />Please <a href=\"%s\">update</a> the option.",
+              "photography-management"
+            ),
+            $link
           );
-        $submessage = __(""); /* UNSAFE_EXPR */
+        $submessage = ""; /* UNSAFE_EXPR */
         printf(
           "<div class=\"".
           $class.
@@ -721,10 +790,10 @@ namespace codeneric\phmm\base\admin {
     }
     public static function get_loading_spinner_html() {
       return
-        "<div style=\"background:url('images/spinner.gif') no-repeat;background-size: 20px 20px;vertical-align: middle;margin: 0 auto;height: 20px;width: 20px;display:block;\"></div>";
+        "<div class='cc-phmm-spinner' style=\"background:url('images/spinner.gif') no-repeat;background-size: 20px 20px;vertical-align: middle;margin: 0 auto;height: 20px;width: 20px;display:block;\"></div>";
     }
     public static function render_client_information_meta_box() {
-      wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
+      \wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
       echo
         ("<div id=\"cc_phmm_client_information\">".
          self::get_loading_spinner_html().
@@ -732,7 +801,7 @@ namespace codeneric\phmm\base\admin {
       ;
     }
     public static function render_client_project_access_meta_box() {
-      wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
+      \wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
       echo
         ("<div id=\"cc_phmm_client_project_access\">".
          self::get_loading_spinner_html().
@@ -740,7 +809,7 @@ namespace codeneric\phmm\base\admin {
       ;
     }
     public static function render_project_gallery_meta_box() {
-      wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
+      \wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
       echo
         ("<div id=\"cc_phmm_project_gallery\">".
          self::get_loading_spinner_html().
@@ -748,7 +817,7 @@ namespace codeneric\phmm\base\admin {
       ;
     }
     public static function render_project_configuration_meta_box() {
-      wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
+      \wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
       echo
         ("<div id=\"cc_phmm_project_configuration\">".
          self::get_loading_spinner_html().
@@ -756,7 +825,7 @@ namespace codeneric\phmm\base\admin {
       ;
     }
     public static function render_project_thumbnail_meta_box() {
-      wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
+      \wp_nonce_field("my_meta_box_nonce", "meta_box_nonce");
       echo
         ("<div id=\"cc_phmm_project_thumbnail\">".
          self::get_loading_spinner_html().
@@ -765,7 +834,7 @@ namespace codeneric\phmm\base\admin {
     }
     public static function remove_post_links_for_custom_post_types($html) {
       $config = Configuration::get();
-      $postType = get_post_type();
+      $postType = \get_post_type();
       if (!\hacklib_cast_as_boolean(is_string($postType))) {
         return $html;
       }
@@ -774,6 +843,38 @@ namespace codeneric\phmm\base\admin {
         return $html;
       }
       return "";
+    }
+    public static function should_start_product_tour() {
+      $config = Configuration::get();
+      $option_product_tour_started =
+        $config[\hacklib_id("option_product_tour_started")];
+      $product_tour_started = \get_option($option_product_tour_started);
+      if ($product_tour_started === false) {
+        return true;
+      }
+      return false;
+    }
+    public static function set_product_tour_finished() {
+      $config = Configuration::get();
+      $option_product_tour_started =
+        $config[\hacklib_id("option_product_tour_started")];
+      \update_option($option_product_tour_started, \time());
+    }
+    public static function inject_support_chat_head() {
+      if (!\hacklib_cast_as_boolean(self::is_our_business())) {
+        return;
+      }
+      echo
+        ("<script src=\"https://wchat.freshchat.com/js/widget.js\"></script>")
+      ;
+    }
+    public static function inject_support_chat_footer() {
+      if (!\hacklib_cast_as_boolean(self::is_our_business())) {
+        return;
+      }
+      echo
+        ("<script>\n       window.fcWidget.init({\n         token: \"8b4dc5f3-67c1-4942-82de-eb906fdbd5e7\",\n         host: \"https://wchat.freshchat.com\",\n         open: true\n       });\n       </script>")
+      ;
     }
   }
 }

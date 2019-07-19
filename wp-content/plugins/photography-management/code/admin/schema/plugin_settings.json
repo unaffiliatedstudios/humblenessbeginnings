@@ -25,6 +25,10 @@
       "type": "boolean",
       "default": true
     },
+    "analytics_opt_in": {
+      "type": "boolean",
+      "default": false
+    },
     "portal_page_id": {
       "type": [
         "null",
@@ -60,6 +64,10 @@
       "items": {
         "$ref": "file://canned_email.json#"
       }
+    },
+    "fast_image_load": {
+      "type": "boolean",
+      "default": false
     }
   },
   "type": "object",

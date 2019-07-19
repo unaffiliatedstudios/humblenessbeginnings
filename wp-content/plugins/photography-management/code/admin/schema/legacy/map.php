@@ -1,7 +1,11 @@
 <?php
 namespace codeneric\phmm\legacy {
   require_once ($GLOBALS["HACKLIB_ROOT"]);
-  use \codeneric\phmm\legacy\type;
+  use \codeneric\phmm\legacy\type\client_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\project_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\comment_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\plugin_settings_data_representation_3_6_5;
+  use \codeneric\phmm\legacy\type\plugin_settings_representation_4_0_0;
   use \codeneric\phmm\base\includes\Error;
   function map_client_from_3_6_5($client_data_3_6_5, $project_ids) {
     $client_data_4_0_0 = array();
@@ -17,7 +21,7 @@ namespace codeneric\phmm\legacy {
     $client_data_4_0_0[\hacklib_id("post_title")] =
       $client_data_3_6_5[\hacklib_id("full_name")];
     \HH\invariant(
-      !\hacklib_cast_as_boolean(is_null($login_name)),
+      !\hacklib_cast_as_boolean(\is_null($login_name)),
       "%s",
       new Error("cannot map this client!")
     );
@@ -38,9 +42,10 @@ namespace codeneric\phmm\legacy {
     $data_4_0_0 = array();
     $data_4_0_0[\hacklib_id("gallery")] = $data_3_6_5[\hacklib_id("gallery")];
     $data_4_0_0[\hacklib_id("protection")] = array(
-      "private" => !\hacklib_cast_as_boolean(is_null($pwd)),
-      "password_protection" => !\hacklib_cast_as_boolean(is_null($pwd)),
-      "password" => $pwd
+      "private" => !\hacklib_cast_as_boolean(\is_null($pwd)),
+      "password_protection" => !\hacklib_cast_as_boolean(\is_null($pwd)),
+      "password" => $pwd,
+      "registration" => null
     );
     $data_4_0_0[\hacklib_id("pwd")] = $pwd;
     $data_4_0_0[\hacklib_id("thumbnail")] =
@@ -59,7 +64,8 @@ namespace codeneric\phmm\legacy {
       "showCaptions" => $data_3_6_5[\hacklib_id("showCaptions")] === "true",
       "showFilenames" =>
         $data_3_6_5[\hacklib_id("showFilenames")] === "true",
-      "watermark" => $watermark
+      "watermark" => $watermark,
+      "favoritable_limit" => null
     );
     return $data_4_0_0;
   }
@@ -77,7 +83,7 @@ namespace codeneric\phmm\legacy {
     $data_4_0_0[\hacklib_id("client_id")] =
       $data_3_6_5[\hacklib_id("client_id")];
     $data_4_0_0[\hacklib_id("time")] =
-      date("Y-m-d H:i:s", $data_3_6_5[\hacklib_id("date")]);
+      \date("Y-m-d H:i:s", $data_3_6_5[\hacklib_id("date")]);
     $data_4_0_0[\hacklib_id("wp_author_id")] =
       $data_3_6_5[\hacklib_id("user_id")];
     return $data_4_0_0;
@@ -88,7 +94,7 @@ namespace codeneric\phmm\legacy {
       $data_3_6_5[\hacklib_id("cc_photo_image_box")] === 1;
     $data_4_0_0[\hacklib_id("slider_theme")] =
       \hacklib_cast_as_boolean(
-        in_array(
+        \in_array(
           $data_3_6_5[\hacklib_id("cc_photo_lightbox_theme")],
           array("light", "dark")
         )
@@ -100,8 +106,8 @@ namespace codeneric\phmm\legacy {
       $data_3_6_5[\hacklib_id("hide_admin_bar")] === 1;
     $data_4_0_0[\hacklib_id("portal_page_id")] =
       $data_3_6_5[\hacklib_id("cc_photo_portal_page")];
-    $er = explode(",", $data_3_6_5[\hacklib_id("cc_email_recipient")]);
-    $er = array_filter(
+    $er = \explode(",", $data_3_6_5[\hacklib_id("cc_email_recipient")]);
+    $er = \array_filter(
       $er,
       function($e) {
         return $e !== "";
@@ -122,10 +128,10 @@ namespace codeneric\phmm\legacy {
     $data_4_0_0[\hacklib_id("canned_emails")] = array();
     $es = $data_3_6_5[\hacklib_id("canned_email_subject")];
     $ec = $data_3_6_5[\hacklib_id("canned_email")];
-    if ((!\hacklib_cast_as_boolean(is_null($es))) &&
-        (!\hacklib_cast_as_boolean(is_null($ec)))) {
+    if ((!\hacklib_cast_as_boolean(\is_null($es))) &&
+        (!\hacklib_cast_as_boolean(\is_null($ec)))) {
       $data_4_0_0[\hacklib_id("canned_emails")][] = array(
-        "id" => "generated_".time(),
+        "id" => "generated_".\time(),
         "display_name" => "Migrated template",
         "subject" => $es,
         "content" => $ec

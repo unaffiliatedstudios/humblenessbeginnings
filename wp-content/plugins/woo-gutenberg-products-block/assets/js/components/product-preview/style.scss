@@ -1,10 +1,8 @@
 .wc-product-preview {
-	text-align: center;
-	margin-bottom: $gap;
 
-	.wc-product-preview__title,
-	.wc-product-preview__price {
-		margin-top: $gap-smallest;
+	.wc-product-preview__image {
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.wp-block-button {
@@ -16,19 +14,28 @@
 		margin: $gap-small 0 0;
 	}
 
-	.cols-4 &,
-	.cols-5 &,
-	.cols-6 & {
+
+	.is-hidden-title & {
 		.wc-product-preview__title {
-			font-size: 0.9em;
-			line-height: 1.2;
+			display: none;
 		}
+	}
+
+	.is-hidden-price & {
 		.wc-product-preview__price {
-			font-size: 0.8em;
+			display: none;
 		}
-		.wc-product-preview__add-to-cart {
-			font-size: 0.7em !important;
-			line-height: 1.4 !important;
+	}
+
+	.is-hidden-rating & {
+		.wc-product-preview__rating {
+			display: none;
+		}
+	}
+
+	.is-hidden-button & {
+		.wp-block-button {
+			display: none;
 		}
 	}
 

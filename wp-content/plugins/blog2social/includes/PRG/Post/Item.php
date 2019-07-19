@@ -127,7 +127,7 @@ class PRG_Post_Item {
                                         <div class="media-body">
                                                 <strong><a target="_blank" href="' . get_permalink($var->ID) . '">' . $postTitle . '</a></strong>
                                             <span class="pull-right b2s-publish-btn">
-                                                <a href="admin.php?page=prg-login&postId=' . $var->ID . '" class="btn btn-warning btn-sm">' . __('Publish on PR-Gateway', 'blog2social') . '</a>
+                                                <a href="admin.php?page=prg-login&postId=' . $var->ID . '" class="btn btn-primary btn-sm">' . __('Publish on PR-Gateway', 'blog2social') . '</a>
                                             </span>
                                             <p class="info hidden-xs">#' . $var->ID . ' | ' . __('Author', 'blog2social') . ' <a href="' . get_author_posts_url($var->post_author) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> | ' . $postStatus[trim(strtolower($var->post_status))] . ' ' . __('on Blog', 'blog2social') . ' ' . B2S_Util::getCustomDateFormat($var->post_date, substr(B2S_LANGUAGE, 0, 2)) . '</p>
                                         </div>

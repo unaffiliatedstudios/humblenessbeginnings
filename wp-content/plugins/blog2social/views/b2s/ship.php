@@ -8,6 +8,7 @@ delete_option('B2S_PLUGIN_POST_META_TAGES_OG_' . (int) $_GET['postId']);
 delete_option('B2S_PLUGIN_POST_CONTENT_' . (int) $_GET['postId']);
 B2S_Tools::checkUserBlogUrl();
 $userLang = strtolower(substr(get_locale(), 0, 2));
+$tosCrossPosting = unserialize(B2S_PLUGIN_NETWORK_CROSSPOSTING_LIMIT);
 $postData = get_post((int) $_GET['postId']);
 $selProfile = isset($_GET['profile']) ? (int) $_GET['profile'] : 0;
 $selImg = isset($_GET['img']) ? base64_decode($_GET['img']) : '';
@@ -23,8 +24,11 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
 ?>
 <div class="b2s-container">
     <div class="b2s-inbox">
-        <?php require_once B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'; ?>
-
+        <!--Header|Start - Include-->
+        <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+        <!--Header|End-->
+        <div class="clearfix"></div>
+        <!--Content|Start-->
         <div class="col-xs-12 col-md-9 del-padding-left">
             <div class="col-xs-12 del-padding-left hidden-xs">
                 <div class="panel panel-group">
@@ -60,7 +64,7 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
 
 
                             </div>
-                            <?php require_once B2S_PLUGIN_DIR . 'views/b2s/html/service.phtml'; ?>
+                            <?php require_once B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.ship.phtml'; ?>
 
                             <div class="clearfix"></div>
 
@@ -219,7 +223,7 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                                             <input type='hidden' id='post_id' name="post_id" value='<?php echo (int) $_GET['postId']; ?>'>
                                             <input type='hidden' id='user_timezone' name="user_timezone" value="<?php echo $userTimeZoneOffset; ?>">
                                             <input type='hidden' id='user_timezone_text' name="user_timezone_text" value="<?php echo _e('Time zone', 'blog2social') . ': (UTC ' . B2S_Util::humanReadableOffset($userTimeZoneOffset) . ') ' . $userTimeZone ?>">
-                                            <input type='hidden' id='default_titel' name="default_titel" value='<?php echo B2S_Util::getTitleByLanguage($postData->post_title, $userLang); ?>'>
+                                            <input type='hidden' id="default_titel" name="default_titel" value="<?php echo addslashes(B2S_Util::getTitleByLanguage($postData->post_title, $userLang)); ?>">
                                             <input type="hidden" id="b2sChangeOgMeta" name="change_og_meta" value="0">
                                             <input type="hidden" id="b2sRelayAccountData" name="relay_account_data" value="<?php echo base64_encode($relayAccountDataHtml); ?>">
                                             <input type="hidden" id="b2sRelayCount" name="relay_count" value="<?php echo count($relayAccountData); ?>">
@@ -453,6 +457,22 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                             </div>
 
 
+                            <div id="b2s-tos-xing-group-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="b2s-tos-xing-group-modal" aria-hidden="true" data-backdrop="false">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="b2s-modal-close close" data-modal-name="#b2s-tos-xing-group-modal">&times;</button>
+                                            <h4 class="modal-title"><?php _e('Important infomations about XING groups', 'blog2social') ?> </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <?php _e('Please follow the new XING guidelines for crossposting in XING groups: You can only publish identical content once within one group. You can publish identical posts in up to 3 different groups.', 'blog2Social') ?>
+                                            <a href="<?php echo B2S_Tools::getSupportLink('network_tos_blog_032019'); ?>" target="_blank"><?php _e('Learn more', 'blog2social') ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
 
                             <div id="b2s-post-ship-item-post-format-modal" class="modal fade" role="dialog" aria-labelledby="b2s-post-ship-item-post-format-modal" aria-hidden="true" data-backdrop="false">
                                 <div class="modal-dialog modal-lg">
@@ -484,8 +504,8 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                                                         <div class="b2s-post-format-settings-info" data-network-id="2" style="display:none;">
                                                             <b><?php _e('Define the default settings for the custom post format for all of your Twitter accounts in the Blog2Social settings.', 'blog2social'); ?></b>
                                                         </div>
-                                                        <div class="b2s-post-format-settings-info" data-network-id="10" style="display:none;">
-                                                            <b><?php _e('Define the default settings for the custom post format for all of your Google+ accounts in the Blog2Social settings.', 'blog2social'); ?></b>
+                                                        <div class="b2s-post-format-settings-info" data-network-id="3" style="display:none;">
+                                                            <b><?php _e('Define the default settings for the custom post format for all of your LinkedIn accounts in the Blog2Social settings.', 'blog2social'); ?></b>
                                                         </div>
                                                         <div class="b2s-post-format-settings-info" data-network-id="12" style="display:none;">
                                                             <b><?php _e('Define the default settings for the custom post format for all of your Instagram accounts in the Blog2Social settings.', 'blog2social'); ?></b>
@@ -520,15 +540,14 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                             <input type="hidden" id="b2sPostType" value="<?php echo (isset($_GET['b2sPostType']) && $_GET['b2sPostType'] == 'ex') ? 'ex' : ''; ?>">
                             <input type="hidden" id="b2sDefault_url" name="default_url" value="<?php echo (isset($_GET['b2sPostType']) && $_GET['b2sPostType'] == 'ex') ? $postData->guid : (get_permalink($postData->ID) !== false ? get_permalink($postData->ID) : $postData->guid); ?>">
                             <input type="hidden" id="b2sPortalImagePath" value="<?php echo plugins_url('/assets/images/portale/', B2S_PLUGIN_FILE); ?>">
+                            <input type="hidden" id="b2sTosXingGroupCrosspostingLimit" value="<?php echo $tosCrossPosting[19][2]; ?>">
                             <input type="hidden" id="b2sServerUrl" value="<?php echo B2S_PLUGIN_SERVER_URL; ?>">
                             <input type="hidden" id="b2sTwitterOrginalPost" value="">
                             <input type="hidden" id="b2sJsTextLoading" value="<?php _e('Loading...', 'blog2social') ?>">
                             <input type="hidden" id="b2sJsTextPublish" value="<?php _e('published', 'blog2social') ?>">
-
                             <input type="hidden" id="b2sJsTextConnectionFail" value="<?php _e('The connection to the server failed. Try again!', 'blog2social') ?>">
                             <input type="hidden" id="b2sJsTextConnectionFailLink" value="<?php echo ($userLang == 'de') ? 'https://www.blog2social.com/de/faq/content/9/108/de/die-verbindung-zum-server-ist-fehlgeschlagen-bitte-versuche-es-erneut.html' : 'https://www.blog2social.com/en/faq/content/9/106/en/the-connection-to-the-server-failed-please-try-again.html'; ?>"> 
                             <input type="hidden" id="b2sJsTextConnectionFailLinkText" value="<?php _e('Give me more information', 'blog2social') ?>"> 
-
                             <input type="hidden" id="b2sSelectedNetworkAuthId" value="<?php echo (isset($_GET['network_auth_id']) && (int) $_GET['network_auth_id'] > 0) ? (int) $_GET['network_auth_id'] : ''; ?>">
                             <input type="hidden" id="b2sDefaultNoImage" value="<?php echo plugins_url('/assets/images/no-image.png', B2S_PLUGIN_FILE); ?>">
                             <input type="hidden" id="isMetaChecked" value="<?php echo $postData->ID; ?>">
@@ -545,6 +564,4 @@ $b2sGeneralOptions = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                                 <input type="hidden" id="b2sSchedPostInfoIgnore" value="0">
                                 <?php
                             }
-
-                            require_once (B2S_PLUGIN_DIR . 'views/b2s/partials/network-tos-modal.php');
                             

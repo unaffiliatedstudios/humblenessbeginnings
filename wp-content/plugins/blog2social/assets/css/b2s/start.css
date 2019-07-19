@@ -1,79 +1,39 @@
 .b2s-dashboard-h4{
     font-weight: 700;
-    font-size: 20px !important;
+    font-size: 24px !important;
 }
 .b2s-dashboard-h5{
-    font-size: 26px;  
+    font-size: 24px;  
+    margin-left: 22px;
+    color: #72777c !important;
 }
 .b2s-dashboard-h6{
     font-size: 18px;  
 }
+
+.form-inline{
+    margin-bottom: 0px !important;
+}
+
 .form-inline .form-control {
     display: inline-block;
     vertical-align: middle;
     width: auto !important;
     min-width: 250px;
 }
-@media(max-width: 430px) {
-    .form-inline .form-control {
-        display: inline-block;
-        vertical-align: middle;
-        width: auto !important;
-        min-width: 100px;
-    }
-}
-@media(min-width: 1440px) {
-    .b2s-btn-width-70{
-        width: 70% !important; 
-    }
-}
 
-.b2s-info-sm{
-    margin-top: 5px;
-    font-size: 9px;
+.b2s-mail-update-title{
+    font-weight: 600;
+    font-size: 16px;
 }
-
-.b2s-btn-link{
-    text-decoration: underline;
-}
-.thumbnail {
-    border:0 none !important;
-    margin-bottom: 0px !important;
-}
-
-.b2s-feature-img-with-90{
-    max-width: 90px !important;
-}
-
 .label {
     font-size: 90% !important;
 }
-.b2s-padding-bottom-50{
-    margin-bottom: 50px;
-}
-
-.b2s-wdith-35{
-    width: 35px;
-}
-
-.b2s-well{
-    background-color: #f5f5f5;
-    border: 1px solid #e3e3e3;
-    border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
-    margin-bottom: 20px;
-    min-height: 20px;
-    padding: 19px;
-}
-.b2s-loading-area-faq{
-    text-align: center;
-}
-
-.b2s-dashoard-btn-phone{
-    cursor: default !important;
-}
 
 /* Widgets */
+.b2s-widget-calendar{
+    margin-top: 10px;
+}
 
 /* Content-Widget */
 .b2s-widget-block-image-content{
@@ -82,8 +42,6 @@
     line-height: 1.2;
 }
 .b2s-widget-block-image-content > img{
-    /*max-height: 150px;
-    max-width: 150px;*/
     margin-right: 10px;
 }
 body .form-inline{
@@ -106,9 +64,13 @@ body .form-inline{
     cursor:pointer
 }
 
-/*.b2s-dashboard-multi-widget-content{
-    flex: 0 1 450px;
-}*/
+.fc-showall-button{
+    color: #fff !important;
+    background-color: #337ab7 !important;
+    border-color: #204d74 !important;
+    text-decoration: none !important;
+}
+
 
 @media(max-width: 530px)
 {
@@ -138,38 +100,10 @@ body .form-inline{
     }
 }
 
-/* Posts-Widget */
-.btn-link.b2s-post-btn .label{
-    font-size: 16px !important;
-}
-
-.b2s-post-btn{
-    font-size: 18px !important;
-}
-
 ul.b2s-sort-result-item-area{
     margin-bottom: 0;
 }
-@media(max-width: 380px)
-{
-    .btn-link.b2s-post-btn .label{
-        font-size: 9px !important;
-    }
-}
-@media(max-width: 350px)
-{
-    .btn-link.b2s-post-btn.b2s-btn-disabled{
-        display: none;
-    }
-}
 
-/* Support */
-.b2s-faq-content a{
-    font-size: 14px;
-}
-#b2s-faq-button{
-    float:right;
-}
 .b2sDetailsSchedPostBtn{
     display: none !important;
 }
@@ -181,15 +115,10 @@ ul.b2s-sort-result-item-area{
     border: 1px solid #ddd;
 }
 
-/* Tutorial */
-#b2s_tutorial_link {
-    float: right;
-    margin-top: 27px;
-}
-
 .b2s-activity-search-content{
     padding-top: 15px;
     padding-left:10px;
+    font-weight: 600;
 }
 
 .b2sSortForm.form-inline{
@@ -198,4 +127,18 @@ ul.b2s-sort-result-item-area{
 
 .fc-day-grid-event{
     cursor: pointer;   
+}
+
+.fc-left > h2 {
+    margin-left: 20px !important;
+    color: #72777c !important;
+}
+body .fc-state-default{
+    color: #000;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+#b2s-mail-update-input, .b2s-mail-btn {
+    z-index: 0 !important;
 }

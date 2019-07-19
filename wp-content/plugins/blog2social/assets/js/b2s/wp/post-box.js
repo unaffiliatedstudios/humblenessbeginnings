@@ -203,6 +203,7 @@ jQuery(document).on('click', '#b2s-post-meta-box-time-dropdown-publish', functio
                 error: function () {
                     jQuery('.b2s-loading-area').hide();
                     jQuery('#b2s-server-connection-fail').show();
+                    jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                     return false;
                 },
                 success: function (data) {
@@ -227,10 +228,16 @@ jQuery(document).on('click', '#b2s-post-meta-box-time-dropdown-publish', functio
 
                         } else {
                             jQuery('#b2s-server-connection-fail').show();
+                            jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                         }
                         wp.heartbeat.connectNow();
                     } else {
-                        jQuery('#b2s-server-connection-fail').show();
+                        if (data.content == 'no_auth') {
+                            jQuery('#b2s-post-meta-box-state-no-auth').show();
+                        } else {
+                            jQuery('#b2s-server-connection-fail').show();
+                        }
+                        jQuery('#b2s-post-meta-box-time-dropdown-publish').prop('checked', false);
                     }
                 }
             });
@@ -239,15 +246,22 @@ jQuery(document).on('click', '#b2s-post-meta-box-time-dropdown-publish', functio
 });
 
 jQuery(document).on('change', '.b2s-post-meta-box-sched-select', function () {
-    if (jQuery(this).val() == '1') {
+    if (jQuery(this).val() >= '1') {
         if (jQuery('#b2s-post-meta-box-version').val() > 1) {
-            jQuery('.b2s-post-meta-box-sched-once').show();
+            if (jQuery(this).val() == '1') {
+                jQuery('.b2s-post-meta-box-sched-best-time').hide();
+                jQuery('.b2s-post-meta-box-sched-once').show();
+            } else if (jQuery(this).val() == '2') {
+                jQuery('.b2s-post-meta-box-sched-once').hide();
+                jQuery('.b2s-post-meta-box-sched-best-time').show();
+            }
         } else {
             jQuery(this).val('0');
             jQuery('#b2s-post-meta-box-note-premium').show();
         }
     } else {
         jQuery('.b2s-post-meta-box-sched-once').hide();
+        jQuery('.b2s-post-meta-box-sched-best-time').hide();
     }
 });
 

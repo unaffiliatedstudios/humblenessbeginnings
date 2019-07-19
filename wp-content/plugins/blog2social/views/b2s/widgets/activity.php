@@ -1,10 +1,7 @@
 <?php
 require_once (B2S_PLUGIN_DIR . 'includes/B2S/Stats.php');
 ?>
-
-<h5 class="b2s-dashboard-h5 pull-left"><?php _e('Your activity', 'blog2social') ?> 
-</h5>
-<div class="b2s-activity-search-content pull-left">
+<div class="b2s-activity-search-content pull-right">
     <?php _e('Show activity starting from', 'blog2social'); ?> <input id="b2s-activity-date-picker" value="<?php echo (substr(B2S_LANGUAGE, 0, 2) == 'de') ? date('d.m.Y', strtotime("-1 week")) : date('Y-m-d', strtotime("-1 week")); ?>" data-language='<?php echo (substr(B2S_LANGUAGE, 0, 2) == 'de' ? 'de' : 'en'); ?>' />
 
 </div>

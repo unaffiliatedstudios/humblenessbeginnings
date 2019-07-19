@@ -8,9 +8,13 @@ $selSchedDate = (isset($_GET['schedDate']) && !empty($_GET['schedDate'])) ? date
 ?>
 <div class="b2s-container">
     <div class="b2s-inbox">
-        <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
         <div class="col-md-12 del-padding-left">
-            <div class="col-md-9 del-padding-left">
+            <div class="col-md-9 del-padding-left del-padding-right">
+                <!--Header|Start - Include-->
+                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+                <!--Header|End-->
+                <div class="clearfix"></div>
+                <!--Content|Start-->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="b2s-post">
@@ -29,6 +33,9 @@ $selSchedDate = (isset($_GET['schedDate']) && !empty($_GET['schedDate'])) ? date
                         </div>
                         <div id="b2s-curation-no-data-info" class="alert alert-danger">
                             <span class="glyphicon glyphicon-remove glyphicon-danger"></span> <?php _e('Invalid data. Please check your data.', 'blog2social'); ?>
+                        </div>
+                        <div id="b2s-curation-saved-draft-info" class="alert alert-success">
+                            <span class="glyphicon glyphicon-success glyphicon-ok"></span> <?php _e('Saved as draft.', 'blog2social'); ?>
                         </div>
                         <div class="b2s-curation-area">
                             <div class="row b2s-curation-input-area">
@@ -71,7 +78,6 @@ $selSchedDate = (isset($_GET['schedDate']) && !empty($_GET['schedDate'])) ? date
                     </div>
                 </div>
             </div>
-            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/service.phtml'); ?>
             <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.phtml'); ?>
         </div>
     </div>

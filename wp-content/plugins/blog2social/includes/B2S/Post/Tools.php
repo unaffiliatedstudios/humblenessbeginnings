@@ -22,14 +22,30 @@ class B2S_Post_Tools {
         global $wpdb;
         $resultPostIds = array();
         $blogPostId = 0;
+        $tosCrossPosting = unserialize(B2S_PLUGIN_NETWORK_CROSSPOSTING_LIMIT);
 
         foreach ($postIds as $v) {
-            $sql = $wpdb->prepare("SELECT id,post_id,post_for_relay,post_for_approve FROM b2s_posts WHERE id =%d AND publish_date = %s", (int) $v, "0000-00-00 00:00:00");
+            $sql = $wpdb->prepare("SELECT b.id,b.post_id,b.post_for_relay,b.post_for_approve,b.sched_details_id,d.network_id,d.network_type FROM b2s_posts b LEFT JOIN b2s_posts_network_details d ON (d.id = b.network_details_id) WHERE b.id =%d AND b.publish_date = %s", (int) $v, "0000-00-00 00:00:00");
             $row = $wpdb->get_row($sql);
             if (isset($row->id) && (int) $row->id == $v) {
-                if ((int)$row->post_for_approve == 1) {
+                if ((int) $row->post_for_approve == 1) {
                     $wpdb->update('b2s_posts', array('hide' => 1), array('id' => $v));
                 } else {
+                    //TOS Crossposting delete entry
+                    if ($row->network_id != null && $row->network_type != null && (int) $row->sched_details_id > 0) {
+                        if (isset($tosCrossPosting[$row->network_id][$row->network_type])) {
+                            //get network_tos_group_id form sched_data
+                            $sql = $wpdb->prepare("SELECT sched_data FROM b2s_posts_sched_details WHERE id =%d", (int) $row->sched_details_id);
+                            $schedData = $wpdb->get_col($sql);
+                            if (isset($schedData[0]) && !empty($schedData[0])) {
+                                $schedData = unserialize($schedData[0]);
+                                if ($schedData !== false && isset($schedData['network_tos_group_id']) && !empty($schedData['network_tos_group_id'])) {
+                                    $options = new B2S_Options(0, 'B2S_PLUGIN_TOS_XING_GROUP_CROSSPOSTING');
+                                    $options->deleteValueByKey($row->post_id, $schedData['network_tos_group_id']);
+                                }
+                            }
+                        }
+                    }
                     $wpdb->update('b2s_posts', array('hook_action' => 3, 'hide' => 1), array('id' => $v));
                 }
                 $resultPostIds[] = $v;

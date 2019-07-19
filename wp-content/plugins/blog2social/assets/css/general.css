@@ -1130,8 +1130,8 @@ img {
     border-radius: 50%;
 }
 hr {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 15px;
+    margin-bottom: 15px;
     border: 0;
     border-top: 1px solid #eee;
 }
@@ -1250,15 +1250,15 @@ h6 .small,
 }
 h1,
 .h1 {
-    font-size: 36px;
+    font-size: 28px;
 }
 h2,
 .h2 {
-    font-size: 30px;
+    font-size: 22px;
 }
 h3,
 .h3 {
-    font-size: 24px;
+    font-size: 20px;
 }
 h4,
 .h4 {
@@ -3419,8 +3419,8 @@ fieldset[disabled] .btn-link:focus {
 }
 .btn-lg,
 .btn-group-lg > .btn {
-    font-size: 20px;
-    line-height: 1.3333333;
+    font-size: 16px;
+    line-height: 1.1333333;
     border-radius: 6px;
 }
 .btn-sm,
@@ -3776,6 +3776,7 @@ input[type="button"].btn-block {
     position: relative;
     display: table;
     border-collapse: separate;
+    direction: ltr !important;
 }
 .input-group[class*="col-"] {
     float: none;
@@ -6728,6 +6729,11 @@ button.close {
     background-color: #79B232 !important; 
 }
 
+.btn-primary, .label-primary{
+    background-color: #337ab7 !important; 
+}
+
+
 .updated a {
     padding-bottom: 10px !important;
 }
@@ -6948,15 +6954,97 @@ p {
 /* B2S Custom */
 .b2s-container{
     margin-top:15px;
+    font-family: "Open Sans",Arial,sans-serif;
+    font-weight: 500;
 }
 
-.b2s-select,.b2s-input{
+.b2s-select,.b2s-input,.b2s-select-area{
     height:  30px !important;
     margin-bottom: 8px !important;
 }
 
-.b2s-logo{
-    padding-bottom: 15px;
+.b2s-btn-logo{
+    font-weight: 600 !important;
+    font-size: 22px !important;
+    line-height: 0.89999 !important;
+    padding:5px 5px !important;
+    color: #337ab7 !important;
+    margin-top: 0px;
+    text-decoration: none !important;
+}
+
+.b2s-img-logo{
+    min-width: 2.5em;
+}
+
+.b2s-sidebar{
+    max-width: 320px;
+}
+
+.b2s-sidebar-version{
+    font-size: 12px !important;
+    white-space:nowrap;
+}
+
+.b2s-sidebar-btn-licence{
+    font-size: 14px !important;   
+}
+
+.b2s-sidebar-btn-licence{
+    text-decoration: underline;
+}
+
+.b2s-sidebar-licence{
+    font-size: 14px !important;
+    padding-top: 5px;
+    font-weight: 600;
+}
+
+.b2s-sidebar-licence-btn-edit{
+    padding-left: 5px;
+    color: #adadad;
+}
+
+@media(max-width:1150px){
+    .b2s-sidebar-licence-btn-edit{
+        display: none;
+    }
+}
+
+
+.b2s-sidebar-head-text{
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom:8px;
+}
+.b2s-sidebar-menu-item{
+    padding-left: 10px;
+    font-weight: 400;
+    font-size: 15px !important;
+    line-height: 1.1333333;
+    color: #337ab7 !important;
+    line-height: 0.89999 !important;
+}
+
+
+.b2s-list-margin-left-10{
+    margin-left: 10px !important;
+    margin-bottom: 10px;
+}
+
+.b2s-info-sm{
+    font-size: 12px !important;
+}
+
+h4{
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.b2s-blog-news-title{
+    font-size: 14px !important;
+    margin-top: 0px !important;
 }
 
 .b2s-loading-area, .prg-loading-area{
@@ -6977,8 +7065,16 @@ p {
     padding: 0 15px;
 }
 
+.add-margin-bottom-10{
+    margin-bottom: 10px;
+}
+
+.add-margin-top-10{
+    margin-top: 10px;
+}
+
 .del-padding-right {
-    padding-right: 0px !important;
+    padding-right: 5px !important;
 }
 
 .padding-bottom-10{
@@ -7099,6 +7195,9 @@ input[type="checkbox"].error + label{
 .b2s-color-green{
     color: #79b232;
 }
+.b2s-color-black{
+    color: #444;
+}
 
 .b2s-version-info{
     font-size: 12px;
@@ -7177,7 +7276,9 @@ input[type="checkbox"].error + label{
 .b2s-close{
     color:#aaa;
     float:right;
-    cursor:pointer
+    cursor:pointer;
+    font-weight: 600;
+    font-size: 18px;
 }
 .b2s-notice-buttons{
     padding-top:10px;
@@ -7405,27 +7506,27 @@ CSS CheckBOX
 
 
 .b2s-scroll-modal-down {
-  opacity: 1;
-  -webkit-transition: all .5s ease-in 3s;
-  transition: all .5s ease-in 3s;
+    opacity: 1;
+    -webkit-transition: all .5s ease-in 3s;
+    transition: all .5s ease-in 3s;
 }
 
 .b2s-scroll-modal-down {
-  position: absolute;
-  bottom: 50px;
-  left: 50%;
-  margin-left: -16px;
-  display: block;
-  width: 32px;
-  height: 32px;
-  border: 2px solid #398439;
-  background-size: 14px auto;
-  border-radius: 50%;
-  z-index: 20000;
-  -webkit-animation: bounce 2s infinite 2s;
-  animation: bounce 2s infinite 2s;
-  -webkit-transition: all .2s ease-in;
-  transition: all .2s ease-in;
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    margin-left: -16px;
+    display: block;
+    width: 32px;
+    height: 32px;
+    border: 2px solid #398439;
+    background-size: 14px auto;
+    border-radius: 50%;
+    z-index: 20000;
+    -webkit-animation: bounce 2s infinite 2s;
+    animation: bounce 2s infinite 2s;
+    -webkit-transition: all .2s ease-in;
+    transition: all .2s ease-in;
 }
 
 .b2s-scroll-modal-down:before {
@@ -7442,27 +7543,46 @@ CSS CheckBOX
 }
 
 @keyframes bounce {
-  0%,
-  100%,
-  20%,
-  50%,
-  80% {
-    -webkit-transform: translateY(0);
-    -ms-transform: translateY(0);
-    transform: translateY(0);
-  }
-  40% {
-    -webkit-transform: translateY(-10px);
-    -ms-transform: translateY(-10px);
-    transform: translateY(-10px);
-  }
-  60% {
-    -webkit-transform: translateY(-5px);
-    -ms-transform: translateY(-5px);
-    transform: translateY(-5px);
-  }
+    0%,
+    100%,
+    20%,
+    50%,
+    80% {
+        -webkit-transform: translateY(0);
+        -ms-transform: translateY(0);
+        transform: translateY(0);
+    }
+    40% {
+        -webkit-transform: translateY(-10px);
+        -ms-transform: translateY(-10px);
+        transform: translateY(-10px);
+    }
+    60% {
+        -webkit-transform: translateY(-5px);
+        -ms-transform: translateY(-5px);
+        transform: translateY(-5px);
+    }
 }
 
 .btn-padding{
     padding:6px 0px;
+}
+
+.b2s-color-white{
+    color:#fff;
+}
+
+.b2s-color-grey{
+    color: #72777c !important;
+}
+
+.b2s-modal-info-key-area{
+    width: 350px !important;
+}
+.b2s-text-underline{
+    text-decoration: underline;
+}
+
+.b2s-feature-img-with-24{
+    max-width: 24px !important;
 }

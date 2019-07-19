@@ -51,6 +51,18 @@ class B2S_Calendar_ItemEdit extends B2S_Ship_Item {
 
         return $message;
     }
+    
+     protected function hook_sched_data(array $schedData)
+    {
+        if($this->getCalendarItem())
+        {
+            $schedData = $this->getCalendarItem()->getSchedData();
+          
+        }
+
+        return $schedData;
+    }
+    
 
     protected function hook_meta(array $meta)
     {

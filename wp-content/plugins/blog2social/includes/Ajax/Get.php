@@ -34,6 +34,9 @@ class Ajax_Get {
         add_action('wp_ajax_b2s_get_multi_widget_content', array($this, 'getMultiWidgetContent'));
         add_action('wp_ajax_b2s_get_stats', array($this, 'getStats'));
         add_action('wp_ajax_b2s_get_blog_post_status', array($this, 'getBlogPostStatus'));
+        add_action('wp_ajax_b2s_support_systemrequirements', array($this, 'b2sSupportSystemRequirements'));
+        add_action('wp_ajax_b2s_search_user', array($this, 'searchUser'));
+        add_action('wp_ajax_b2s_get_select_mandant_user', array($this, 'getSelectMandantUser'));
     }
 
     public function getBlogPostStatus() {
@@ -45,27 +48,26 @@ class Ajax_Get {
     public function scrapeUrl() {
         if (isset($_POST['url']) && !empty($_POST['url'])) {
             $data = B2S_Util::scrapeUrl($_POST['url']);
+            $scrapeError = ($data !== false) ? false : true;
             require_once (B2S_PLUGIN_DIR . 'includes/B2S/Curation/View.php');
             $curation = new B2S_Curation_View();
             $preview = $curation->getCurationPreviewHtml($_POST['url'], $data);
-            if (!empty($preview) && $data !== false) {
+            if (!empty($preview)) {
                 if (isset($_POST['loadSettings']) && filter_var($_POST['loadSettings'], FILTER_VALIDATE_BOOLEAN)) {
                     $result = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getProfileUserAuth', 'token' => B2S_PLUGIN_TOKEN)));
                     if (isset($result->result) && (int) $result->result == 1 && isset($result->data) && !empty($result->data) && isset($result->data->mandant) && isset($result->data->auth) && !empty($result->data->mandant) && !empty($result->data->auth)) {
-                        require_once (B2S_PLUGIN_DIR . 'includes/B2S/Curation/View.php');
-                        $curation = new B2S_Curation_View();
-                        echo json_encode(array('result' => true, 'preview' => $preview, 'settings' => $curation->getShippingDetails($result->data->mandant, $result->data->auth)));
+                        echo json_encode(array('result' => true, 'preview' => $preview, 'scrapeError' => $scrapeError, 'settings' => $curation->getShippingDetails($result->data->mandant, $result->data->auth)));
                         wp_die();
                     }
-                    echo json_encode(array('result' => false, 'preview' => $preview, 'error' => 'NO_AUTH'));
+                    echo json_encode(array('result' => false, 'preview' => $preview, 'scrapeError' => $scrapeError, 'error' => 'NO_AUTH'));
                     wp_die();
                 } else {
-                    echo json_encode(array('result' => true, 'preview' => $preview));
+                    echo json_encode(array('result' => true, 'preview' => $preview, 'scrapeError' => $scrapeError));
                     wp_die();
                 }
             }
         }
-        echo json_encode(array('result' => false, 'preview' => '', 'error' => 'NO_PREVIEW'));
+        echo json_encode(array('result' => false, 'preview' => '', 'scrapeError' => false, 'error' => 'NO_PREVIEW'));
         wp_die();
     }
 
@@ -82,6 +84,7 @@ class Ajax_Get {
         $b2sSortPostPublishDate = isset($_POST['b2sSortPostPublishDate']) ? trim($_POST['b2sSortPostPublishDate']) : "";
         $b2sSortPostStatus = isset($_POST['b2sSortPostStatus']) ? trim($_POST['b2sSortPostStatus']) : "";
         $b2sShowByDate = isset($_POST['b2sShowByDate']) ? trim($_POST['b2sShowByDate']) : ""; //YYYY-mm-dd
+        $b2sShowByNetwork = isset($_POST['b2sShowByNetwork']) ? (int) $_POST['b2sShowByNetwork'] : 0;
         $b2sUserAuthId = isset($_POST['b2sUserAuthId']) ? (int) $_POST['b2sUserAuthId'] : 0;
         $b2sPostBlogId = isset($_POST['b2sPostBlogId']) ? (int) $_POST['b2sPostBlogId'] : 0;
         $b2sSortPostCat = isset($_POST['b2sSortPostCat']) ? trim($_POST['b2sSortPostCat']) : "";
@@ -89,8 +92,8 @@ class Ajax_Get {
         $b2sSelectSchedDate = isset($_POST['b2sSchedDate']) ? trim($_POST['b2sSchedDate']) : "";
         $b2sUserLang = isset($_POST['b2sUserLang']) ? trim($_POST['b2sUserLang']) : strtolower(substr(B2S_LANGUAGE, 0, 2));
         $b2sResultsPerPage = isset($_POST['b2sPostsPerPage']) && intval($_POST['b2sPostsPerPage']) > 0 ? intval($_POST['b2sPostsPerPage']) : B2S_PLUGIN_POSTPERPAGE;
-        if (!empty($b2sType) && in_array($b2sType, array('all', 'sched', 'publish', 'notice', 'approve'))) {
-            $postItem = new B2S_Post_Item($b2sType, $b2sSortPostTitle, $b2sSortPostAuthor, $b2sSortPostStatus, $b2sSortPostPublishDate, $b2sSortPostSchedDate, $b2sShowByDate, $b2sUserAuthId, $b2sPostBlogId, $b2sPagination, $b2sSortPostCat, $b2sSortPostType, $b2sUserLang, $b2sResultsPerPage);
+        if (!empty($b2sType) && in_array($b2sType, array('all', 'sched', 'publish', 'notice', 'approve', 'draft'))) {
+            $postItem = new B2S_Post_Item($b2sType, $b2sSortPostTitle, $b2sSortPostAuthor, $b2sSortPostStatus, $b2sSortPostPublishDate, $b2sSortPostSchedDate, $b2sShowByDate, $b2sShowByNetwork, $b2sUserAuthId, $b2sPostBlogId, $b2sPagination, $b2sSortPostCat, $b2sSortPostType, $b2sUserLang, $b2sResultsPerPage);
             $result = array('result' => true, 'content' => $postItem->getItemHtml($b2sSelectSchedDate), 'schedDates' => json_encode($postItem->getCalendarSchedDate()));
             if ($b2sShowPagination) {
                 $result['pagination'] = $postItem->getPaginationHtml();
@@ -127,10 +130,15 @@ class Ajax_Get {
 
     public function getPostMetaBox() {
         $result = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getProfileUserAuth', 'token' => B2S_PLUGIN_TOKEN)));
-        if (isset($result->result) && (int) $result->result == 1 && isset($result->data) && !empty($result->data) && isset($result->data->mandant) && isset($result->data->auth) && !empty($result->data->mandant) && !empty($result->data->auth)) {
-            $postBox = new B2S_PostBox();
-            echo json_encode(array('result' => true, 'content' => $postBox->getPostBoxAutoHtml($result->data->mandant, $result->data->auth)));
-            wp_die();
+        if (isset($result->result) && (int) $result->result == 1 && isset($result->data) && !empty($result->data) && isset($result->data->mandant) && isset($result->data->auth) && !empty($result->data->mandant)) {
+            if (!empty($result->data->auth)) {
+                $postBox = new B2S_PostBox();
+                echo json_encode(array('result' => true, 'content' => $postBox->getPostBoxAutoHtml($result->data->mandant, $result->data->auth)));
+                wp_die();
+            } else {
+                echo json_encode(array('result' => false, 'content' => 'no_auth'));
+                wp_die();
+            }
         }
         echo json_encode(array('result' => false, 'content' => ''));
         wp_die();
@@ -143,7 +151,8 @@ class Ajax_Get {
             if (isset($data->post_content)) {
                 $postUrl = (get_permalink($data->ID) !== false) ? get_permalink($data->ID) : $data->guid;
                 $content = trim(B2S_Util::prepareContent($data->ID, $data->post_content, $postUrl, '', false, $userLang));
-                echo json_encode(array('result' => true, 'text' => trim(strip_tags($content)), 'networkAuthId' => (int) $_POST['networkAuthId']));
+                $networkId = isset($_POST['networkId']) ? (int) $_POST['networkId'] : 0;
+                echo json_encode(array('result' => true, 'text' => trim(strip_tags($content)), 'networkAuthId' => (int) $_POST['networkAuthId'], 'networkId' => $networkId));
                 wp_die();
             }
         }
@@ -153,11 +162,22 @@ class Ajax_Get {
 
     public function getShipItem() {
         if (isset($_POST['postId']) && (int) $_POST['postId'] > 0 && isset($_POST['networkAuthId']) && (int) $_POST['networkAuthId'] > 0) {
+            //TOS XING Group
+            if ((int) $_POST['networkId'] == 19 && isset($_POST['networkTosGroupId']) && !empty($_POST['networkTosGroupId'])) {
+                $options = new B2S_Options(0, 'B2S_PLUGIN_TOS_XING_GROUP_CROSSPOSTING');
+                if ($options->existsValueByKey($_POST['postId'], $_POST['networkTosGroupId'])) {
+                    echo json_encode(array('result' => false, 'reason' => 'tos_xing_group_exists', 'networkAuthId' => (int) $_POST['networkAuthId']));
+                    wp_die();
+                }
+            }
+
             $userLang = isset($_POST['userLang']) ? trim($_POST['userLang']) : strtolower(substr(B2S_LANGUAGE, 0, 2));
             $relayCount = isset($_POST['relayCount']) ? (int) $_POST['relayCount'] : 0;
             require_once B2S_PLUGIN_DIR . 'includes/B2S/Ship/Item.php';
             $itemData = array('networkAuthId' => (int) $_POST['networkAuthId'],
                 'networkId' => (int) $_POST['networkId'],
+                'networkKind' => (int) $_POST['networkKind'],
+                'networkTosGroupId' => ((isset($_POST['networkTosGroupId']) && !empty($_POST['networkTosGroupId'])) ? trim($_POST['networkTosGroupId']) : ''),
                 'instantSharing' => (isset($_POST['instantSharing']) ? (int) $_POST['instantSharing'] : 0),
                 'network_display_name' => strip_tags(stripslashes($_POST['networkDisplayName'])),
                 'networkType' => (int) $_POST['networkType']);
@@ -208,9 +228,26 @@ class Ajax_Get {
         if ((int) $_POST['networkAuthId']) {
             require_once (B2S_PLUGIN_DIR . 'includes/B2S/Network/Item.php');
             $networkData = new B2S_Network_Item(false);
-            $count = $networkData->getCountSchedPostsByUserAuth((int) $_POST['networkAuthId']);
-            if ($count !== false) {
-                echo json_encode(array('result' => true, 'count' => $count));
+            global $wpdb;
+            $blogUserTokenResult = $wpdb->get_results("SELECT token FROM `b2s_user`");
+            $blogUserToken = array();
+            foreach ($blogUserTokenResult as $k => $row) {
+                array_push($blogUserToken, $row->token);
+            }
+            $data = array('action' => 'getTeamAssignUserAuth', 'token' => B2S_PLUGIN_TOKEN, 'networkAuthId' => (int) $_POST['networkAuthId'], 'blogUser' => $blogUserToken);
+            $networkAuthAssignment = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, $data, 30), true);
+            if ($networkAuthAssignment['result'] == true) {
+                $count = $networkData->getCountSchedPostsByUserAuth((int) $_POST['networkAuthId']);
+                $assignCount = 0;
+                $assignList = array();
+                foreach ($networkAuthAssignment['assignList'] as $k => $v) {
+                    $assignList[$v['assign_blog_user_id']] = (int) $v['assign_network_auth_id'];
+                    $authCount = $networkData->getCountSchedPostsByUserAuth((int) $v['assign_network_auth_id']);
+                    if ($authCount !== false) {
+                        $assignCount += $authCount;
+                    }
+                }
+                echo json_encode(array('result' => true, 'count' => ($count !== false) ? $count : 0, 'assignCount' => $assignCount, 'assignListCount' => count($networkAuthAssignment['assignList']), 'assignList' => serialize($assignList)));
                 wp_die();
             }
         }
@@ -224,8 +261,9 @@ class Ajax_Get {
             require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
             $postData = new B2S_Post_Item();
             $showByDate = isset($_POST['showByDate']) ? trim($_POST['showByDate']) : '';
+            $showByNetwork = isset($_POST['showByNetwork']) ? trim($_POST['showByNetwork']) : '';
             $userAuthId = isset($_POST['userAuthId']) ? (int) $_POST['userAuthId'] : 0;
-            $result = $postData->getSchedPostDataHtml((int) $_POST['postId'], $showByDate, $userAuthId);
+            $result = $postData->getSchedPostDataHtml((int) $_POST['postId'], $showByDate, $showByNetwork, $userAuthId);
             if ($result !== false) {
                 echo json_encode(array('result' => true, 'postId' => (int) $_POST['postId'], 'content' => $result));
                 wp_die();
@@ -336,9 +374,11 @@ class Ajax_Get {
         $network_id = (isset($_GET['filter_network']) && (int) $_GET['filter_network'] >= 1) ? (int) $_GET['filter_network'] : 0; // 0=all
         //Filter Network Details
         $network_details_id = (isset($_GET['filter_network_auth']) && (int) $_GET['filter_network_auth'] >= 1) ? (int) $_GET['filter_network_auth'] : 0; // 0=all
+        //Filter Status
+        $status = (isset($_GET['filter_status']) && (int) $_GET['filter_status'] >= 0) ? (int) $_GET['filter_status'] : 0; // 0=all,1=publish, 2=scheduled
 
         if (isset($_GET['start'])) {
-            $calendar = B2S_Calendar_Filter::getByTimespam($_GET['start'] . " 00:00:00", $_GET['end'] . " 23:59:59", $network_id, $network_details_id);
+            $calendar = B2S_Calendar_Filter::getByTimespam($_GET['start'] . " 00:00:00", $_GET['end'] . " 23:59:59", $network_id, $network_details_id, $status);
         } else {
             $calendar = B2S_Calendar_Filter::getAll($network_id, $network_details_id);
         }
@@ -367,7 +407,7 @@ class Ajax_Get {
             if ($item != null) {
                 $lock_user_id = get_option("B2S_PLUGIN_CALENDAR_BLOCKED_" . $_POST['id']);
                 if (!$lock_user_id) {
-                    update_option("B2S_PLUGIN_CALENDAR_BLOCKED_" . $_POST['id'], get_current_user_id());
+                    update_option("B2S_PLUGIN_CALENDAR_BLOCKED_" . $_POST['id'], get_current_user_id(), false);
                     $options = new B2S_Options(get_current_user_id());
                     $block_old = $options->_getOption("B2S_PLUGIN_USER_CALENDAR_BLOCKED");
 
@@ -421,6 +461,61 @@ class Ajax_Get {
             $stats->set_from($_GET['from']);
         }
         echo json_encode($stats->get_result());
+        wp_die();
+    }
+
+    public function b2sSupportSystemRequirements() {
+        if (!current_user_can('administrator')) {
+            echo json_encode(array('result' => false, 'error' => 'admin'));
+            wp_die();
+        }
+        require_once (B2S_PLUGIN_DIR . 'includes/B2S/Support/Check/System.php');
+        $support = new B2S_Support_Check_System();
+        $htmlData = $support->htmlData();
+        $blogData = $support->blogData();
+        if (empty($htmlData) || empty($blogData)) {
+            $result = array('result' => false);
+        } else {
+            $result = array('result' => true, 'htmlData' => $htmlData, "blogData" => $blogData);
+        }
+        echo json_encode($result);
+        wp_die();
+    }
+
+    public function searchUser() {
+        if (isset($_GET['search_user']) && !empty($_GET['search_user'])) {
+            $options = B2S_Tools::searchUser($_GET['search_user']);
+            echo json_encode(array('result' => true, 'options' => $options));
+            wp_die();
+        }
+        echo json_encode(array('result' => false));
+        wp_die();
+    }
+
+    public function getSelectMandantUser() {
+        if (isset($_GET['owner']) && (int) $_GET['owner'] > 0) {
+            $owner = stripslashes(get_user_by('id', $_GET['owner'])->display_name);
+            $owner = (empty($owner) || $owner == false) ? __("Unknown username", "blog2social") : $owner;
+            echo json_encode(array('result' => true, 'ownerName' => $owner));
+            wp_die();
+        } else {
+            $networkAuthId = (isset($_GET['networkAuthId']) && (int) $_GET['networkAuthId'] > 0) ? $_GET['networkAuthId'] : 0;
+            $networkId = (isset($_GET['networkId']) && (int) $_GET['networkId'] > 0) ? $_GET['networkId'] : 0;
+            $networkType = (isset($_GET['networkType']) && (int) $_GET['networkType'] >= 0) ? $_GET['networkType'] : 0;
+            if ($networkAuthId > 0 && $networkId > 0) {
+                require_once (B2S_PLUGIN_DIR . 'includes/B2S/Network/Item.php');
+                $networkItem = new B2S_Network_Item();
+                $networkAuthAssignment = $networkItem->getNetworkAuthAssignment($networkAuthId, $networkId, $networkType);
+                if ($networkAuthAssignment['result'] !== false) {
+                    $userSelect = $networkAuthAssignment['userSelect'];
+                    $assignList = $networkAuthAssignment['assignList'];
+
+                    echo json_encode(array('result' => true, 'userSelect' => $userSelect, 'assignList' => $assignList));
+                    wp_die();
+                }
+            }
+        }
+        echo json_encode(array('result' => false));
         wp_die();
     }
 

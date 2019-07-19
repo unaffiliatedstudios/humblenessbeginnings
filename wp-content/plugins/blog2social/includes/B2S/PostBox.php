@@ -104,7 +104,7 @@ class B2S_PostBox {
         $content .='<input id="b2s-post-meta-box-time-dropdown-publish" class="post-format" ' . ((B2S_PLUGIN_USER_VERSION == 0) ? 'disabled' : '') . ' name="b2s-post-meta-box-time-dropdown" value="publish" type="checkbox" ' . $isChecked . '>
                       <label for="b2s-post-meta-box-time-dropdown-publish" class="post-format-icon">' . __('enable Auto-Posting', 'blog2social') . '</label>';
 
-        if (B2S_PLUGIN_USER_VERSION <= 1) {
+        if (B2S_PLUGIN_USER_VERSION == 0) {
             $content .= ' <span class="b2s-label b2s-label-success"><a href="#" class="b2s-btn-label-premium b2s-info-btn" data-modal-target="b2sInfoMetaBoxModalAutoPost">' . __("PREMIUM", "blog2social") . '</a></span>';
         }
 
@@ -221,6 +221,7 @@ class B2S_PostBox {
         $content .='<select class="b2s-post-meta-box-sched-select" style="width:100%;" name="b2s-post-meta-box-sched-select">
                         <option value="0">' . __('immediately after publishing', 'blog2social') . '</option>
                         <option value="1">' . __('at scheduled times', 'blog2social') . '</option>
+                        <option value="2">' . __('schedule (best times)', 'blog2social') . '</option>
                         </select>';
 
         $content .='<div id="b2s-post-meta-box-note-premium" class="b2s-info-success"><button class="b2s-btn-close-meta-box b2s-close-icon" data-area-id="b2s-post-meta-box-note-premium" title="close notice"></button><b>' . __('You want to sched your blog post with Auto-Poster?', 'blog2social') . '</b><br> <a class="" target="_blank" href="' . B2S_Tools::getSupportLink('affiliate') . '">' . __('Upgrade to PREMIUM PRO', 'blog2social') . '</a></div>';
@@ -232,16 +233,19 @@ class B2S_PostBox {
         $content .='<label class="b2s-font-bold">' . __('Select date:', 'blog2social') . '</label>';
         $content .='<a href="#b2s-post-box-calendar-header" id="b2s-post-box-calendar-btn" class="pull-right">' . __('show calendar', 'blog2social') . '</a>';
         $content .='<br><span class="dashicons dashicons-calendar b2s-calendar-icon"></span><input style="width:88%;" id="b2s-post-meta-box-sched-date-picker" name="b2s-post-meta-box-sched-date" value="" readonly data-timepicker="true" data-language="' . substr(B2S_LANGUAGE, 0, 2) . '" data-time-format="' . $timeFormat . '" data-date-format="' . $dateFormat . '" type="text"><br>';
-
+        
+        $content .="</div>";
+        
         //Opt: Best Time Settings
         if (!empty($myBestTimeSettings) && is_array($myBestTimeSettings)) {
             $bestTimeSettings = array('type' => $bestTimeType, 'times' => $myBestTimeSettings);
-            $content .="<input id='b2s-post-meta-box-best-time-settings' class='post-format' name='b2s-post-meta-box-best-time-settings' value='" . serialize($bestTimeSettings) . "' type='checkbox'> ";
-            $content .="<label class='post-format-icon' for='b2s-post-meta-box-best-time-settings'>" . __('post at', 'blog2social');
-            $content .=' <a href="' . $this->b2sSiteUrl . 'wp-admin/admin.php?page=blog2social-network' . '" target="_blank">' . __('my time settings', 'blog2social') . '</a></label>';
+            $content .="<input id='b2s-post-meta-box-best-time-settings' class='post-format' name='b2s-post-meta-box-best-time-settings' value='" . serialize($bestTimeSettings) . "' type='hidden'> ";
+            $content .="<div class='b2s-post-meta-box-sched-best-time' style='display:none;'>";
+            $content .="<span class='post-format-icon'>" . __('change', 'blog2social') . "</span>";
+            $content .=' <a href="' . $this->b2sSiteUrl . 'wp-admin/admin.php?page=blog2social-network' . '" target="_blank">' . __('best times', 'blog2social') . '</a></label>';
             $content .='<br><hr><span>' . __('Note: If you ​have​ not ​specified​ your own times, we automatically provide you with the best times to post​ on the social networks. You can always ​edit​ your own times in the settings.', 'blog2social') . '</span>';
+            $content .="</div>";
         }
-        $content .="</div>";
 
         $content .='</div>';
         return $content;

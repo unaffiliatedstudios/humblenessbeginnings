@@ -32,7 +32,7 @@
 .b2s-btn-change-url-preview{
     cursor: pointer;
 }
-#b2s-curation-no-review-info, #b2s-curation-no-auth-info, .b2s-post-curation-ship-date-area, #b2s-curation-no-data-info{
+#b2s-curation-no-review-info, #b2s-curation-no-auth-info, .b2s-post-curation-ship-date-area, #b2s-curation-no-data-info, #b2s-curation-saved-draft-info{
     display: none;
 }
 
@@ -81,10 +81,24 @@
     margin: 3px 3px 3px 0px;
 }
 
+.b2s-post-item-network-deprecated {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 3px 3px 3px 0px;
+}
+
 .b2s-post-item-details p {
     font-size: 12px;
 }
 
 .b2s-post-item-details-message-result {
     margin-top: 2px;
+}
+
+.b2s-post-curation-ship-date[readonly]{
+    background-color: #fff !important;
+}
+
+#b2s-btn-curation-draft {
+    margin-left: 10px;
 }

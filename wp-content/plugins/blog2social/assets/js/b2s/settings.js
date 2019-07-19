@@ -392,11 +392,15 @@ jQuery(document).on('click', '.b2s-post-type-select-btn', function () {
     if (jQuery(this).attr('data-select-toogle-state') == "0") { //0=select
         jQuery('.b2s-post-type-item-' + type).prop('checked', true);
         jQuery(this).attr('data-select-toogle-state', '1');
-        jQuery('.b2s-auto-post-own-update-warning').show();
+        if (type == 'update') {
+            jQuery('.b2s-auto-post-own-update-warning').show();
+        }
     } else {
         jQuery('.b2s-post-type-item-' + type).prop('checked', false);
         jQuery(this).attr('data-select-toogle-state', '0');
-        jQuery('.b2s-auto-post-own-update-warning').hide();
+        if (type == 'update') {
+            jQuery('.b2s-auto-post-own-update-warning').hide();
+        }
     }
     jQuery(this).text(jQuery(this).attr('data-select-toogle-name'));
     jQuery(this).attr('data-select-toogle-name', tempCurText);
@@ -622,7 +626,7 @@ jQuery('.b2sSaveUserSettingsPostFormatTw').validate({
 });
 
 
-jQuery('.b2sSaveUserSettingsPostFormatGp').validate({
+jQuery('.b2sSaveUserSettingsPostFormatLi').validate({
     ignore: "",
     errorPlacement: function () {
         return false;
@@ -694,46 +698,6 @@ jQuery('.b2sSaveUserSettingsPostFormatIn').validate({
         return false;
     }
 });
-
-
-
-/*jQuery(document).on('change', '.b2s-user-network-settings-post-format', function () {
- jQuery('.b2s-settings-user-success').hide();
- jQuery('.b2s-settings-user-error').hide();
- jQuery('.b2s-server-connection-fail').hide();
- jQuery(".b2s-loading-area").show();
- jQuery(".b2s-user-settings-area").hide();
- 
- var networkId = jQuery(this).attr("data-network-id");
- jQuery('.b2s-user-network-settings-post-format[data-network-id="' + networkId + '"]').removeClass('b2s-settings-checked');
- jQuery(this).addClass('b2s-settings-checked');
- 
- jQuery.ajax({
- url: ajaxurl,
- type: "POST",
- dataType: "json",
- cache: false,
- data: {
- 'action': 'b2s_user_network_settings',
- 'post_format': jQuery(this).val(),
- 'network_id': networkId
- },
- error: function () {
- jQuery('.b2s-server-connection-fail').show();
- return false;
- },
- success: function (data) {
- jQuery(".b2s-loading-area").hide();
- jQuery(".b2s-user-settings-area").show();
- if (data.result == true) {
- jQuery('.b2s-settings-user-success').show();
- } else {
- jQuery('.b2s-settings-user-error').show();
- }
- }
- });
- return false;
- });*/
 
 function padDate(n) {
     return ("0" + n).slice(-2);

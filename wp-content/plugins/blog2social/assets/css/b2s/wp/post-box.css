@@ -248,3 +248,6 @@
     color: #ff4f68;
 }
 
+.pull-right{
+    float: right;
+}

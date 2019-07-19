@@ -1,7 +1,7 @@
 jQuery.noConflict();
 
 var curSource = new Array();
-curSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all';
+curSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all&filter_status=0';
 var newSource = new Array();
 
 jQuery(document).ready(function () {
@@ -30,6 +30,9 @@ jQuery(document).ready(function () {
             element.append($header);
             $body = jQuery("<div>").addClass("b2s-calendar-body");
             $body.append(event.avatar);
+            if (event.status == "error") {
+                $body.append(jQuery('<i>').addClass('glyphicon glyphicon-warning-sign glyphicon-danger'));
+            }
             $body.append(element.find(".fc-title"));
             $body.append(jQuery("<br>"));
             var $em = jQuery("<em>").css("padding-top", "5px").css("display", "block");
@@ -38,6 +41,9 @@ jQuery(document).ready(function () {
             $em.append(jQuery("<span>").text(": " + event.profile));
             $body.append($em);
             element.append($body);
+            if (event.status != "scheduled") {
+                event.editable = false;
+            }
         },
         dayRender: function (date, element) {
             //TODO state to load
@@ -74,7 +80,13 @@ jQuery(document).ready(function () {
             return dropLocation.start.isAfter(b2s_calendar_date) && draggedEvent.start.isAfter(b2s_calendar_datetime);
         },
         eventClick: function (calEvent, jsEvent, view) {
-            showEditSchedCalendarPost(calEvent.b2s_id, calEvent.post_id, calEvent.network_auth_id, calEvent.network_type, calEvent.network_id, calEvent.post_format, calEvent.relay_primary_post_id);
+            if (calEvent.status == "scheduled") {
+                showEditSchedCalendarPost(calEvent.b2s_id, calEvent.post_id, calEvent.network_auth_id, calEvent.network_type, calEvent.network_id, calEvent.post_format, calEvent.relay_primary_post_id);
+            } else {
+                if (calEvent.publish_link != "") {
+                    window.open(calEvent.publish_link, '_blank');
+                }
+            }
         },
         loading: function (bool) {
             if (!bool) {
@@ -98,6 +110,7 @@ function showEditSchedCalendarPost(b2s_id, post_id, network_auth_id, network_typ
         jQuery('#b2s-edit-event-modal-' + b2s_id).remove();
     }
     b2s_current_post_id = post_id;
+    jQuery("#b2sPostId").val(post_id);
     var $modal = jQuery("<div>");
     jQuery.ajax({
         url: ajaxurl,
@@ -195,8 +208,6 @@ function showEditSchedCalendarPost(b2s_id, post_id, network_auth_id, network_typ
         }
 
     }
-
-    jQuery("#b2sPostId").val(post_id);
     var today = new Date();
     var dateFormat = "yyyy-mm-dd";
     var language = "en";
@@ -251,10 +262,9 @@ function showEditSchedCalendarPost(b2s_id, post_id, network_auth_id, network_typ
     }
 }
 
-
-
 jQuery(document).on('change', '.b2s-calendar-filter-network-btn', function () {
-    newSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=' + jQuery(this).val();
+    var filter_status = jQuery('#b2s-calendar-filter-status').val();
+    newSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=' + jQuery(this).val() + '&filter_status=' + filter_status;
     jQuery('#b2s_calendar').fullCalendar('removeEventSource', curSource[0]);
     jQuery('#b2s_calendar').fullCalendar('addEventSource', newSource[0]);
     curSource[0] = newSource[0];
@@ -287,13 +297,37 @@ jQuery(document).on('change', '.b2s-calendar-filter-network-btn', function () {
 jQuery(document).on('change', '#b2s-calendar-filter-network-auth-sel', function () {
     var filter_network_details_auth_id = jQuery(this).val();
     var filter_network_id = jQuery('.b2s-calendar-filter-network-btn:checked').val();
-    newSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=' + filter_network_details_auth_id + '&filter_network=' + filter_network_id;
+    var filter_status = jQuery('#b2s-calendar-filter-status').val();
+    newSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=' + filter_network_details_auth_id + '&filter_network=' + filter_network_id + '&filter_status=' + filter_status;
     jQuery('#b2s_calendar').fullCalendar('removeEventSource', curSource[0]);
     jQuery('#b2s_calendar').fullCalendar('addEventSource', newSource[0]);
     curSource[0] = newSource[0];
 
     return false;
 
+});
+
+jQuery(document).on('change', '#b2s-calendar-filter-status', function () {
+    var filter_network_id = jQuery('.b2s-calendar-filter-network-btn:checked').val();
+    var filter_network_details_auth_id = jQuery('#b2s-calendar-filter-network-auth-sel').val();
+    if (typeof filter_network_details_auth_id == 'undefined') {
+        filter_network_details_auth_id = 'all';
+    }
+    var filter_status = jQuery('#b2s-calendar-filter-status').val();
+    newSource[0] = ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=' + filter_network_details_auth_id + '&filter_network=' + filter_network_id + '&filter_status=' + filter_status;
+    jQuery('#b2s_calendar').fullCalendar('removeEventSource', curSource[0]);
+    jQuery('#b2s_calendar').fullCalendar('addEventSource', newSource[0]);
+    curSource[0] = newSource[0];
+
+    return false;
+
+});
+
+
+//Modal Edit Post close
+jQuery(document).on('click', '.b2s-modal-close-edit-post', function (e) {
+   jQuery(jQuery(this).attr('data-modal-name')).remove();
+   return false;
 });
 
 
@@ -429,6 +463,10 @@ function b2sSortFormSubmit() {
     });
     return false;
 }
+//Overlay second modal
+jQuery('#b2s-show-post-type-modal').on('hidden.bs.modal', function () {
+    jQuery('body').addClass('modal-open');
+});
 
 //Overlay second modal
 jQuery('#b2s-network-select-image').on('hidden.bs.modal', function () {
@@ -560,6 +598,9 @@ jQuery('#b2s-network-select-image').on('hidden.bs.modal', function (e) {
     jQuery('body').addClass('modal-open');
 });
 jQuery('#b2s-post-ship-item-post-format-modal').on('hidden.bs.modal', function (e) {
+    jQuery('body').addClass('modal-open');
+});
+jQuery('#b2s-info-change-meta-tag-modal').on('hidden.bs.modal', function () {
     jQuery('body').addClass('modal-open');
 });
 //jQuery(this).attr('data-network-auth-id')

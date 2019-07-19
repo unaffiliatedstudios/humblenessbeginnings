@@ -5,17 +5,18 @@ $settingsItem = new B2S_Settings_Item();
 ?>
 
 <div class="b2s-container">
-    <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
-
     <div class=" b2s-inbox col-md-12 del-padding-left">
-        <div class="col-md-9 del-padding-left">
-
+        <div class="col-md-9 del-padding-left del-padding-right">
+            <!--Header|Start - Include-->
+            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+            <!--Header|End-->
+            <div class="clearfix"></div>
+            <!--Content|Start-->
             <div class="panel panel-group b2s-upload-image-no-permission" style="display:none;">
                 <div class="panel-body">
                     <span class="glyphicon glyphicon-remove glyphicon-danger"></span> <?php _e('You need a higher user role to upload an image on this blog. Please contact your administrator.', 'blog2social'); ?>
                 </div>
             </div>  
-
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="col-md-12">                       
@@ -25,7 +26,7 @@ $settingsItem = new B2S_Settings_Item();
                             <div class="text-center b2s-loader-text"><?php _e("save...", "blog2social"); ?></div>
                         </div>
                         <div class="row b2s-user-settings-area">
-                            <ul  class="nav nav-pills">
+                            <ul class="nav nav-pills">
                                 <li class="active">
                                     <a href="#b2s-general" class="b2s-general" data-toggle="tab"><?php _e('General', 'blog2social') ?></a>
                                 </li>
@@ -39,7 +40,7 @@ $settingsItem = new B2S_Settings_Item();
                                     <a href="#b2s-network" class="b2s-network" data-toggle="tab"><?php _e('Network Settings', 'blog2social') ?></a>
                                 </li>
                             </ul>
-                            <hr>
+                            <hr class="b2s-settings-line">
                             <div class="tab-content clearfix">
                                 <div class="tab-pane active" id="b2s-general">
                                     <?php echo $settingsItem->getGeneralSettingsHtml(); ?>
@@ -50,7 +51,7 @@ $settingsItem = new B2S_Settings_Item();
                                 <div class="tab-pane" id="b2s-social-meta-data">
                                     <form class="b2sSaveSocialMetaTagsSettings" method="post" novalidate="novalidate">           
                                         <?php echo $settingsItem->getSocialMetaDataHtml(); ?>
-                                        <?php if (B2S_PLUGIN_USER_VERSION >= 1 || B2S_PLUGIN_ADMIN) { ?>
+                                        <?php if (B2S_PLUGIN_USER_VERSION >= 1 && B2S_PLUGIN_ADMIN) { ?>
                                             <button class="btn btn-primary pull-right" type="submit"><?php _e('save', 'blog2social') ?></button>
                                         <?php } ?>
                                         <input type="hidden" name="is_admin" value="<?php echo ((B2S_PLUGIN_ADMIN) ? 1 : 0) ?>">
@@ -77,7 +78,7 @@ $settingsItem = new B2S_Settings_Item();
                                                 <a href="#b2s-network-2" class="b2s-network-2" data-toggle="tab"><?php _e('Twitter', 'blog2social') ?></a>
                                             </li>
                                             <li>
-                                                <a href="#b2s-network-10" class="b2s-network-10" data-toggle="tab"><?php _e('Google+', 'blog2social') ?></a>
+                                                <a href="#b2s-network-3" class="b2s-network-10" data-toggle="tab"><?php _e('LinkedIn', 'blog2social') ?></a>
                                             </li>
                                             <li>
                                                 <a href="#b2s-network-12" class="b2s-network-12" data-toggle="tab"><?php _e('Instagram', 'blog2social') ?></a>
@@ -116,10 +117,10 @@ $settingsItem = new B2S_Settings_Item();
                                                     <input type="hidden" name="network_id" value="2">
                                                 </form>    
                                             </div>
-                                            <div class="tab-pane" id="b2s-network-10">
-                                                <form class="b2sSaveUserSettingsPostFormatGp" method="post" novalidate="novalidate">                                                
+                                            <div class="tab-pane" id="b2s-network-3">
+                                                <form class="b2sSaveUserSettingsPostFormatLi" method="post" novalidate="novalidate">                                                
                                                     <?php
-                                                    echo $settingsItem->getNetworkSettingsPostFormatHtml(10);
+                                                    echo $settingsItem->getNetworkSettingsPostFormatHtml(3);
                                                     if (B2S_PLUGIN_USER_VERSION > 0) {
                                                         ?>
                                                         <button class="btn btn-primary pull-right" type="submit"><?php _e('save', 'blog2social') ?></button>    
@@ -128,7 +129,7 @@ $settingsItem = new B2S_Settings_Item();
                                                     <?php } ?>
                                                     <input type="hidden" name="action" value="b2s_user_network_settings">
                                                     <input type="hidden" name="type" value="post_format">
-                                                    <input type="hidden" name="network_id" value="10">
+                                                    <input type="hidden" name="network_id" value="3">
                                                 </form>      
                                             </div>
                                             <div class="tab-pane" id="b2s-network-12">
@@ -162,7 +163,6 @@ $settingsItem = new B2S_Settings_Item();
                 </div>
             </div>
         </div>
-        <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/service.phtml'); ?>
         <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.phtml'); ?>
     </div>
 </div>
@@ -247,8 +247,6 @@ $settingsItem = new B2S_Settings_Item();
         </div>
     </div>
 </div>
-
-<?php require_once (B2S_PLUGIN_DIR . 'views/b2s/partials/network-tos-modal.php'); ?>
 
 
 

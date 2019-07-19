@@ -396,7 +396,7 @@ class B2S_Ship_Save {
                 $html .='</div>';
             }
             if ($data['network_id'] == 10) {
-                $html .='<br><div class="alert alert-warning"><b>' . __('For sharing your posts on Google+ you can now use Google+ Instant Sharing', 'blog2social') . '</b> (<a target="_blank" href="' . B2S_Tools::getSupportLink('network_tos_google_201812') . '">' . __('Read why', 'blog2social') . '</a>).';
+                $html .='<br><div class="alert alert-warning"><b>' . __('For sharing your posts on Google+ you can now use Google+ Instant Sharing', 'blog2social') . '</b></a>).';
                 $html .='<br><br>';
                 $html .='<b>' . __('This is how it works:', 'blog2social') . '</b><br>';
                 $html .= __('-To share your post immediately, click the "Share" button next to your selected Google+ account below.', 'blog2social') . '<br>';

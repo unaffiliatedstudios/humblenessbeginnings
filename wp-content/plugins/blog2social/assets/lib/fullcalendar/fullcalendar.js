@@ -2852,10 +2852,10 @@ var Popover = Class.extend(ListenerMixin, {
 			left = Math.max(left, viewportLeft + this.margin);
 		}
 
-		this.el.css({
+		/*this.el.css({
 			top: top - origin.top,
 			left: left - origin.left
-		});
+		});*/
 	},
 
 

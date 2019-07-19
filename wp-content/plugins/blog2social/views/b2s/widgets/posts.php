@@ -11,24 +11,11 @@ $b2sShowByDate = isset($_GET['b2sShowByDate']) ? trim($_GET['b2sShowByDate']) : 
         <!--Filter Start-->
         <div class="b2s-post">
             <div class="grid-body">
-                <?php
-                $isPremiumInfo = (B2S_PLUGIN_USER_VERSION == 0) ? 'b2s-btn-disabled' : '';
-                ?>
                 <!--Navbar Start-->
                 <div class="col-md-12 pull-left b2s-post-menu del-padding-left">
-                    <a class="btn btn-primary b2s-post-btn b2s-post-all" href="#" onclick="jQuery('#b2sType').val('all');b2sSortFormSubmit()"><?php _e('Latest Posts','blog2social') ?></a>
-                    <a class="btn btn-link b2s-post-btn b2s-post-sched <?php echo $isPremiumInfo; ?>"
-                       <?php if(B2S_PLUGIN_USER_VERSION == 0){ ?>
-                           <?php if(defined('B2S_PLUGIN_TRAIL_END') && B2S_PLUGIN_TRAIL_END){ ?>
-                               href="<?php echo B2S_Tools::getSupportLink('affiliate'); ?>" target="_blank"
-                           <?php } else { ?>
-                                data-toggle="modal" data-target="#b2s-trial-modal"
-                           <?php } ?>
-                       <?php } else { ?>
-                           href="#" onclick="jQuery('#b2sType').val('sched');b2sSortFormSubmit()"
-                       <?php } ?>>
-
-                        <?php _e('Scheduled Posts','blog2social') ?> <?php echo (!empty($isPremiumInfo) ? '<span class="label label-success">'.__("PREMIUM","blog2social").'</span>' : '' ); ?>  </a>
+                    <a class="btn btn-primary b2s-post-btn btn-sm b2s-post-all" href="#" onclick="jQuery('#b2sType').val('all');b2sSortFormSubmit()"><?php _e('Latest Posts', 'blog2social') ?></a>
+                    <a class="btn btn-link b2s-post-btn btn-sm b2s-post-sched" href="#" onclick="jQuery('#b2sType').val('sched');b2sSortFormSubmit()">
+                        <?php _e('Scheduled Posts', 'blog2social') ?> <?php echo (B2S_PLUGIN_USER_VERSION == 0 ? '<span class="label label-success">' . __("PREMIUM", "blog2social") . '</span>' : '' ); ?>  </a>
                 </div>
                 <hr class="pull-left">
                 <!--Navbar Ende-->

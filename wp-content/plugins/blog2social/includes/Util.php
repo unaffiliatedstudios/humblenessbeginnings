@@ -37,12 +37,12 @@ class B2S_Util {
         return substr(chunk_split($version, 1, '.'), 0, -1);
     }
 
-    public static function getCustomDateFormat($dateTime = '0000-00-00 00:00:00', $lang = 'en') {
+    public static function getCustomDateFormat($dateTime = '0000-00-00 00:00:00', $lang = 'en', $time = true) {
         if ($lang == 'de') {
-            $ident = 'd.m.Y H:i';
-            return date($ident, strtotime($dateTime)) . ' Uhr';
+            $ident = 'd.m.Y ' . (($time) ? 'H:i' : '');
+            return date($ident, strtotime($dateTime)) . (($time) ? ' Uhr' : '');
         } else {
-            $ident = 'Y/m/d g:i a';
+            $ident = 'Y/m/d ' . (($time) ? 'g:i a' : '');
             return date($ident, strtotime($dateTime));
         }
     }
@@ -68,10 +68,10 @@ class B2S_Util {
             $param = array();
             libxml_use_internal_errors(true); // Yeah if you are so worried about using @ with warnings
             $url = $url . ((parse_url($url, PHP_URL_QUERY) ? '&' : '?') . 'no_cache=1');  //nocache
-            $html = self::b2sFileGetContents($url);
+            $html = self::b2sFileGetContents($url, true);
             if (!empty($html) && $html !== false) {
                 //Search rist Parameter
-                $data = self::b2sGetAllTags($html, 'all');
+                $data = self::b2sGetAllTags($html, 'all', true);
                 if (is_array($data) && !empty($data)) {
                     return $data;
                 }
@@ -82,6 +82,7 @@ class B2S_Util {
 
     public static function getMetaTags($postId = 0, $postUrl = '', $network = 1) {
         $type = ($network == 2) ? 'twitter' : 'og';
+        $search = ($network == 2) ? 'name' : 'property';
         //GETSTOREEDDATA
         if ((int) $postId != 0) {
             $metaData = get_option('B2S_PLUGIN_POST_META_TAGES_' . strtoupper($type) . '_' . $postId);
@@ -97,7 +98,7 @@ class B2S_Util {
         $html = self::b2sFileGetContents($postUrl);
         if (!empty($html) && $html !== false) {
             //Search rist OG Parameter
-            $temp = self::b2sGetAllTags($html, $type);
+            $temp = self::b2sGetAllTags($html, $type, false, $search);
             foreach ($getTags as $k => $v) {
                 if (isset($temp[$v]) && !empty($temp[$v])) {
                     $param[$v] = $temp[$v];
@@ -127,13 +128,22 @@ class B2S_Util {
         return false;
     }
 
-    private static function b2sFileGetContents($url) {
+    private static function b2sFileGetContents($url, $extern = false) {
         $args = array(
             'timeout' => '20',
             'redirection' => '5',
             'user-agent' => "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:5.0) Gecko/20100101 Firefox/5.0"
         );
-        return wp_remote_retrieve_body(wp_remote_get($url, $args));
+        $response = wp_remote_get($url, $args);
+        if (!is_wp_error($response)) {
+            return wp_remote_retrieve_body($response);
+        } else if ($extern) {
+            $res = json_decode(B2S_Api_Get::get(B2S_PLUGIN_API_ENDPOINT . 'get.php?action=scrapeUrl&url=' . urlencode($url)));
+            if (isset($res->data) && !empty($res->data)) {
+                return $res->data;
+            }
+        }
+        return false;
     }
 
     private static function b2sGetMetaDescription($html) {
@@ -148,11 +158,10 @@ class B2S_Util {
         return (isset($matches[1]) && !empty($matches[1])) ? trim(preg_replace('/\s+/', ' ', $matches[1])) : '';
     }
 
-    private static function b2sGetAllTags($html, $type = 'og') {
-        $search = 'property';
+    private static function b2sGetAllTags($html, $type = 'og', $ignoreEncoding = false, $search = 'property') {
         $list = array();
         $doc = new DOMDocument();
-        if (function_exists('mb_convert_encoding')) {
+        if (function_exists('mb_convert_encoding') && !$ignoreEncoding) {
             @$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         } else {
             @$doc->loadHTML($html);
@@ -170,14 +179,14 @@ class B2S_Util {
         for ($i = 0; $i < $metas->length; $i++) {
             $meta = $metas->item($i);
             if ($type != 'all') {
-                if ($meta->getAttribute($search) == $type . ':title' && !isset($list['title'])) {
+                if (($meta->getAttribute('property') == $type . ':title' || $meta->getAttribute('name') == $type . ':title')  && !isset($list['title'])) {
                     $list['title'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($meta->getAttribute('content')) : $meta->getAttribute('content'));
                 }
-                if ($meta->getAttribute($search) == $type . ':description' && !isset($list['description'])) {
+                if (($meta->getAttribute('property') == $type . ':description' || $meta->getAttribute('name') == $type . ':description') && !isset($list['description'])) {
                     $desc = self::cleanContent(strip_shortcodes($meta->getAttribute('content')));
                     $list['description'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($desc) : $desc);
                 }
-                if ($meta->getAttribute($search) == $type . ':image' && !isset($list['image'])) {
+                if (($meta->getAttribute('property') == $type . ':image' || $meta->getAttribute('name') == $type . ':image') && !isset($list['image'])) {
                     $list['image'] = (function_exists('mb_convert_encoding') ? htmlspecialchars($meta->getAttribute('content')) : $meta->getAttribute('content'));
                 }
             } else {
@@ -265,10 +274,10 @@ class B2S_Util {
         $postContent = self::getFullContent($postId, $postContent, $postUrl, $postLang);
         $prepareContent = ($allowHtml !== false) ? self::cleanContent(self::cleanHtmlAttr(strip_shortcodes(self::cleanShortCodeByCaption($postContent)))) : self::cleanContent(strip_shortcodes($postContent));
         $prepareContent = ($allowEmoji !== false) ? $prepareContent : self::remove4byte($prepareContent);
-        $prepareContent = preg_replace('/(?:[ \t]*(?:\n|\r\n?)){3,}/', "\n\n", $prepareContent);
+        //$prepareContent = preg_replace('/(?:[ \t]*(?:\n|\r\n?)){3,}/', "\n\n", $prepareContent);
 
         if ($allowHtml !== false) {
-            $tempContent = nl2br(trim(strip_tags($prepareContent, $allowHtml)));
+            $tempContent = nl2br(preg_replace('/(?:[ \t]*(?:\n|\r\n?)){3,}/', "\n", trim(strip_tags($prepareContent, $allowHtml))));
             if (preg_match_all('%<img.*?src=[\"\'](.*?)[\"\'].*?/>%', $tempContent, $matches)) {
                 foreach ($matches[1] as $key => $imgUrl) {
                     if ($imgUrl == false) {
@@ -294,7 +303,7 @@ class B2S_Util {
             }
             return $tempContent;
         }
-        return trim(strip_tags($prepareContent));
+        return preg_replace('/(?:[ \t]*(?:\n|\r\n?)){3,}/', "\n\n", trim(strip_tags($prepareContent)));
     }
 
     public static function cleanHtmlAttr($postContent) {
@@ -403,16 +412,31 @@ class B2S_Util {
             }
             $stops = array('.', ':');
             $min = (int) $count / 2;
+            $cleanTruncateWord = true;
             $max = ($max !== false) ? ($max - $min) : ($min - 1);
             $sub = mb_substr($text, $min, $max, 'UTF-8');
             for ($i = 0; $i < count($stops); $i++) {
                 if (count($subArray = explode($stops[$i], $sub)) > 1) {
-                    $subArray[count($subArray) - 1] = ' ';
+                    $cleanTruncateWord = false;
+                    if (mb_substr($subArray[count($subArray) - 1], 0, 1) == ' ') { //empty first charcater in last explode - delete last explode
+                        $subArray[count($subArray) - 1] = ' ';
+                    }
+                    if (mb_stripos($subArray[count($subArray) - 1], $stops[$i]) === false) { //delete last explode if no stops set
+                        $subArray[count($subArray) - 1] = ' ';
+                    }
                     $sub = implode($stops[$i], $subArray);
                     $add = false;
                     break;
                 }
             }
+
+            if ($cleanTruncateWord) {
+                $lastIndex = mb_strripos($sub, ' ');
+                if ($lastIndex !== false) {
+                    $sub = trim(mb_substr($sub, 0, $lastIndex));
+                }
+            }
+
             $text = trim(mb_substr($text, 0, $min, 'UTF-8') . $sub);
             return ($add) ? $text . "..." : $text;
         }
@@ -421,6 +445,7 @@ class B2S_Util {
 
 //Plugin qTranslate [:en]Content[:de]Text[:]
     public static function getTitleByLanguage($title, $postLang = 'en') {
+        //$title = html_entity_decode($title, ENT_QUOTES | ENT_XML1);
         $postLang = ($postLang === false) ? 'en' : trim(strtolower($postLang));
         $regex = "#(<!--:[a-z]{2}-->|<!--:-->|\[:[a-z]{2}\]|\[:\]|\{:[a-z]{2}\}|\{:\})#ism";
         $blocks = preg_split($regex, $title, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);

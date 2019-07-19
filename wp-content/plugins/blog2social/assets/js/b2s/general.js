@@ -71,6 +71,7 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
     jQuery('.b2s-key-area-success').hide();
     jQuery('.b2s-key-area-fail').hide();
     jQuery('.b2s-key-area-fail-max-use').hide();
+    jQuery('.b2s-key-area-fail-no-token').hide();
 
     if (jQuery('.b2s-key-area-input').val() == "") {
         jQuery('.b2s-key-area-input').addClass('error');
@@ -86,6 +87,7 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
             data: {
                 'action': 'b2s_update_user_version',
                 'key': jQuery('.b2s-key-area-input').val(),
+                'user_id': jQuery('#b2s-license-user').val(),
             },
             error: function () {
                 jQuery('.b2s-server-connection-fail').show();
@@ -97,11 +99,18 @@ jQuery(document).on('click', '.b2s-key-area-btn-submit', function () {
                 jQuery('.b2s-trail-premium-info-area').hide();
                 if (data.result == true) {
                     jQuery('.b2s-key-area-success').show();
-                    jQuery('.b2s-key-area-key-name').html(data.lizenzName);
-                    jQuery('.b2s-key-name').html(data.lizenzName);
+                    if(data.licenseName != false) {
+                        jQuery('.b2s-key-area-key-name').html(data.licenseName);
+                        jQuery('.b2s-key-name').html(data.licenseName);
+                    }
+                    jQuery('#b2s-license-user-select').empty();
+                    jQuery('#b2s-license-user-select').append(jQuery('<option value="0"></option>'));
+                    jQuery('#b2s-license-user-select').trigger("chosen:updated");
                 } else {
                     if (data.reason != null && data.reason == 1) {
                         jQuery('.b2s-key-area-fail-max-use').show();
+                    } else if (data.reason != null && data.reason == 2) {
+                        jQuery('.b2s-key-area-fail-no-token').show();
                     } else {
                         jQuery('.b2s-key-area-fail').show();
                     }

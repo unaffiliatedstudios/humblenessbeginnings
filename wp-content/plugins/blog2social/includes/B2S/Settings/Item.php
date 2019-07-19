@@ -118,7 +118,10 @@ class B2S_Settings_Item {
         $limit = unserialize(B2S_PLUGIN_AUTO_POST_LIMIT);
 
         $content = '';
-        $content .='<div class="panel panel-group b2s-auto-post-own-update-warning"><div class="panel-body"><span class="glyphicon glyphicon-exclamation-sign glyphicon-warning"></span> ' . __('Auto-posts for Facebook Profiles will be shown in the "Instant Sharing" tab on your "Posts & Sharing" navigation bar and can be shared on your Facebook Profile by clicking on the "Share" button next to your auto-post.', 'blog2social') . '</div>';
+        $content .='<div class="panel panel-group b2s-auto-post-own-general-warning"><div class="panel-body">';
+        $content .='<span class="glyphicon glyphicon-exclamation-sign glyphicon-warning"></span> ' . __('Auto-posts for Facebook Profiles will be shown in the "Instant Sharing" tab on your "Posts & Sharing" navigation bar and can be shared on your Facebook Profile by clicking on the "Share" button next to your auto-post.', 'blog2social');
+        //$content .='<br><span class="glyphicon glyphicon-exclamation-sign glyphicon-warning"></span> ' . __('XING is excluded due to the cross posting rules for auto posting', 'blog2social'). " <a target='_blank' href='".B2S_Tools::getSupportLink('xing_auto_posting')."'>".__("read more","blog2social")."</a>";
+        $content .='</div>';
         $content .='</div>';
         $content .='<h4>' . __('Auto-post your own created posts', 'blog2social') . ' ' . $isPremium . ' <a href="#" data-toggle="modal" data-target="#b2sInfoAutoShareModal" class="b2s-info-btn del-padding-left">' . __('Info', 'Blog2Social') . '</a>';
         $content .='<br><div class="b2s-text-sm">' . __('Define by default to automatically post your posts on social media:', 'blog2social') . '</div>';
@@ -317,8 +320,10 @@ class B2S_Settings_Item {
 
         $content .='<strong>' . __('This is a global feature for your blog, which can only be edited by users with admin rights.', 'blog2social') . '</strong>';
         $content .='<div class="' . ( (B2S_PLUGIN_ADMIN) ? "" : "b2s-disabled-div") . '">';
-        $content .='<h4>' . __('Frontpage Settings', 'blog2social') . '</h4>';
-        $content .='<div><img alt="" class="b2s-post-item-network-image" src="' . plugins_url('/assets/images/portale/1_flat.png', B2S_PLUGIN_FILE) . '"> <b>Facebook</b></div>';
+        $content .='<h4>' . __('Frontpage Settings', 'blog2social');
+        $content .=' <a class="btn-link b2s-btn-link-txt" href="admin.php?page=blog2social-support#b2s-support-sharing-debugger">' . __("Check Settings with Sharing-Debugger", "blog2social") . '</a>';
+        $content .='</h4>';
+        $content .='<div><b>Open Graph</b></div>';
         $content .= '<p>' . __('Add the default Open Graph parameters for title, description and image you want Facebook to display, if you share the frontpage of your blog as link post (http://www.yourblog.com)', 'blog2social') . '</p>';
         $content .='<br>';
         $content .='<div class="col-md-8">';
@@ -334,7 +339,7 @@ class B2S_Settings_Item {
         $content .='</div>';
         $content .='<div class="clearfix"></div>';
         $content .='<br>';
-        $content .='<div><img alt="" class="b2s-post-item-network-image" src="' . plugins_url('/assets/images/portale/2_flat.png', B2S_PLUGIN_FILE) . '"> <b>Twitter</b></div>';
+        $content .='<div><b>Twitter Card</b></div>';
         $content .='<p>' . __('Add the default Twitter Card parameters for title, description and image you want Twitter to display, if you share the frontpage of your blog as link post (http://www.yourblog.com)', 'blog2social') . '</p>';
         $content .='<br>';
         $content .='<div class="col-md-8">';
@@ -361,6 +366,7 @@ class B2S_Settings_Item {
 
     public function getNetworkSettingsHtml() {
         $optionPostFormat = $this->options->_getOption('post_format');
+        $defaultPostFormat = unserialize(B2S_PLUGIN_NETWORK_SETTINGS_FORMAT_DEFAULT);
         $content = '';
         $networkName = unserialize(B2S_PLUGIN_NETWORK);
 
@@ -371,11 +377,11 @@ class B2S_Settings_Item {
             $content .='<hr></div>';
         }
 
-        foreach (array(1, 2, 10, 12) as $n => $networkId) { //FB,TW,GB,IN
-            $type = ($networkId == 1 || $networkId == 10) ? array(0, 1, 2) : array(0);
+        foreach (array(1, 2, 3, 12) as $n => $networkId) { //FB,TW,LI,IN
+            $type = ($networkId == 1) ? array(0, 1, 2) : (($networkId == 3) ? array(0, 1) : array(0));
             foreach ($type as $t => $typeId) { //Profile,Page,Group
                 if (!isset($optionPostFormat[$networkId]['all'])) {
-                    $optionPostFormat[$networkId]['all'] = 0;
+                    $optionPostFormat[$networkId]['all'] = isset($defaultPostFormat[$networkId]) ? (int) $defaultPostFormat[$networkId] : 0;
                 }
 
                 $post_format_0 = ((isset($optionPostFormat[$networkId]) && is_array($optionPostFormat[$networkId]) && (((int) $optionPostFormat[$networkId]['all'] == 0) || (isset($optionPostFormat[$networkId][$typeId]) && (int) $optionPostFormat[$networkId][$typeId] == 0)) ) ? 'b2s-settings-checked' : (!isset($optionPostFormat[$networkId]) ? 'b2s-settings-checked' : '' )); //LinkPost
@@ -391,7 +397,7 @@ class B2S_Settings_Item {
                 if ($networkId == 12) {
                     $content .= __('Insert white frames to show the whole image in your timeline. All image information will be shown in your timeline.', 'blog2social');
                 } else {
-                    $content .= __('The link post format displays posts title, link address and the first one or two sentences of the post. The networks scan this information from your META or OpenGraph.  PLEASE NOTE: If you want your link posts to display the selected image from the Blog2Social preview editor, please make sure you have activated the Social Meta Tags for Facebook and Twitter in your Blog2Social settings. You find these settings in the tab "Social Meta Data". If you don\'t select a specific post image, some networks display the first image detected on your page. The image links to your blog post. PLEASE NOTE: For link posts on Google + , only images from the blog posts gallery can be selected and will be displayed on the network. ', 'blog2social');
+                    $content .= __('The link post format displays posts title, link address and the first one or two sentences of the post. The networks scan this information from your META or OpenGraph.  PLEASE NOTE: If you want your link posts to display the selected image from the Blog2Social preview editor, please make sure you have activated the Social Meta Tags for Facebook and Twitter in your Blog2Social settings. You find these settings in the tab "Social Meta Data". If you don\'t select a specific post image, some networks display the first image detected on your page. The image links to your blog post.', 'blog2social');
                 }
                 $content .='</div>';
                 $content .='<div class="col-md-6 col-xs-12">';
@@ -416,24 +422,17 @@ class B2S_Settings_Item {
         $optionPostFormat = $this->options->_getOption('post_format');
         $optionNoCache = $this->options->_getOption('link_no_cache');
         $optionNoCache = ($optionNoCache === false || $optionNoCache == 0) ? 0 : 1;  //default inactive , 1=active 0=not
-//Take old settings
-        if (!isset($optionPostFormat[$networkId])) {
-            $oldPostFormatSettings = ($networkId == 1) ? (isset($this->settings->network_post_format_1) ? (int) $this->settings->network_post_format_1 : 0) : (isset($this->settings->network_post_format_2) ? (int) $this->settings->network_post_format_2 : 1);  // Twitter Default Photopost
-            $post_format[$networkId] = array();
-            $post_format[$networkId] = array('all' => $oldPostFormatSettings);
-            $optionPostFormat = $post_format;
-            $this->options->_setOption('post_format', $post_format);
-        }
 
         if (!isset($optionPostFormat[$networkId]['all'])) {
-            $optionPostFormat[$networkId]['all'] = 0;
+            $defaultPostFormat = unserialize(B2S_PLUGIN_NETWORK_SETTINGS_FORMAT_DEFAULT);
+            $optionPostFormat[$networkId]['all'] = isset($defaultPostFormat[$networkId]) ? (int) $defaultPostFormat[$networkId] : 0;
         }
 
         $disabledInputType = (B2S_PLUGIN_USER_VERSION < 2) ? 'disabled' : '';
         $disabledInputAll = (B2S_PLUGIN_USER_VERSION == 0) ? 'disabled' : '';
         $disabledTextType = (B2S_PLUGIN_USER_VERSION < 2) ? 'font-gray' : '';
         $disabledTextAll = (B2S_PLUGIN_USER_VERSION == 0) ? 'font-gray' : '';
-        $textAll = ($networkId == 1 || $networkId == 10) ? __('All', 'blog2social') : __('Profile', 'blog2social');
+        $textAll = ($networkId == 1 || $networkId == 3) ? __('All', 'blog2social') : __('Profile', 'blog2social');
 
 
         $content = '';
@@ -443,19 +442,21 @@ class B2S_Settings_Item {
         $content .= '<br><br>';
         $content .='<div class="padding-left-15">';
 
-        if ((B2S_PLUGIN_USER_VERSION < 2 && ($networkId == 1 || $networkId == 10)) || $networkId == 2 || $networkId == 12) {
+        if ((B2S_PLUGIN_USER_VERSION < 2 && ($networkId == 1 || $networkId == 3)) || $networkId == 2 || $networkId == 12) {
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right b2s-input-margin-bottom-5"><input type="radio" ' . $disabledInputAll . ' id="all-' . $networkId . '-1"  ' . ( (isset($optionPostFormat[$networkId]) && is_array($optionPostFormat[$networkId]) && (int) $optionPostFormat[$networkId]['all'] == 0) ? 'checked' : ((!isset($optionPostFormat[$networkId])) ? 'checked' : '' )) . '   name="all" value="0"><label class="' . $disabledTextAll . '" for="all-' . $networkId . '-1">' . $textAll . '</label></div><div class="clearfix"></div>';
         }
-        if ($networkId == 1 || $networkId == 10) {
+        if ($networkId == 1) {
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[0]-' . $networkId . '-1" ' . ((isset($optionPostFormat[$networkId][0]) && (int) $optionPostFormat[$networkId][0] == 0) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 0 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[0]" value="0"><label class="' . $disabledTextType . '" for="type[0]-' . $networkId . '-1">' . __('Profile', 'blog2social') . '</label></div><div class="clearfix"></div>';
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[1]-' . $networkId . '-1" ' . ( (isset($optionPostFormat[$networkId][1]) && (int) $optionPostFormat[$networkId][1] == 0) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 0 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[1]" value="0"><label class="' . $disabledTextType . '" for="type[1]-' . $networkId . '-1">' . __('Page', 'blog2social') . '</label></div><div class="clearfix"></div>';
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[2]-' . $networkId . '-1" ' . ( (isset($optionPostFormat[$networkId][2]) && (int) $optionPostFormat[$networkId][2] == 0) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 0 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[2]" value="0"><label class="' . $disabledTextType . '" for="type[2]-' . $networkId . '-1">' . __('Group', 'blog2social') . '</label></div><div class="clearfix"></div>';
-
-//Option: no_cache param for varnish caching
-            if ($networkId == 1) {
-                $content .= '<br><div class="col-lg-6 col-md-6 col-xs-12 del-padding-left del-padding-right"><input id="link-no-cache" type="checkbox" ' . (($optionNoCache == 1) ? 'checked' : '') . ' name="no_cache" value="' . (($optionNoCache == 1) ? 0 : 1) . '"><label for="link-no-cache">' . __('Activate Instant Caching', 'blog2social') . '</label> <a href="#" data-toggle="modal" data-target="#b2sInfoNoCache" class="b2s-info-btn vertical-middle del-padding-left">' . __('Info', 'Blog2Social') . '</a></div><div class="clearfix"></div>';
-            }
+            //Option: no_cache param for varnish caching
+            $content .= '<br><div class="col-lg-6 col-md-6 col-xs-12 del-padding-left del-padding-right"><input id="link-no-cache" type="checkbox" ' . (($optionNoCache == 1) ? 'checked' : '') . ' name="no_cache" value="' . (($optionNoCache == 1) ? 0 : 1) . '"><label for="link-no-cache">' . __('Activate Instant Caching', 'blog2social') . '</label> <a href="#" data-toggle="modal" data-target="#b2sInfoNoCache" class="b2s-info-btn vertical-middle del-padding-left">' . __('Info', 'Blog2Social') . '</a></div><div class="clearfix"></div>';
         }
+        if ($networkId == 3) {
+            $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[0]-' . $networkId . '-1" ' . ((isset($optionPostFormat[$networkId][0]) && (int) $optionPostFormat[$networkId][0] == 0) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 0 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[0]" value="0"><label class="' . $disabledTextType . '" for="type[0]-' . $networkId . '-1">' . __('Profile', 'blog2social') . '</label></div><div class="clearfix"></div>';
+            $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[1]-' . $networkId . '-1" ' . ( (isset($optionPostFormat[$networkId][1]) && (int) $optionPostFormat[$networkId][1] == 0) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 0 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[1]" value="0"><label class="' . $disabledTextType . '" for="type[1]-' . $networkId . '-1">' . __('Page', 'blog2social') . '</label></div><div class="clearfix"></div>';
+        }
+
         $content .='</div>';
         $content .='</div>';
 
@@ -465,13 +466,17 @@ class B2S_Settings_Item {
         $content .= '<br><br>';
         $content .='<div class="padding-left-15">';
 
-        if ((B2S_PLUGIN_USER_VERSION < 2 && ($networkId == 1 || $networkId == 10)) || $networkId == 2 || $networkId == 12) {
+        if ((B2S_PLUGIN_USER_VERSION < 2 && ($networkId == 1 || $networkId == 3)) || $networkId == 2 || $networkId == 12) {
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right b2s-input-margin-bottom-5"><input type="radio" ' . $disabledInputAll . ' id="all-' . $networkId . '-2" ' . ((isset($optionPostFormat[$networkId]) && is_array($optionPostFormat[$networkId]) && (int) $optionPostFormat[$networkId]['all'] == 1) ? 'checked' : '') . '  name="all"  value="1"><label class="' . $disabledTextAll . '" for="all-' . $networkId . '-2">' . $textAll . '</label></div><div class="clearfix"></div>';
         }
-        if ($networkId == 1 || $networkId == 10) {
+        if ($networkId == 1) {
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[0]-' . $networkId . '-2" ' . ( (isset($optionPostFormat[$networkId][0]) && (int) $optionPostFormat[$networkId][0] == 1) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 1 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[0]" value="1"><label class="' . $disabledTextType . '" for="type[0]-' . $networkId . '-2">' . __('Profile', 'blog2social') . '</label></div><div class="clearfix"></div>';
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[1]-' . $networkId . '-2" ' . ( (isset($optionPostFormat[$networkId][1]) && (int) $optionPostFormat[$networkId][1] == 1) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 1 && !isset($optionPostFormat[$networkId][1]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[1]" value="1"><label class="' . $disabledTextType . '" for="type[1]-' . $networkId . '-2">' . __('Page', 'blog2social') . '</label></div><div class="clearfix"></div>';
             $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[2]-' . $networkId . '-2" ' . ( (isset($optionPostFormat[$networkId][2]) && (int) $optionPostFormat[$networkId][2] == 1) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 1 && !isset($optionPostFormat[$networkId][1]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[2]" value="1"><label class="' . $disabledTextType . '" for="type[2]-' . $networkId . '-2">' . __('Group', 'blog2social') . '</label></div><div class="clearfix"></div>';
+        }
+        if ($networkId == 3) {
+            $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[0]-' . $networkId . '-2" ' . ( (isset($optionPostFormat[$networkId][0]) && (int) $optionPostFormat[$networkId][0] == 1) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 1 && !isset($optionPostFormat[$networkId][0]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[0]" value="1"><label class="' . $disabledTextType . '" for="type[0]-' . $networkId . '-2">' . __('Profile', 'blog2social') . '</label></div><div class="clearfix"></div>';
+            $content .= '<div class="col-lg-3 col-md-4 col-xs-5 del-padding-left del-padding-right"><input type="radio" ' . $disabledInputType . ' id="type[1]-' . $networkId . '-2" ' . ( (isset($optionPostFormat[$networkId][1]) && (int) $optionPostFormat[$networkId][1] == 1) ? 'checked' : ( (int) $optionPostFormat[$networkId]['all'] == 1 && !isset($optionPostFormat[$networkId][1]) && B2S_PLUGIN_USER_VERSION >= 2) ? 'checked' : '') . ' name="type-format[1]" value="1"><label class="' . $disabledTextType . '" for="type[1]-' . $networkId . '-2">' . __('Page', 'blog2social') . '</label></div><div class="clearfix"></div>';
         }
         $content .='</div>';
         $content .='</div>';
@@ -482,18 +487,9 @@ class B2S_Settings_Item {
     public function setNetworkSettingsHtml() {
         $optionPostFormat = $this->options->_getOption('post_format');
         $content = "<input type='hidden' class='b2sNetworkSettingsPostFormatText' value='" . json_encode(array('post' => array(__('Link Post', 'blog2social'), __('Photo Post', 'blog2social')), 'image' => array(__('Image with frame'), __('Image cut out')))) . "'/>";
-        foreach (array(1, 2, 10, 12) as $n => $networkId) { //FB,TW,In
-//Take old settings
-            if (!isset($optionPostFormat[$networkId])) {
-                $oldPostFormatSettings = ($networkId == 1 || $networkId == 10) ? (isset($this->settings->network_post_format_1) ? (int) $this->settings->network_post_format_1 : 0) : (isset($this->settings->network_post_format_2) ? (int) $this->settings->network_post_format_2 : 1);  // Twitter Default Photopost
-                $post_format[$networkId] = array();
-                $post_format[$networkId] = array('all' => $oldPostFormatSettings);
-                $optionPostFormat = $post_format;
-                $this->options->_setOption('post_format', $post_format);
-            }
-
+        foreach (array(1, 2, 3, 12) as $n => $networkId) { //FB,TW,LI,IN
             $postFormatType = ($networkId == 12) ? 'image' : 'post';
-            $type = ($networkId == 1 || $networkId == 10) ? array(0, 1, 2) : array(0);
+            $type = ($networkId == 1) ? array(0, 1, 2) : (($networkId == 3) ? array(0, 1) : array(0));
             foreach ($type as $t => $typeId) { //Profile,Page,Group                
                 if (!isset($optionPostFormat[$networkId]['all']) && !isset($optionPostFormat[$networkId][$typeId])) { //DEFAULT
                     $optionPostFormat[$networkId]['all'] = 0;

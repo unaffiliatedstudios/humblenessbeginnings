@@ -6,6 +6,7 @@ require_once B2S_PLUGIN_DIR . 'includes/B2S/Settings/Item.php';
 $b2sShowByDate = isset($_GET['b2sShowByDate']) ? trim($_GET['b2sShowByDate']) : "";
 $b2sUserAuthId = isset($_GET['b2sUserAuthId']) ? (int) $_GET['b2sUserAuthId'] : "";
 $b2sPostBlogId = isset($_GET['b2sPostBlogId']) ? (int) $_GET['b2sPostBlogId'] : "";
+$b2sShowByNetwork = isset($_GET['b2sShowByNetwork']) ? (int) $_GET['b2sShowByNetwork'] : "";
 $options = new B2S_Options(B2S_PLUGIN_BLOG_USER_ID);
 $optionUserTimeZone = $options->_getOption('user_time_zone');
 $userTimeZone = ($optionUserTimeZone !== false) ? $optionUserTimeZone : get_option('timezone_string');
@@ -15,9 +16,13 @@ $metaSettings = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
 
 <div class="b2s-container">
     <div class="b2s-inbox">
-        <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
         <div class="col-md-12 del-padding-left">
-            <div class="col-md-9 del-padding-left">
+            <div class="col-md-9 del-padding-left del-padding-right">
+                <!--Header|Start - Include-->
+                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+                <!--Header|End-->
+                <div class="clearfix"></div>
+                <!--Content|Start-->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <!--Posts from Wordpress Start-->
@@ -32,6 +37,7 @@ $metaSettings = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                                     <input id="b2sShowByDate" type="hidden" value="<?php echo $b2sShowByDate; ?>" name="b2sShowByDate">
                                     <input id="b2sUserAuthId" type="hidden" value="<?php echo $b2sUserAuthId; ?>" name="b2sUserAuthId">
                                     <input id="b2sPostBlogId" type="hidden" value="<?php echo $b2sPostBlogId; ?>" name="b2sPostBlogId">
+                                    <input id="b2sShowByNetwork" type="hidden" value="<?php echo $b2sShowByNetwork; ?>" name="b2sShowByNetwork">
                                     <input id="b2sPagination" type="hidden" value="1" name="b2sPagination">
                                     <?php
                                     $postFilter = new B2S_Post_Filter('sched');
@@ -63,7 +69,6 @@ $metaSettings = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                     </div>
                 </div>
             </div>
-            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/service.phtml'); ?>
             <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.phtml'); ?>
         </div>
     </div>
@@ -140,8 +145,8 @@ $metaSettings = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
                             <div class="b2s-post-format-settings-info" data-network-id="2" style="display:none;">
                                 <b><?php _e('Define the default settings for the custom post format for all of your Twitter accounts in the Blog2Social settings.', 'blog2social'); ?></b>
                             </div>
-                            <div class="b2s-post-format-settings-info" data-network-id="10" style="display:none;">
-                                <b><?php _e('Define the default settings for the custom post format for all of your Google+ accounts in the Blog2Social settings.', 'blog2social'); ?></b>
+                            <div class="b2s-post-format-settings-info" data-network-id="3" style="display:none;">
+                                <b><?php _e('Define the default settings for the custom post format for all of your LinkedIn accounts in the Blog2Social settings.', 'blog2social'); ?></b>
                             </div>
                             <div class="b2s-post-format-settings-info" data-network-id="12" style="display:none;">
                                 <b><?php _e('Define the default settings for the custom post format for all of your Instagram accounts in the Blog2Social settings.', 'blog2social'); ?></b>
@@ -172,6 +177,3 @@ $metaSettings = get_option('B2S_PLUGIN_GENERAL_OPTIONS');
     var b2s_post_formats = <?= json_encode(array('post' => array(__('Link Post', 'blog2social'), __('Photo Post', 'blog2social')), 'image' => array(__('Image with frame'), __('Image cut out')))); ?>;
     var b2s_is_calendar = true;
 </script>
-
-
-<?php require_once (B2S_PLUGIN_DIR . 'views/b2s/partials/network-tos-modal.php');?>

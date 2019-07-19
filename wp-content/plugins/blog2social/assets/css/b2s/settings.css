@@ -16,7 +16,7 @@
     padding: 10px 15px !important;
 }
 
-hr{
+.b2s-settings-line{
     margin-top: 0px!important;
 }
 
@@ -105,7 +105,7 @@ ul.chosen-choices {
     box-shadow: none;
 }
 
-.b2s-auto-post-own-update-warning{
+.b2s-auto-post-own-update-warning, .b2s-auto-post-own-general-warning{
     border: 1px solid #aaa !important; 
 }
 
@@ -121,4 +121,9 @@ ul.chosen-choices {
 }
 .b2s-user-network-shortener-account-area{
     vertical-align: middle;
+}
+
+.b2s-btn-link-txt{
+    font-size: 14px !important;
+    font-weight: 500 !important;
 }

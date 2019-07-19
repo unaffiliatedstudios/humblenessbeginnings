@@ -4,6 +4,7 @@ class B2S_Ship_Navbar {
 
     private $neworkName;
     private $networkTypeName;
+    private $networkKindName;
     private $authUrl;
     private $allowProfil;
     private $allowPage;
@@ -13,7 +14,9 @@ class B2S_Ship_Navbar {
     public function __construct() {
         $this->neworkName = unserialize(B2S_PLUGIN_NETWORK);
         $this->networkTypeName = unserialize(B2S_PLUGIN_NETWORK_TYPE);
-        $this->authUrl = B2S_PLUGIN_API_ENDPOINT_AUTH . '?b2s_token=' . B2S_PLUGIN_TOKEN . '&sprache=' . substr(B2S_LANGUAGE, 0, 2) . '&unset=true';
+        $this->networkKindName = unserialize(B2S_PLUGIN_NETWORK_KIND);
+        $hostUrl = (function_exists('rest_url')) ? rest_url() : get_site_url();
+        $this->authUrl = B2S_PLUGIN_API_ENDPOINT_AUTH . '?b2s_token=' . B2S_PLUGIN_TOKEN . '&sprache=' . substr(B2S_LANGUAGE, 0, 2) . '&unset=true&hostUrl='.$hostUrl;
         $this->allowProfil = unserialize(B2S_PLUGIN_NETWORK_ALLOW_PROFILE);
         $this->allowPage = unserialize(B2S_PLUGIN_NETWORK_ALLOW_PAGE);
         $this->allowGroup = unserialize(B2S_PLUGIN_NETWORK_ALLOW_GROUP);
@@ -62,14 +65,14 @@ class B2S_Ship_Navbar {
         }
 
         $content = '<li class="b2s-sidbar-wrapper-nav-li i" data-mandant-id=\'' . json_encode($mandantIds) . '\' data-mandant-default-id="' . $data->mandantId . '">';
-        $content .= '<div class="b2s-network-select-btn ' . (($data->expiredDate != '0000-00-00' && $data->expiredDate <= date('Y-m-d')) ? 'b2s-network-select-btn-deactivate" ' . $onclick : '"') . ' data-instant-sharing="'.(isset($data->instant_sharing) ? (int)$data->instant_sharing : 0).'" data-network-auth-id="' . $data->networkAuthId . '" data-network-type="' . $data->networkType . '" data-network-id = "' . $data->networkId . '" data-network-display-name="' . strtolower($data->networkUserName) . '">'; 
+        $content .= '<div class="b2s-network-select-btn ' . (($data->expiredDate != '0000-00-00' && $data->expiredDate <= date('Y-m-d')) ? 'b2s-network-select-btn-deactivate" ' . $onclick : '"') . ' data-instant-sharing="'.(isset($data->instant_sharing) ? (int)$data->instant_sharing : 0).'" data-network-auth-id="' . $data->networkAuthId . '" data-network-type="' . $data->networkType . '" data-network-kind="' . $data->networkKind . '" data-network-id = "' . $data->networkId . '"  data-network-tos-group-id="'.$data->networkTosGroupId.'" data-network-display-name="' . strtolower($data->networkUserName) . '">'; 
         $content .= '<div class="b2s-network-list">';
         $content .= '<div class="b2s-network-thumb">';
         $content .= '<img alt="" src="' . plugins_url('/assets/images/portale/' . $data->networkId . '_flat.png', B2S_PLUGIN_FILE) . '">';
         $content .= '</div>';
         $content .= '<div class="b2s-network-details">';
         $content .= '<h4>' . $username . '</h4>';
-        $content .= '<p>' . $this->networkTypeName[$data->networkType] . ' | ' . $this->neworkName[$data->networkId] . '</p>';
+        $content .= '<p>' .($data->networkId == 19 && $data->networkType == 1 && isset($this->networkKindName[$data->networkKind]) ? $this->networkKindName[$data->networkKind].'-' :'').$this->networkTypeName[$data->networkType] . ' | ' . $this->neworkName[$data->networkId] . '</p>';
         $content .= '</div>';
         $content .= '<div class="b2s-network-status" data-network-auth-id="' . $data->networkAuthId . '">';
         $content .= '<span class="b2s-network-hide b2s-network-status-img glyphicon glyphicon-ok glyphicon-success"></span>';

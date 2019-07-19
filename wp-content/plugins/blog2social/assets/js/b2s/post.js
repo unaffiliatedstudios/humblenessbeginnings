@@ -56,6 +56,9 @@ jQuery('#b2s-network-select-image').on('hidden.bs.modal', function () {
 jQuery('#b2s-post-ship-item-post-format-modal').on('hidden.bs.modal', function () {
     jQuery('body').addClass('modal-open');
 });
+jQuery('#b2s-info-change-meta-tag-modal').on('hidden.bs.modal', function () {
+    jQuery('body').addClass('modal-open');
+});
 
 
 jQuery(document).on('click', '.b2sDetailsPublishPostBtn', function () {
@@ -170,6 +173,7 @@ jQuery(document).on('click', '#b2s-sort-reset-btn', function () {
     jQuery('#b2sShowByDate').val("");
     jQuery('#b2sUserAuthId').val("");
     jQuery('#b2sPostBlogId').val("");
+    jQuery('#b2sShowByNetwork').val("0");
     jQuery('#b2sSortPostStatus').prop('selectedIndex', 0);
     jQuery('#b2sSortPostPublishDate').prop('selectedIndex', 0);
     b2sSortFormSubmit();
@@ -201,6 +205,7 @@ function b2sSortFormSubmit(sched_dates) {
         'b2sPostBlogId': jQuery('#b2sPostBlogId').val(),
         'b2sType': jQuery('#b2sType').val(),
         'b2sShowByDate': jQuery('#b2sShowByDate').val(),
+        'b2sShowByNetwork': jQuery('#b2sShowByNetwork').val(),
         'b2sPagination': jQuery('#b2sPagination').val(),
         'b2sShowPagination': jQuery('#b2sShowPagination').length > 0 ? jQuery('#b2sShowPagination').val() : 1,
         'b2sSortPostStatus': jQuery('#b2sSortPostStatus').val(),
@@ -259,6 +264,7 @@ function b2sSortFormSubmit(sched_dates) {
 jQuery(document).on('click', '.b2sDetailsSchedPostBtn', function () {
     var postId = jQuery(this).attr('data-post-id');
     var showByDate = jQuery(this).attr('data-search-date');
+    var showByNetwork = jQuery(this).attr('data-search-network');
     var userAuthId = jQuery('#b2sUserAuthId').val();
     if (!jQuery(this).find('i').hasClass('isload')) {
         jQuery('.b2s-server-connection-fail').hide();
@@ -271,6 +277,7 @@ jQuery(document).on('click', '.b2sDetailsSchedPostBtn', function () {
                 'action': 'b2s_sched_post_data',
                 'postId': postId,
                 'showByDate': showByDate,
+                'showByNetwork': showByNetwork,
                 'userAuthId': userAuthId
             },
             error: function () {
@@ -489,6 +496,12 @@ jQuery(document).on('click', '.b2s-approve-delete-confirm-btn', function () {
     });
 });
 
+//Modal Edit Post close
+jQuery(document).on('click', '.b2s-modal-close-edit-post', function (e) {
+   jQuery(jQuery(this).attr('data-modal-name')).remove();
+   return false;
+});
+
 jQuery(document).on('click', '.b2s-post-approve-area-drop-btn', function () {
     jQuery('#b2s-delete-confirm-post-id').val(jQuery(this).attr('data-post-id'));
     jQuery('#b2s-delete-confirm-post-count').html('1');
@@ -556,6 +569,7 @@ function showEditSchedPost(b2s_id, post_id, network_auth_id, network_type, netwo
     {
         jQuery('#b2s-edit-event-modal-' + b2s_id).remove();
     }
+    jQuery("#b2sPostId").val(post_id);
     var $modal = jQuery("<div>");
     jQuery.ajax({
         url: ajaxurl,
@@ -654,8 +668,6 @@ function showEditSchedPost(b2s_id, post_id, network_auth_id, network_type, netwo
         }
 
     }
-
-    jQuery("#b2sPostId").val(post_id);
     var today = new Date();
     var dateFormat = "yyyy-mm-dd";
     var language = "en";

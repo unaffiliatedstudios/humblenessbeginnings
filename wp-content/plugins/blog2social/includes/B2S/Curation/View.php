@@ -14,8 +14,8 @@ class B2S_Curation_View {
             $image = $data['og_image'];
             $externalImage = true;
         }
-        $title = isset($data['og_title']) ? $data['og_title'] : (isset($data['default_title']) ? $data['default_title'] : '');
-        $desc = isset($data['og_description']) ? $data['og_description'] : (isset($data['default_description']) ? $data['default_description'] : '');
+        $title = (isset($data['og_title']) &&!empty(trim($data['og_title']))) ? $data['og_title'] : ((isset($data['default_title']) && !empty(trim($data['default_title']))) ? $data['default_title'] : '');
+        $desc = (isset($data['og_description']) &&!empty(trim($data['og_description']))) ? $data['og_description'] : ((isset($data['default_description']) && !empty(trim($data['default_description']))) ? $data['default_description'] : '');
 
         $html = '';
         $html .='<div class="row">';
@@ -32,7 +32,7 @@ class B2S_Curation_View {
         $html .='</div>';
         $html .='<div class="col-xs-12 b2s-post-original-area col-sm-7 col-lg-9">';
         $html .='<p class="b2s-post-item-details-preview-title">' . $title . '</p>';
-        $html .='<input type="hidden" id="b2s-post-curation-preview-title" name="title" value="' . addslashes($title) . '">';
+        $html .='<input type="hidden" id="b2s-post-curation-preview-title" class="form-control" name="title" value="' . addslashes($title) . '" placeholder="'.__('Title', 'blog2social').'">';
         $html .='<span class="b2s-post-item-details-preview-desc">' . $desc . '</span>';
         $html .='<br>';
         $html .='<span class="b2s-post-item-details-preview-url"><a href="' . $url . '" target="_blank" class="btn btn-link del-padding-left">' . $url . '</a></span>';
@@ -104,6 +104,8 @@ class B2S_Curation_View {
         $content .='<div class="row">';
         $content .='<div class="col-xs-12 col-sm-6 col-lg-6">';
         $content .= '<button class="btn btn-primary pull-left" type="submit" id="b2s-btn-curation-customize">' . __('Customize & Schedule', 'blog2social') . '</button>';
+        $content .= '<button class="btn btn-primary pull-left" type="submit" id="b2s-btn-curation-draft">' . __('Save as Draft', 'blog2social') . '</button>';
+        $content .= '<input type="hidden" id="b2s-draft-id" value="" name="b2s-draft-id">';
         $content .='</div>';
         $content .='<div class="col-xs-12 col-sm-6 col-lg-6">';
         $content .= '<button class="btn btn-success pull-right" type="submit" id="b2s-btn-curation-share">' . __('Share', 'blog2social') . '</button>';

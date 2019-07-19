@@ -16,9 +16,10 @@ class B2S_Calendar_Filter {
         $res = new B2S_Calendar_Filter();
         $items = $wpdb->get_results($sql);
         foreach ($items as $item) {
-            if (is_null($item->sched_data) && is_null($item->image_url) && (int) $item->relay_primary_post_id == 0) {
+            if ($item->sched_date != "0000-00-00 00:00:00" && is_null($item->sched_data) && is_null($item->image_url) && (int) $item->relay_primary_post_id == 0) {
                 continue;
             }
+
             //is relay post?
             if ((int) $item->relay_primary_post_id > 0) {
                 //set sched_data & image_url    
@@ -77,6 +78,7 @@ class B2S_Calendar_Filter {
                 . "b2s_posts.id as b2s_id, "
                 . "b2s_posts.user_timezone, "
                 . "b2s_posts.post_id, "
+                . "b2s_posts.publish_link, "
                 . "b2s_posts.relay_primary_post_id, "
                 . "b2s_posts.relay_delay_min, "
                 . "b2s_posts.post_for_relay, "
@@ -106,7 +108,7 @@ class B2S_Calendar_Filter {
     public static function getFilterNetworkAuthHtml($network_id = 0) {
         global $wpdb;
         $addNotAdminPosts = (B2S_PLUGIN_ADMIN == false) ? $wpdb->prepare(' AND b2s_posts.`blog_user_id` = %d', B2S_PLUGIN_BLOG_USER_ID) : '';
-        $addNetwork = $wpdb->prepare(' AND b2s_posts_network_details.`network_id` = %d', $network_id);
+        $addNetwork = ($network_id != 19) ? $wpdb->prepare(' AND b2s_posts_network_details.`network_id` = %d', $network_id) : ' AND (b2s_posts_network_details.`network_id` = ' . $network_id . ' OR b2s_posts_network_details.`network_id` = 8)'; //combine XING old and new
         $approvePosts = " AND ((b2s_posts.`sched_date_utc` != '0000-00-00 00:00:00' AND b2s_posts.`post_for_approve` = 0)OR (b2s_posts.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND b2s_posts.`post_for_approve` = 1))";
 
         $sql = "SELECT b2s_posts_network_details.network_type, "
@@ -135,7 +137,7 @@ class B2S_Calendar_Filter {
     /**
      * @return B2S_Calendar_Filter|null
      */
-    public static function getByTimespam($start, $end, $network_id = 0, $network_details_id = 0) { //0=all
+    public static function getByTimespam($start, $end, $network_id = 0, $network_details_id = 0, $filter = 2) { //0=all,1=publish,2=scheduled
         global $wpdb;
         $res = null;
 
@@ -144,8 +146,25 @@ class B2S_Calendar_Filter {
         $addNetworkDetails = ($network_details_id >= 1) ? $wpdb->prepare(' AND b2s_posts.`network_details_id` = %d', $network_details_id) : '';
         $approvePosts = " AND ((b2s_posts.`sched_date_utc` != '0000-00-00 00:00:00' AND b2s_posts.`post_for_approve` = 0) OR (b2s_posts.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND b2s_posts.`post_for_approve` = 1))";
 
+        if ($filter == 1) {//published
+            $where = "WHERE b2s_posts.publish_date != '0000-00-00 00:00:00' "
+                    . "AND publish_error_code = '' "
+                    . "AND b2s_posts.publish_date BETWEEN '" . date('Y-m-d H:i:s', strtotime($start)) . "' AND '" . date('Y-m-d H:i:s', strtotime($end)) . "' "
+                    . "AND b2s_posts.hide = 0 " . $addNotAdminPosts . $addNetwork . $addNetworkDetails . " ORDER BY publish_date";
+        } elseif ($filter == 2) {//scheduled
+            $where = "WHERE b2s_posts.sched_date != '0000-00-00 00:00:00' "
+                    . "AND b2s_posts.sched_date BETWEEN '" . date('Y-m-d H:i:s', strtotime($start)) . "' AND '" . date('Y-m-d H:i:s', strtotime($end)) . "' "
+                    . "AND b2s_posts.hide = 0 " . $addNotAdminPosts . $addNetwork . $addNetworkDetails . $approvePosts . " ORDER BY sched_date";
+        } else {//all
+            $where = "WHERE b2s_posts.hide = 0 "
+                    . "AND ((b2s_posts.sched_date BETWEEN '" . date('Y-m-d H:i:s', strtotime($start)) . "' AND '" . date('Y-m-d H:i:s', strtotime($end)) . "')  "
+                    . "OR (b2s_posts.publish_date BETWEEN '" . date('Y-m-d H:i:s', strtotime($start)) . "' AND '" . date('Y-m-d H:i:s', strtotime($end)) . "')) "
+                    . $addNotAdminPosts . $addNetwork . $addNetworkDetails . " ORDER BY publish_date, sched_date";
+        }
 
         $sql = "SELECT b2s_posts.sched_date, "
+                . "b2s_posts.publish_date, "
+                . "b2s_posts.publish_link, "
                 . "b2s_posts.blog_user_id, "
                 . "b2s_posts.id as b2s_id, "
                 . "b2s_posts.user_timezone, "
@@ -162,18 +181,15 @@ class B2S_Calendar_Filter {
                 . "post.post_type, "
                 . "b2s_posts_sched_details.sched_data, "
                 . "b2s_posts_sched_details.image_url, "
-                . "b2s_posts.sched_details_id "
+                . "b2s_posts.sched_details_id, "
+                . "b2s_posts.publish_error_code "
                 . "FROM b2s_posts "
                 . "INNER JOIN b2s_posts_network_details ON b2s_posts.network_details_id = b2s_posts_network_details.id "
                 . "LEFT JOIN b2s_posts_sched_details ON b2s_posts.sched_details_id = b2s_posts_sched_details.id "
                 . "INNER JOIN " . $wpdb->posts . " post ON post.ID = b2s_posts.post_id "
-                . "WHERE b2s_posts.publish_link = '' "
-                . "AND b2s_posts.sched_date BETWEEN '" . date('Y-m-d H:i:s', strtotime($start)) . "' AND '" . date('Y-m-d H:i:s', strtotime($end)) . "' "
-                . "AND b2s_posts.hide = 0 " . $addNotAdminPosts . $addNetwork . $addNetworkDetails . $approvePosts . " ORDER BY sched_date";
-
+                . $where;
 
         $res = self::getBySql($sql);
-
         return $res;
     }
 
@@ -193,6 +209,7 @@ class B2S_Calendar_Filter {
                 . "b2s_posts.id as b2s_id, "
                 . "b2s_posts.user_timezone, "
                 . "b2s_posts.post_id, "
+                . "b2s_posts.publish_link, "
                 . "b2s_posts.relay_primary_post_id, "
                 . "b2s_posts.relay_delay_min, "
                 . "b2s_posts.post_for_relay, "
@@ -242,6 +259,7 @@ class B2S_Calendar_Filter {
                 . "b2s_posts.id as b2s_id, "
                 . "b2s_posts.user_timezone, "
                 . "b2s_posts.post_id, "
+                . "b2s_posts.publish_link, "
                 . "b2s_posts_network_details.network_id, "
                 . "b2s_posts_network_details.network_type, "
                 . "b2s_posts_network_details.network_display_name, "
@@ -286,11 +304,15 @@ class B2S_Calendar_Filter {
 
     public function getNetworkHtml() {
         $content = '';
+        $deprecatedNetwork = 8;
         $result = json_decode(B2S_Api_Post::post(B2S_PLUGIN_API_ENDPOINT, array('action' => 'getNetwork', 'token' => B2S_PLUGIN_TOKEN, 'version' => B2S_PLUGIN_VERSION)));
         if (is_object($result) && isset($result->result) && (int) $result->result == 1 && isset($result->portale) && is_array($result->portale)) {
             $content = '<label><input type="radio" class="b2s-calendar-filter-network-btn" checked name="b2s-calendar-filter-network-btn" value="all" /><span>all</span></label>';
 
             foreach ($result->portale as $k => $v) {
+                if ($v->id == $deprecatedNetwork) {
+                    continue;
+                }
                 $content .='<label><input type="radio" class="b2s-calendar-filter-network-btn" name="b2s-calendar-filter-network-btn" value="' . $v->id . '" /><span>';
                 $content .='<img class="b2s-calendar-filter-img" alt="' . $v->name . '" src="' . plugins_url('/assets/images/portale/' . $v->id . '_flat.png', B2S_PLUGIN_FILE) . '">';
                 $content .='</span></label>';

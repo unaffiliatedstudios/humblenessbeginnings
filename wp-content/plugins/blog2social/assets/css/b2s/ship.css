@@ -80,7 +80,7 @@
     margin-top: 5px;
 }
 
-.b2s-select{
+.b2s-select, .b2s-select-area{
     margin-top: 6px;
 }
 
@@ -294,6 +294,12 @@
     font-size: 16px;
     font-weight: 600;
     text-transform: uppercase;
+    margin: 3px 3px 3px 0px;
+}
+
+.b2s-post-item-network-deprecated {
+    font-weight: 600;
+    font-size: 14px;
     margin: 3px 3px 3px 0px;
 }
 
@@ -822,4 +828,8 @@ input[type="number"]{
 
 .b2s-post-approve-info{
     display: none;
+}
+
+.b2s-sidebar-menu-item{
+    font-weight: 600 !important;
 }

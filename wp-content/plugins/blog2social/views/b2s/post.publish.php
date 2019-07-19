@@ -7,9 +7,13 @@ $b2sShowByDate = isset($_GET['b2sShowByDate']) ? trim($_GET['b2sShowByDate']) : 
 
 <div class="b2s-container">
     <div class="b2s-inbox">
-        <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
         <div class="col-md-12 del-padding-left">
-            <div class="col-md-9 del-padding-left">
+            <div class="col-md-9 del-padding-left del-padding-right">
+                <!--Header|Start - Include-->
+                <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/header.phtml'); ?>
+                <!--Header|End-->
+                <div class="clearfix"></div>
+                <!--Content|Start-->
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <!--Filter Start-->
@@ -51,7 +55,6 @@ $b2sShowByDate = isset($_GET['b2sShowByDate']) ? trim($_GET['b2sShowByDate']) : 
                     </div>
                 </div>
             </div>
-            <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/service.phtml'); ?>
             <?php require_once (B2S_PLUGIN_DIR . 'views/b2s/html/sidebar.phtml'); ?>
         </div>
     </div>
@@ -80,5 +83,3 @@ $b2sShowByDate = isset($_GET['b2sShowByDate']) ? trim($_GET['b2sShowByDate']) : 
 
 <input type="hidden" id="b2sLang" value="<?php echo substr(B2S_LANGUAGE, 0, 2); ?>">
 <input type="hidden" id="b2sUserLang" value="<?php echo strtolower(substr(get_locale(), 0, 2)); ?>">
-
-<?php require_once (B2S_PLUGIN_DIR . 'views/b2s/partials/network-tos-modal.php');?>

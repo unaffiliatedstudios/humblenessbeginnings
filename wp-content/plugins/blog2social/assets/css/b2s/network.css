@@ -62,7 +62,12 @@
 }
 
 .b2s-add-padding-network-refresh{
-    padding: 4px 15px;
+    padding: 4px 7px;
+}
+
+.b2s-add-padding-network-team{
+    padding: 4px 3px;
+    line-height: 2;
 }
 
 .b2s-sched-manager-best-time-info{
@@ -111,6 +116,14 @@
 
 }
 
+.b2s-network-approved-from{
+    font-size: 12px;
+    font-style: italic;
+    color: #777;
+    font-weight: normal;
+
+}
+
 .b2s-network-item-auth-list{
     padding-top:6px;
     font-size: 0.80rem !important;
@@ -145,7 +158,7 @@ ul.b2s-network-item-auth-list li:last-child{
     line-height: 2;
 }
 
-.b2s-modify-board-and-group-network-modal-footer{
+.b2s-modify-board-and-group-network-modal-footer, .b2s-manage-auth-team-modal-footer{
     border: 0px !important;
 }
 
@@ -204,10 +217,48 @@ ul.b2s-network-item-auth-list li:last-child{
     border-left: 3px solid #FDBF45;
 }
 
+.b2s-label-info-border-left{
+    border-left: 3px solid #31708f;
+}
+
 .b2s-label-danger-border-left{
     border-left: 3px solid #d9534f;
 }
 
 .b2s-label-success-border-left{
     border-left: 3px solid #398439;
+}
+
+.b2s-margin-top-8 {
+    margin-top: 8px;
+}
+
+.b2s-margin-bottom-8 {
+    margin-bottom: 8px;
+}
+
+#b2s-manage-auth-team-modal {
+    z-index: 1049;
+}
+
+.b2s-add-padding-network-placeholder-btn{
+    padding: 4px 14px;
+}
+
+.b2s-bold{
+    font-weight: 600;
+}
+
+#b2s-delete-network-sched-post {
+    float: left;
+}
+
+.b2s-btn-network-delete-list {
+    margin-left: 36px;
+    list-style: disc;
+}
+
+.b2s-loading-area-manage-auth-team-modal{
+    float: left;
+    text-align: center;
 }

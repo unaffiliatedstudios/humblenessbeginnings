@@ -135,17 +135,19 @@ class B2S_Post_Filter {
         if (B2S_PLUGIN_ADMIN) {
             $this->postFilter .= $this->getAutorHtml();
         }
-        $this->postFilter .= $this->getPostCatHtml();
-        $this->postFilter .= $this->getPostTypeHtml();
+        if($this->type != 'draft') {
+            $this->postFilter .= $this->getPostCatHtml();
+            $this->postFilter .= $this->getPostTypeHtml();
 
-        if ($this->type == 'all') {
-            $this->postFilter .= $this->getPostStatusHtml();
-        }
-        if ($this->type == 'publish' || $this->type == 'notice') {
-            $this->postFilter .= $this->getPublishDateHtml();
-        }
-        if ($this->type == 'sched') {
-            $this->postFilter .= $this->getSchedDateHtml();
+            if ($this->type == 'all') {
+                $this->postFilter .= $this->getPostStatusHtml();
+            }
+            if ($this->type == 'publish' || $this->type == 'notice') {
+                $this->postFilter .= $this->getPublishDateHtml();
+            }
+            if ($this->type == 'sched') {
+                $this->postFilter .= $this->getSchedDateHtml();
+            }
         }
 
         $this->postFilter .= '<div class="form-group">';

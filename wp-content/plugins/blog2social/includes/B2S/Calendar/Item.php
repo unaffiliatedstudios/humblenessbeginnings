@@ -6,6 +6,7 @@ require_once (B2S_PLUGIN_DIR . 'includes/Util.php');
 class B2S_Calendar_Item {
 
     private $sched_date = null;
+    private $publish_date = null;
     private $network_id = null;
     private $post_title = null;
     private $post_type = null;
@@ -25,12 +26,15 @@ class B2S_Calendar_Item {
     private $post_for_relay = null;
     private $post_for_approve = null;
     private $relay_delay_min = null;
+    private $publish_link = null;
+    private $status = null;
 
     public function __construct(\StdClass $data = null) {
         if (isset($data)) {
             $this
                     ->setSchedData($data->sched_data)
                     ->setSchedDate($data->sched_date)
+                    ->setPublishDate($data->publish_date)
                     ->setNetworkId($data->network_id)
                     ->setPostTitle($data->post_title)
                     ->setPostType($data->post_type)
@@ -45,9 +49,11 @@ class B2S_Calendar_Item {
                     ->setImageUrl($data->image_url)
                     ->setRelayPrimaryPostId($data->relay_primary_post_id)
                     ->setPostForRelay($data->post_for_relay)
-                    ->setPostForApprove($data->post_for_approve);
+                    ->setPostForApprove($data->post_for_approve)
+                    ->setStatus($data->publish_error_code)
+                    ->setPublishLink($data->publish_link);
 
-            if ($data->network_id == 1 || $data->network_id == 2) {
+            if ($data->network_id == 1 || $data->network_id == 2 || $data->network_id == 3) {
                 $this->setPostFormat();
             }
             if ($data->network_id == 2 && isset($data->relay_primary_sched_date)) {
@@ -55,6 +61,14 @@ class B2S_Calendar_Item {
                 $this->setRelayDelayMin($data->relay_delay_min);
             }
         }
+    }
+    
+    public function setPublishLink($value){
+        $this->publish_link = trim($value);
+        return $this;
+    }
+    public function getPublishLink(){
+        return $this->publish_link ;
     }
 
     public function setPostForRelay($value) {
@@ -109,7 +123,7 @@ class B2S_Calendar_Item {
     public function setSchedDate($value) {
         if (is_numeric($value) || is_null($value)) {
             $this->sched_date = $value;
-        } else if (is_string($value)) {
+        } else if (is_string($value) && $value !="0000-00-00 00:00:00") {
             $this->sched_date = strtotime($value);
         }
 
@@ -121,6 +135,26 @@ class B2S_Calendar_Item {
      */
     public function getSchedDate() {
         return $this->sched_date;
+    }
+    
+    /**
+     * @param integer $value
+     * @return $this
+     */
+    public function setPublishDate($value) {
+        if (is_numeric($value) || is_null($value)) {
+            $this->publish_date= $value;
+        } else if (is_string($value) && $value !="0000-00-00 00:00:00") {
+            $this->publish_date = strtotime($value);
+        }
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPublishDate() {
+        return $this->publish_date;
     }
 
     /**
@@ -430,6 +464,23 @@ class B2S_Calendar_Item {
 
         return $res;
     }
+    
+    public function setStatus($error = "") {
+        if(!empty($error)){
+            $this->status = "error";
+        } else {
+            if($this->sched_date == null && $this->publish_date != null){
+                $this->status = "published";
+            } else {
+                $this->status = "scheduled";
+            }
+        }
+        return $this;
+    }
+    
+    public function getStaus() {
+        return $this->status;
+    }
 
     private function getColor() {
         $colors = ["#983b3b", "#79B232", "#983b7d", "#3b3b98", "#3b8e98", "#65983b", "#6b3b98", "#93983b", "#987d3b", "#985c3b"];
@@ -450,11 +501,12 @@ class B2S_Calendar_Item {
      * @return array
      */
     public function asCalendarArray() {
+                
         return ["title" => $this->getPostTitle(),
             "post_type" => $this->getPostType(),
             "avatar" => $this->getAvatar(),
             "author" => $this->getAuthor(),
-            "start" => date("Y-m-d H:i:s", $this->getSchedDate()),
+            "start" => (($this->getSchedDate() != null && (int) $this->getSchedDate() > 0) ? date("Y-m-d H:i:s", $this->getSchedDate()) : (($this->getPublishDate() != null &&  (int)$this->getPublishDate() > 0) ? date("Y-m-d H:i:s", $this->getPublishDate()) : date("Y-m-d H:i:s"))),
             "color" => $this->getColor(),
             "network_name" => $this->getNetworkName(),
             "network_id" => $this->getNetworkId(),
@@ -467,7 +519,9 @@ class B2S_Calendar_Item {
             "b2s_id" => $this->getB2SId(),
             "post_id" => $this->getPostId(),
             "user_timezone" => $this->getUserTimezone(),
-            "profile" => $this->getNetworkDisplayName()];
+            "profile" => $this->getNetworkDisplayName(),
+            "status" => $this->getStaus(),
+            "publish_link" => $this->getPublishLink()];
     }
 
     /**

@@ -16,6 +16,8 @@ $isPremiumInfo = (B2S_PLUGIN_USER_VERSION == 0) ? 'b2s-btn-disabled' : '';
 </div>
 <hr class="pull-left">
 
-<div class="hidden-lg hidden-md hidden-sm filterShow"><a href="#" onclick="showFilter('show');return false;"><i class="glyphicon glyphicon-chevron-down"></i><?php _e('filter', 'blog2social') ?></a></div>
-<div class="hidden-lg hidden-md hidden-sm filterHide"><a href="#" onclick="showFilter('hide');return false;"><i class="glyphicon glyphicon-chevron-up"></i><?php _e('filter', 'blog2social') ?></a></div>
-<!--Navbar Ende-->
+<?php if ($getPage != 'blog2social-curation') { ?>
+    <div class="hidden-lg hidden-md hidden-sm filterShow"><a href="#" onclick="showFilter('show');return false;"><i class="glyphicon glyphicon-chevron-down"></i><?php _e('filter', 'blog2social') ?></a></div>
+    <div class="hidden-lg hidden-md hidden-sm filterHide"><a href="#" onclick="showFilter('hide');return false;"><i class="glyphicon glyphicon-chevron-up"></i><?php _e('filter', 'blog2social') ?></a></div>
+    <!--Navbar Ende-->
+<?php } 

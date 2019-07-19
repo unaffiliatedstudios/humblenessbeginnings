@@ -6,8 +6,21 @@ jQuery(document).ready(function () {
         editable: false,
         locale: b2s_calendar_locale,
         eventLimit: 2,
-        contentHeight: 340,
+        contentHeight: 475,
         timeFormat: 'H:mm',
+        customButtons: {
+            showall: {
+                text: 'show full calendar',
+                click: function () {
+                    window.open('admin.php?page=blog2social-calendar',"_self");
+                }
+            }
+        },
+        header: {
+            left: 'title',
+            center: '',
+            right: 'showall today prev,next'
+        },
         eventSources: ajaxurl + '?action=b2s_get_calendar_events&filter_network_auth=all&filter_network=all',
         eventRender: function (event, element) {
             show = true;
@@ -42,8 +55,6 @@ jQuery(document).ready(function () {
         }
     });
 
-    getWidgetFaq();
-
     drawBasic();
 
     jQuery('#b2s-activity-date-picker').b2sdatepicker({
@@ -54,12 +65,7 @@ jQuery(document).ready(function () {
     jQuery('#b2s-activity-date-picker').on("selectDate", function () {
         setTimeout(drawBasic);
     });
-
     getWidgetContent();
-
-
-
-
 });
 
 /* EMail-Widget */
@@ -89,50 +95,10 @@ jQuery(document).on('click', '.b2s-post-btn', function () {
     var target = jQuery(".b2s-post");
     if (target.length) {
         jQuery('html,body').animate({
-            scrollTop: target.offset().top - 100
+            scrollTop: target.offset().top - 50
         }, 1000);
     }
 });
-
-/* FAQ-Widget */
-//jQuery(window).on("load", function () {
-function getWidgetFaq() {
-    jQuery('.b2s-faq-area').show();
-    if (typeof wp.heartbeat == "undefined") {
-        jQuery('#b2s-heartbeat-fail').show();
-    }
-
-    var legacyMode = jQuery('#isLegacyMode').val();
-    if (legacyMode == "1") {
-        legacyMode = false; // loading is sync (stack)
-    } else {
-        legacyMode = true; // loading is async (parallel)
-    }
-
-    jQuery.ajax({
-        url: ajaxurl,
-        type: "POST",
-        dataType: "json",
-        async: legacyMode,
-        cache: false,
-        data: {
-            'action': 'b2s_get_faq_entries'
-        },
-        error: function () {
-            jQuery('.b2s-faq-area').hide();
-            return false;
-        },
-        success: function (data) {
-            if (data.result == true) {
-                jQuery('.b2s-loading-area-faq').hide();
-                jQuery('.b2s-faq-content').html(data.content);
-            } else {
-                jQuery('.b2s-faq-area').hide();
-            }
-        }
-    });
-}
-//});
 
 /* Content-Widget */
 function getWidgetContent() {
@@ -146,7 +112,6 @@ function getWidgetContent() {
         } else {
             legacyMode = true; // loading is async (parallel)
         }
-
         jQuery.ajax({
             url: ajaxurl,
             type: "GET",

@@ -10,6 +10,7 @@ class B2S_Post_Item {
     protected $searchAuthorId;
     protected $searchPostStatus;
     protected $searchShowByDate;
+    protected $searchShowByNetwork;
     protected $searchPublishDate;
     protected $searchSchedDate;
     protected $searchPostTitle;
@@ -23,7 +24,7 @@ class B2S_Post_Item {
     public $currentPage = 0;
     public $type;
 
-    function __construct($type = 'all', $title = "", $authorId = "", $postStatus = "", $publishDate = '', $schedDate = '', $showByDate = '', $userAuthId = 0, $blogPostId = 0, $currentPage = 0, $postCat = "", $postType = "", $userLang = "en", $results_per_page = B2S_PLUGIN_POSTPERPAGE) {
+    function __construct($type = 'all', $title = "", $authorId = "", $postStatus = "", $publishDate = '', $schedDate = '', $showByDate = '', $showByNetwork = 0, $userAuthId = 0, $blogPostId = 0, $currentPage = 0, $postCat = "", $postType = "", $userLang = "en", $results_per_page = B2S_PLUGIN_POSTPERPAGE) {
         $this->type = $type;
         $this->searchPostTitle = $title;
         $this->searchAuthorId = $authorId;
@@ -31,6 +32,7 @@ class B2S_Post_Item {
         $this->searchPublishDate = $publishDate;
         $this->searchSchedDate = $schedDate;
         $this->searchShowByDate = $showByDate;
+        $this->searchShowByNetwork = $showByNetwork;
         $this->searchUserAuthId = $userAuthId;
         $this->searchBlogPostId = $blogPostId;
         $this->currentPage = $currentPage;
@@ -73,8 +75,6 @@ class B2S_Post_Item {
             $leftJoin2 = "LEFT JOIN $wpdb->term_taxonomy ON $wpdb->term_taxonomy.`term_taxonomy_id` = $wpdb->term_relationships.`term_taxonomy_id`";
             $leftJoinWhere = "AND  $wpdb->term_taxonomy.`term_id` = " . $this->searchPostCat;
         }
-
-
 
         if (!empty($this->searchPostStatus)) {
             $addSearchType = $wpdb->prepare(' posts.`post_status` = %s', $this->searchPostStatus);
@@ -138,21 +138,25 @@ class B2S_Post_Item {
                 } else {
                     $addWhere = ($this->type == 'notice') ? ' AND a.`publish_error_code` != "" ' : ' AND a.`publish_error_code` = "" ';
                     $where = ($this->type == 'publish' || $this->type == 'notice') ? " a.`hide` = 0 AND a.`post_for_approve`= 0 AND (a.`sched_date`= '0000-00-00 00:00:00' OR a.`sched_type` = 3) $addWhere $addNotAdminPosts GROUP BY a.`post_id` ORDER BY a.`publish_date` " . $sortType : " a.`hide` = 0 AND ((a.`sched_date_utc` != '0000-00-00 00:00:00' AND a.`post_for_approve` = 0) OR (a.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND a.`post_for_approve` = 1)) AND a.`sched_type` != 3 AND a.`publish_date`= '0000-00-00 00:00:00' $addNotAdminPosts GROUP BY a.`post_id` ORDER BY a.`sched_date` " . $sortType;
-                    $orderBy = ($this->type == 'publish' || $this->type == 'notice') ? " ORDER BY filter.`publish_date` " . $sortType : " ORDER BY filter.`sched_date` " . $sortType;
+                    $orderBy = ($this->type == 'publish' || $this->type == 'notice') ? " ORDER BY filter.max_publish_date " . $sortType : " ORDER BY filter.`sched_date` " . $sortType;
                     $addSearchBlogPostId = ((int) $this->searchBlogPostId != 0) ? " a.`post_id` = " . (int) $this->searchBlogPostId . " AND " : '';
                     $addSearchShowByDate = (!empty($this->searchShowByDate)) ? (($this->type == 'publish' || $this->type == 'notice') ? " DATE_FORMAT(a.`publish_date`,'%Y-%m-%d') = '" . $this->searchShowByDate . "' AND " : " DATE_FORMAT(a.`sched_date`,'%Y-%m-%d') = '" . $this->searchShowByDate . "' AND ") : '';
-                    $select = ($this->type == 'publish' || $this->type == 'notice') ? 'filter.`blog_user_id`, filter.`publish_date`' : 'filter.`blog_user_id`, filter.`sched_date`';
-                    $selectInnerJoin = ($this->type == 'publish' || $this->type == 'notice') ? '`publish_date`' : '`sched_date`';
+                    $select = ($this->type == 'publish' || $this->type == 'notice') ? 'filter.`blog_user_id`, filter.max_publish_date' : 'filter.`blog_user_id`, filter.`sched_date`';
+                    $selectInnerJoin = ($this->type == 'publish' || $this->type == 'notice') ? 'MAX(a.`publish_date`) as max_publish_date' : '`sched_date`';
                 }
                 $addInnerJoinLeftJoin = ((int) $this->searchUserAuthId != 0) ? ' LEFT JOIN b2s_posts_network_details b ON b.`id` = a.`network_details_id` ' : '';
                 $addInnnerJoinLeftJoinWhere = ((int) $this->searchUserAuthId != 0) ? ' b.`network_auth_id` =' . $this->searchUserAuthId . ' AND ' : '';
+
+                $addInnerJoinLeftJoinNetwork = ((int) $this->searchShowByNetwork != 0 && empty($addInnerJoinLeftJoin)) ? ' LEFT JOIN b2s_posts_network_details b ON b.`id` = a.`network_details_id` ' : '';
+                $addInnnerJoinLeftJoinWhereNetwork = ((int) $this->searchShowByNetwork != 0) ? ' b.`network_id` =' . $this->searchShowByNetwork . ' AND ' : '';
+
 
                 $sqlPosts = "SELECT posts.`ID`, posts.`post_author`,posts.`post_type`,posts.`post_title`, " . $select . ", filter.`id`
                             FROM `$wpdb->posts` posts $leftJoin $leftJoin2
                                 INNER JOIN(
                                         SELECT a.`id`,$selectInnerJoin, a.`blog_user_id`, a.`post_id`
-                                            FROM `b2s_posts` a $addInnerJoinLeftJoin
-                                                  WHERE $addInnnerJoinLeftJoinWhere $addSearchBlogPostId $addSearchShowByDate $where
+                                            FROM `b2s_posts` a $addInnerJoinLeftJoin $addInnerJoinLeftJoinNetwork
+                                                  WHERE $addInnnerJoinLeftJoinWhere $addInnnerJoinLeftJoinWhereNetwork $addSearchBlogPostId $addSearchShowByDate $where
                                          ) filter
                                      ON posts.`ID` = filter.`post_id`
                              WHERE $addSearchType $addSearchAuthorId $addSearchPostTitle AND $postTypes $leftJoinWhere $orderBy
@@ -178,8 +182,8 @@ class B2S_Post_Item {
                             FROM `$wpdb->posts` posts $leftJoin $leftJoin2
                                 INNER JOIN(
                                         SELECT a.`post_id`, a.`sched_date`
-                                            FROM `b2s_posts` a $addInnerJoinLeftJoin
-                                                 WHERE $addInnnerJoinLeftJoinWhere $addSearchShowByDate $where 
+                                            FROM `b2s_posts` a $addInnerJoinLeftJoin $addInnerJoinLeftJoinNetwork
+                                                 WHERE $addInnnerJoinLeftJoinWhere $addInnnerJoinLeftJoinWhereNetwork $addSearchShowByDate $where 
                                          ) filter
                                      ON posts.`ID` = filter.`post_id`
                              WHERE $addSearchType $addSearchAuthorId $addSearchPostTitle AND $postTypes $leftJoinWhere";
@@ -200,6 +204,26 @@ class B2S_Post_Item {
                     }
                 }
             }
+        }
+
+        if ($this->type == 'draft') {
+            $sqlPosts = "SELECT posts.`ID`, posts.`post_author`, posts.`post_date`, posts.`post_type`, posts.`post_status`, posts.`post_title`, posts.`post_content`, posts.`guid` 
+		FROM `$wpdb->posts` posts $leftJoin $leftJoin2 
+                LEFT JOIN b2s_posts ON posts.ID = b2s_posts.post_id 
+		WHERE (posts.`post_type` LIKE '%b2s_ex_post%')
+                AND b2s_posts.post_id IS NULL 
+                $addSearchAuthorId $addSearchPostTitle $addNotAdmin $leftJoinWhere 
+		ORDER BY `" . $order . "` " . $sortType . "
+                LIMIT " . (($this->currentPage - 1) * $this->results_per_page) . "," . $this->results_per_page;
+            $this->postData = $wpdb->get_results($sqlPosts);
+            
+            $sqlPostsTotal = "SELECT COUNT(*)
+		FROM `$wpdb->posts` posts $leftJoin $leftJoin2 
+                LEFT JOIN b2s_posts ON posts.ID = b2s_posts.post_id 
+		WHERE (posts.`post_type` LIKE '%b2s_ex_post%')
+                AND b2s_posts.post_id IS NULL 
+                $addSearchAuthorId $addSearchPostTitle $addNotAdmin $leftJoinWhere";
+            $this->postTotal = $wpdb->get_var($sqlPostsTotal);
         }
     }
 
@@ -243,7 +267,7 @@ class B2S_Post_Item {
                                         <div class="media-body">
                                                 <strong><a target="_blank" href="' . get_permalink($var->ID) . '">' . $postTitle . '</a></strong>
                                             <span class="pull-right b2s-publish-btn">
-                                                <a class="btn btn-success btn-sm publishPostBtn" href="admin.php?page=blog2social-ship&postId=' . $var->ID . (!empty($selectSchedDate) ? '&schedDate=' . $selectSchedDate : '') . '">' . __('Share on Social Media', 'blog2social') . '</a>
+                                                <a class="btn btn-primary btn-sm publishPostBtn" href="admin.php?page=blog2social-ship&postId=' . $var->ID . (!empty($selectSchedDate) ? '&schedDate=' . $selectSchedDate : '') . '">' . __('Share on Social Media', 'blog2social') . '</a>
                                             </span>
                                             <p class="info hidden-xs">#' . $var->ID . ' | ' . __('Author', 'blog2social') . ' <a href="' . get_author_posts_url($var->post_author) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> | ' . $postStatus[trim(strtolower($var->post_status))] . ' ' . __('on blog', 'blog2social') . ': ' . B2S_Util::getCustomDateFormat($var->post_date, substr(B2S_LANGUAGE, 0, 2)) . $lastPublish . '</p>
                                         </div>
@@ -262,7 +286,7 @@ class B2S_Post_Item {
                                                     <div class="pull-left media-nav">
                                                             <strong><a target="_blank" href="' . get_permalink($var->ID) . '">' . $postTitle . '</a></strong>' . $curated . '
                                                         <span class="pull-right">
-                                                        <a class="btn btn-success hidden-xs btn-sm" href="admin.php?page=blog2social-ship&postId=' . $var->ID . '">' . __('Re-share this post', 'blog2social') . '</a>
+                                                        <a class="btn btn-primary hidden-xs btn-sm" href="admin.php?page=blog2social-ship&postId=' . $var->ID . '">' . __('Re-share this post', 'blog2social') . '</a>
                                                             <button type="button" class="btn btn-primary btn-sm b2sDetailsPublishPostBtn" data-search-date="' . $this->searchShowByDate . '" data-post-id="' . $var->ID . '"><i class="glyphicon glyphicon-chevron-down"></i> ' . __('Details', 'blog2social') . '</button>
                                                         </span>
                                                         <p class="info hidden-xs"><a class="b2sDetailsPublishPostTriggerLink" href="#"><span class="b2s-publish-count" data-post-id="' . $var->ID . '">' . $countPublish . '</span> ' . __('shared social media posts', 'blog2social') . '</a> | ' . __('latest share by', 'blog2social') . ' <a href="' . get_author_posts_url($var->blog_user_id) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> ' . B2S_Util::getCustomDateFormat($lastPublish, substr(B2S_LANGUAGE, 0, 2)) . '</p>
@@ -287,7 +311,7 @@ class B2S_Post_Item {
                                                     <div class="pull-left media-head">
                                                             <strong><a target="_blank" href="' . get_permalink($var->ID) . '">' . $postTitle . '</a></strong>' . $curated . '
                                                         <span class="pull-right">
-                                                            <button type="button" class="btn btn-primary btn-sm b2sDetailsSchedPostBtn" data-search-date="' . $this->searchShowByDate . '" data-post-id="' . $var->ID . '"><i class="glyphicon glyphicon-chevron-down"></i> ' . __('Details', 'blog2social') . '</button>
+                                                            <button type="button" class="btn btn-primary btn-sm b2sDetailsSchedPostBtn" data-search-network="' . $this->searchShowByNetwork . '" data-search-date="' . $this->searchShowByDate . '" data-post-id="' . $var->ID . '"><i class="glyphicon glyphicon-chevron-down"></i> ' . __('Details', 'blog2social') . '</button>
                                                         </span>
                                                         <p class="info hidden-xs"><a class="b2sDetailsSchedPostTriggerLink" href="#"><span class="b2s-sched-count" data-post-id="' . $var->ID . '">' . $schedPublish . '</span> ' . __('scheduled social media posts', 'blog2social') . '</a> | ' . __('next share by', 'blog2social') . ' <a href="' . get_author_posts_url($var->blog_user_id) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> ' . B2S_Util::getCustomDateFormat($nextSched, substr(B2S_LANGUAGE, 0, 2)) . '</p>
                                                     </div>
@@ -320,6 +344,27 @@ class B2S_Post_Item {
                                          </div>
                                     </li>';
             }
+
+            if ($this->type == 'draft') {
+                $browser = (get_post_meta($var->ID, "b2s_source", true) == "b2s_browser_extension") ? ' - <strong>' . __('via Browser-Extension', 'blog2social') . '</strong>' : '';
+                $userInfo = get_user_meta($var->post_author);
+                $lastPublish = $this->getLastPublish($var->ID);
+                $lastPublish = ($lastPublish != false) ? ' | ' . __('last shared on social media', 'blog2social') . ' ' . B2S_Util::getCustomDateFormat($lastPublish, substr(B2S_LANGUAGE, 0, 2)) : '';
+                $url = (!empty($browser)) ? get_post_meta($var->ID, "b2s_original_url", true) : $var->guid;
+
+                $this->postItem .= '<li class="list-group-item">
+                                <div class="media">
+                                    <img class="post-img-10 pull-left hidden-xs" src="' . plugins_url('/assets/images/b2s/' . $postType . '-icon.png', B2S_PLUGIN_FILE) . '" alt="posttype">
+                                        <div class="media-body">
+                                                <strong><a target="_blank" href="' . $url . '">' . $postTitle . '</a></strong>' . $browser . '
+                                            <span class="pull-right b2s-publish-btn">
+                                                <a class="btn btn-primary btn-sm publishPostBtn" href="admin.php?page=blog2social-curation&postId=' . $var->ID . '&url=' . urlencode($url) . '&title=' . urlencode($var->post_title) . '&comment=' . urlencode($var->post_content) . '">' . __('Share on Social Media', 'blog2social') . '</a>
+                                            </span>
+                                            <p class="info hidden-xs">#' . $var->ID . ' | ' . __('Author', 'blog2social') . ' <a href="' . get_author_posts_url($var->post_author) . '">' . (isset($userInfo['nickname'][0]) ? $userInfo['nickname'][0] : '-') . '</a> | ' . __('saved', 'blog2social') . ': ' . B2S_Util::getCustomDateFormat($var->post_date, substr(B2S_LANGUAGE, 0, 2)) . $lastPublish . '</p>
+                                        </div>
+                                    </div>
+                                </li>';
+            }
         }
 
         return html_entity_decode($this->postItem, ENT_COMPAT, 'UTF-8');
@@ -331,6 +376,8 @@ class B2S_Post_Item {
             $addNotAdmin = (B2S_PLUGIN_ADMIN == false) ? $wpdb->prepare(' AND posts.`blog_user_id` = %d', B2S_PLUGIN_BLOG_USER_ID) : '';
             $addLeftJoin = ((int) $this->searchUserAuthId != 0) ? ' LEFT JOIN b2s_posts_network_details details ON details.`id` = posts.`network_details_id` ' : '';
             $addLeftJoinWhere = ((int) $this->searchUserAuthId != 0) ? ' details.`network_auth_id` =' . $this->searchUserAuthId . ' AND ' : '';
+            $addLeftJoinNetwork = ((int) $this->searchShowByNetwork != 0 && empty($addLeftJoin)) ? ' LEFT JOIN b2s_posts_network_details details ON details.`id` = posts.`network_details_id` ' : '';
+            $addLeftJoinWhereNetwork = ((int) $this->searchShowByNetwork != 0) ? ' details.`network_id` =' . $this->searchShowByNetwork . ' AND ' : '';
 
             if ($this->type == 'approve') {
                 $addSearchShowByDate = (!empty($this->searchShowByDate)) ? " (DATE_FORMAT(posts.publish_date,'%Y-%m-%d') = '" . $this->searchShowByDate . "' OR DATE_FORMAT(posts.sched_date,'%Y-%m-%d') = '" . $this->searchShowByDate . "') AND " : '';
@@ -340,8 +387,7 @@ class B2S_Post_Item {
                 $addWhere = ($this->type == 'notice') ? ' AND posts.`publish_error_code` != "" ' : ' AND posts.`publish_error_code` = "" ';
                 $where = ($this->type == 'publish' || $this->type == 'notice') ? " (posts.`sched_date` = '0000-00-00 00:00:00' OR posts.`sched_type` = 3) AND posts.`post_for_approve`= 0 " . $addWhere : " posts.`sched_type` != 3 AND posts.`publish_date` = '0000-00-00 00:00:00' AND ((posts.`sched_date_utc` != '0000-00-00 00:00:00' AND posts.`post_for_approve` = 0) OR (posts.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND posts.`post_for_approve` = 1)) ";
             }
-
-            $sqlPostsTotal = "SELECT COUNT(posts.`post_id`) FROM `b2s_posts` posts $addLeftJoin WHERE $addLeftJoinWhere $where $addNotAdmin $addSearchShowByDate AND posts.`hide` = 0 AND posts.`post_id` = " . $post_id;
+            $sqlPostsTotal = "SELECT COUNT(posts.`post_id`) FROM `b2s_posts` posts $addLeftJoin $addLeftJoinNetwork WHERE $addLeftJoinWhere $addLeftJoinWhereNetwork $where $addNotAdmin $addSearchShowByDate AND posts.`hide` = 0 AND posts.`post_id` = " . $post_id;
             return $wpdb->get_var($sqlPostsTotal);
         }
         return 0;
@@ -493,7 +539,7 @@ class B2S_Post_Item {
             global $wpdb;
             $addNotAdminPosts = (!B2S_PLUGIN_ADMIN) ? (' AND blog_user_id =' . B2S_PLUGIN_BLOG_USER_ID) : '';
             $addSearchShowByDate = (!empty($showByDate)) ? " AND (DATE_FORMAT(`b2s_posts`.`sched_date`,'%%Y-%%m-%%d') = '" . $showByDate . "' OR DATE_FORMAT(`b2s_posts`.`publish_date`,'%%Y-%%m-%%d') = '" . $showByDate . "') " : '';
-            $sqlData = $wpdb->prepare("SELECT `b2s_posts`.`id`, `b2s_posts`.`post_id`, `b2s_posts`.`blog_user_id`, `b2s_posts`.`sched_date`,`b2s_posts`.`publish_date`,`b2s_posts_network_details`.`network_id`,`b2s_posts_network_details`.`network_type`, `b2s_posts_network_details`.`network_auth_id`, `b2s_posts_network_details`.`network_display_name`, `b2s_posts_sched_details`.`sched_data` FROM `b2s_posts` LEFT JOIN `b2s_posts_network_details` ON `b2s_posts`.`network_details_id` = `b2s_posts_network_details`.`id` LEFT JOIN `b2s_posts_sched_details` ON `b2s_posts`.`sched_details_id` = `b2s_posts_sched_details`.`id` WHERE `b2s_posts`.`hide` = 0 AND `b2s_posts`.`post_for_approve` = 1 AND (`b2s_posts`.`publish_date` != '0000-00-00 00:00:00' OR `b2s_posts`.`sched_date_utc` <= '" . gmdate('Y-m-d H:i:s') . "') $addNotAdminPosts $addSearchShowByDate AND `b2s_posts`.`post_id` = %d ORDER BY `b2s_posts`.`sched_date` ASC,`b2s_posts`.`publish_date` ASC", $post_id);
+            $sqlData = $wpdb->prepare("SELECT `b2s_posts`.`id`, `b2s_posts`.`post_id`, `b2s_posts`.`blog_user_id`, `b2s_posts`.`sched_date`,`b2s_posts`.`publish_date`,`b2s_posts_network_details`.`network_id`,`b2s_posts_network_details`.`network_type`, `b2s_posts_network_details`.`network_auth_id`, `b2s_posts_network_details`.`network_display_name`, `b2s_posts_sched_details`.`sched_data` FROM `b2s_posts` LEFT JOIN `b2s_posts_network_details` ON `b2s_posts`.`network_details_id` = `b2s_posts_network_details`.`id` LEFT JOIN `b2s_posts_sched_details` ON `b2s_posts`.`sched_details_id` = `b2s_posts_sched_details`.`id` WHERE `b2s_posts`.`hide` = 0 AND `b2s_posts`.`post_for_approve` = 1 AND (`b2s_posts`.`publish_date` != '0000-00-00 00:00:00' OR `b2s_posts`.`sched_date_utc` <= '" . gmdate('Y-m-d H:i:s') . "') $addNotAdminPosts $addSearchShowByDate AND `b2s_posts`.`post_id` = %d ORDER BY `b2s_posts`.`sched_date` DESC,`b2s_posts`.`publish_date` DESC", $post_id);
             $result = $wpdb->get_results($sqlData);
             if (!empty($result) && is_array($result)) {
                 $networkType = unserialize(B2S_PLUGIN_NETWORK_TYPE);
@@ -549,13 +595,15 @@ class B2S_Post_Item {
         return false;
     }
 
-    public function getSchedPostDataHtml($post_id = 0, $showByDate = '', $userAuthId = 0) {
+    public function getSchedPostDataHtml($post_id = 0, $showByDate = '', $showByNetwork = 0, $userAuthId = 0) {
         if ($post_id > 0) {
             global $wpdb;
             $addNotAdminPosts = (B2S_PLUGIN_ADMIN == false) ? $wpdb->prepare(' AND `b2s_posts`.`blog_user_id` = %d', B2S_PLUGIN_BLOG_USER_ID) : '';
             $addSearchShowByDate = (!empty($showByDate)) ? " AND DATE_FORMAT(`b2s_posts`.`sched_date`,'%%Y-%%m-%%d') = '" . $showByDate . "' " : '';
+            $addSearchShowByNetwork = ((int) $showByNetwork > 0) ? " AND `b2s_posts_network_details`.`network_id` = '" . $showByNetwork . "' " : '';
             $addSearchUserAuthId = ($userAuthId != 0) ? " AND `b2s_posts_network_details`.`network_auth_id` =" . $userAuthId . " " : '';
-            $sqlData = $wpdb->prepare("SELECT `b2s_posts`.`id`, `b2s_posts`.`post_id`,`blog_user_id`,`last_edit_blog_user_id`,`v2_id`, `sched_date`, `sched_date_utc`, `sched_type`, `relay_primary_post_id`, `b2s_posts_network_details`.`network_id`,`b2s_posts_network_details`.`network_auth_id`,`b2s_posts_network_details`.`network_type`,`b2s_posts_network_details`.`network_display_name` FROM `b2s_posts` LEFT JOIN `b2s_posts_network_details` ON `b2s_posts`.`network_details_id` = `b2s_posts_network_details`.`id` WHERE `b2s_posts`.`hide` = 0 AND ((`b2s_posts`.`sched_date_utc` != '0000-00-00 00:00:00' AND `b2s_posts`.`post_for_approve` = 0) OR (`b2s_posts`.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND `b2s_posts`.`post_for_approve` = 1)) AND `b2s_posts`.`sched_type` != 3  AND `b2s_posts`.`publish_date` = '0000-00-00 00:00:00' $addNotAdminPosts $addSearchShowByDate $addSearchUserAuthId AND `b2s_posts`.`post_id` = %d ORDER BY `b2s_posts`.`sched_date` ASC ", $post_id);
+
+            $sqlData = $wpdb->prepare("SELECT `b2s_posts`.`id`, `b2s_posts`.`post_id`,`blog_user_id`,`last_edit_blog_user_id`,`v2_id`, `sched_date`, `sched_date_utc`, `sched_type`, `relay_primary_post_id`, `b2s_posts_network_details`.`network_id`,`b2s_posts_network_details`.`network_auth_id`,`b2s_posts_network_details`.`network_type`,`b2s_posts_network_details`.`network_display_name` FROM `b2s_posts` LEFT JOIN `b2s_posts_network_details` ON `b2s_posts`.`network_details_id` = `b2s_posts_network_details`.`id` WHERE `b2s_posts`.`hide` = 0 AND ((`b2s_posts`.`sched_date_utc` != '0000-00-00 00:00:00' AND `b2s_posts`.`post_for_approve` = 0) OR (`b2s_posts`.`sched_date_utc` >= '" . gmdate('Y-m-d H:i:s') . "' AND `b2s_posts`.`post_for_approve` = 1)) AND `b2s_posts`.`sched_type` != 3  AND `b2s_posts`.`publish_date` = '0000-00-00 00:00:00' $addNotAdminPosts $addSearchShowByDate $addSearchShowByNetwork $addSearchUserAuthId AND `b2s_posts`.`post_id` = %d ORDER BY `b2s_posts`.`sched_date` ASC ", $post_id);
             $result = $wpdb->get_results($sqlData);
             $specialPostingData = array(4 => __('Retweet', 'blog2social'));
             if (!empty($result) && is_array($result)) {

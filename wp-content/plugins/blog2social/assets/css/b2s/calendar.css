@@ -70,6 +70,13 @@ body .fc-time{
     text-transform: uppercase;
     margin: 3px 3px 3px 0px;
 }
+
+.b2s-post-item-network-deprecated {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 3px 3px 3px 0px;
+}
+
 .btn-circle {
     width: 30px;
     height: 30px;
@@ -178,7 +185,7 @@ body .fc-day-grid-event .fc-content{
     width: 100% !important;
 }
 
-.og_title, .og_desc, .card_desc, .card_title, .b2s-post-item-details-item-title-input, .b2s-select{
+.og_title, .og_desc, .card_desc, .card_title, .b2s-post-item-details-item-title-input, .b2s-select, .b2s-select-area{
     margin-bottom: 8px !important;
 }
 
@@ -291,4 +298,12 @@ body .fc-day-grid-event .fc-content{
 
 .img-width-150{
     width: 150px;
+}
+
+.img-thumbnail{
+    display: block !important;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 100%;
 }

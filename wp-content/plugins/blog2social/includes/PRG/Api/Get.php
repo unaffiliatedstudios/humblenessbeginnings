@@ -2,7 +2,7 @@
 
 class PRG_Api_Get {
 
-    public static function get($url = '', $timeout = 30, $header = array("Content-Type:application/x-www-form-urlencoded")) {
+    public static function get($url = '', $header = array("Content-Type:application/x-www-form-urlencoded"), $timeout = 30) {
         if (empty($url)) {
             return false;
         }
